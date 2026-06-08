@@ -538,7 +538,7 @@ async function startCreate() {
 
   try {
     showToast("Chargement de la grille…");
-    state.gridData = await fetchGrid();
+    state.gridData = fetchGrid();
     state.pseudo = pseudo;
     state.myFoundWords = new Set();
 
@@ -587,7 +587,7 @@ async function onRoomUpdate(room) {
   if (room.status === "playing" && !state.gridData) {
     // Joiner: load the grid
     showToast("Chargement de la grille…");
-    state.gridData = await fetchGrid();
+    state.gridData = fetchGrid();
   }
 
   if (room.status === "playing" && qs("#screen-game:not(.active)")) {
