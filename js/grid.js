@@ -1,7 +1,7 @@
 // Fetches the daily grid from franceinfo via a CORS proxy
 // Parses APP_GAME_DATA from the HTML
 
-const PROXY = "https://corsproxy.io/?";
+const PROXY = "https://api.allorigins.win/raw?url=";
 const BASE_URL = "https://jeux.franceinfo.fr/mots-fleches";
 
 export async function fetchGrid(date = null) {
