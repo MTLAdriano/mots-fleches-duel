@@ -1,59 +1,25 @@
-// Fetches the daily grid from franceinfo via a CORS proxy
-// Parses APP_GAME_DATA from the HTML
+// Grilles stockées en local — à mettre à jour manuellement chaque jour
+// Pour ajouter une grille : coller le HTML de franceinfo à Claude, il extrait le JSON
 
-const PROXY = "https://api.allorigins.win/raw?url=";
-const BASE_URL = "https://jeux.franceinfo.fr/mots-fleches";
+const GRIDS = {
+  "2026-06-08": {"id":359,"rows":"16","columns":"13","grid":[{"id":"1","x":"1","y":"1","dir":"RB","def":"Change de trottoir","type":"A","size_word":8},{"id":"2","x":"1","y":"1","dir":"BR","def":"Carte de tarot","type":"A","size_word":6},{"id":"3","x":"3","y":"1","dir":"RB","def":"Relatif au vaccin","type":"A","size_word":8},{"id":"4","x":"3","y":"1","dir":"BB","def":"Très sale","type":"A","size_word":5},{"id":"5","x":"5","y":"1","dir":"RB","def":"Oiseau coloré","type":"A","size_word":4},{"id":"6","x":"7","y":"1","dir":"RB","def":"Curry ou gingembre","type":"A","size_word":5},{"id":"7","x":"9","y":"1","dir":"RB","def":"Exact","type":"A","size_word":7},{"id":"8","x":"9","y":"1","dir":"BB","def":"Souveraine","type":"A","size_word":5},{"id":"9","x":"11","y":"1","dir":"RB","def":"Sandale de plage","type":"A","size_word":4},{"id":"10","x":"13","y":"1","dir":"BB","def":"Privées de parole","type":"A","size_word":7},{"id":"11","x":"7","y":"2","dir":"RR","def":"Il peut être possessif","type":"A","size_word":6},{"id":"12","x":"1","y":"3","dir":"RR","def":"Arme de jet","type":"A","size_word":3},{"id":"13","x":"1","y":"3","dir":"BR","def":"Flasque, sans ressort","type":"A","size_word":6},{"id":"14","x":"5","y":"3","dir":"RR","def":"Alliage résistant","type":"A","size_word":5},{"id":"15","x":"5","y":"3","dir":"BB","def":"Protocole Internet","type":"A","size_word":4},{"id":"16","x":"11","y":"3","dir":"RR","def":"Pas même culotté","type":"A","size_word":2},{"id":"17","x":"11","y":"3","dir":"BB","def":"Cessation","type":"A","size_word":5},{"id":"18","x":"7","y":"4","dir":"RR","def":"Il fait briller","type":"A","size_word":6},{"id":"19","x":"7","y":"4","dir":"BB","def":"Sorbet","type":"A","size_word":5},{"id":"20","x":"1","y":"5","dir":"RR","def":"Décret du roi","type":"A","size_word":4},{"id":"21","x":"1","y":"5","dir":"BR","def":"Os de la tête","type":"A","size_word":7},{"id":"22","x":"6","y":"5","dir":"RR","def":"Importuner","type":"A","size_word":5},{"id":"23","x":"6","y":"5","dir":"BB","def":"Point culminant","type":"A","size_word":6},{"id":"24","x":"12","y":"5","dir":"BB","def":"Il habite Florence","type":"A","size_word":7},{"id":"25","x":"8","y":"6","dir":"RR","def":"Rédige","type":"A","size_word":5},{"id":"26","x":"8","y":"6","dir":"BB","def":"Superlatif absolu","type":"A","size_word":4},{"id":"27","x":"1","y":"7","dir":"BR","def":"Qui est dans le vrai","type":"A","size_word":4},{"id":"28","x":"3","y":"7","dir":"RR","def":"Il attire le poisson","type":"A","size_word":5},{"id":"29","x":"3","y":"7","dir":"BB","def":"Trop-plein","type":"A","size_word":5},{"id":"30","x":"9","y":"7","dir":"RR","def":"Elle domine le corps","type":"A","size_word":4},{"id":"31","x":"9","y":"7","dir":"BB","def":"À cran, nerveuse","type":"A","size_word":7},{"id":"32","x":"5","y":"8","dir":"RR","def":"Teinte jaune brun","type":"A","size_word":4},{"id":"33","x":"5","y":"8","dir":"BB","def":"Long bâton pointu","type":"A","size_word":5},{"id":"34","x":"10","y":"8","dir":"RR","def":"Amoncel- lement","type":"A","size_word":3},{"id":"35","x":"10","y":"8","dir":"BB","def":"Chic et élégant","type":"A","size_word":5},{"id":"36","x":"1","y":"9","dir":"BR","def":"Nettoie en grattant","type":"A","size_word":6},{"id":"37","x":"2","y":"9","dir":"BB","def":"Plus que sensible","type":"A","size_word":7},{"id":"38","x":"4","y":"9","dir":"RR","def":"Grecs aussi","type":"A","size_word":6},{"id":"39","x":"4","y":"9","dir":"BB","def":"Elle vit à Alep","type":"A","size_word":7},{"id":"40","x":"11","y":"9","dir":"BB","def":"Obscurité","type":"A","size_word":7},{"id":"41","x":"13","y":"9","dir":"BB","def":"Tomber (se)","type":"A","size_word":7},{"id":"42","x":"7","y":"10","dir":"RR","def":"Sac à grain","type":"A","size_word":6},{"id":"43","x":"7","y":"10","dir":"BB","def":"Complet","type":"A","size_word":6},{"id":"44","x":"1","y":"11","dir":"RR","def":"Connectée","type":"A","size_word":6},{"id":"45","x":"1","y":"11","dir":"BR","def":"Installée","type":"A","size_word":5},{"id":"46","x":"8","y":"11","dir":"RR","def":"Usée jusqu'à la corde","type":"A","size_word":5},{"id":"47","x":"6","y":"12","dir":"RR","def":"Désolant","type":"A","size_word":7},{"id":"48","x":"6","y":"12","dir":"BB","def":"Aventure intime","type":"A","size_word":4},{"id":"49","x":"1","y":"13","dir":"BR","def":"Monstre au Tibet","type":"A","size_word":4},{"id":"50","x":"3","y":"13","dir":"RR","def":"Coup de golf","type":"A","size_word":4},{"id":"51","x":"3","y":"13","dir":"BB","def":"Intonation","type":"A","size_word":3},{"id":"52","x":"8","y":"13","dir":"RR","def":"et cætera","type":"A","size_word":3},{"id":"53","x":"8","y":"13","dir":"BB","def":"Dialogue à deux","type":"A","size_word":3},{"id":"54","x":"12","y":"13","dir":"BB","def":"Brame au bois","type":"A","size_word":3},{"id":"55","x":"5","y":"14","dir":"RR","def":"Marque du temps sur la peau","type":"A","size_word":4},{"id":"56","x":"10","y":"14","dir":"RR","def":"Cliché médical","type":"A","size_word":3},{"id":"57","x":"10","y":"14","dir":"BB","def":"Il est mis en barres","type":"A","size_word":2},{"id":"58","x":"1","y":"15","dir":"RR","def":"Fin des poursuites","type":"A","size_word":7},{"id":"59","x":"1","y":"15","dir":"BR","def":"Guide de bêtes","type":"A","size_word":4},{"id":"60","x":"9","y":"15","dir":"RR","def":"Déplacée","type":"A","size_word":4},{"id":"61","x":"5","y":"16","dir":"RR","def":"Assurer la descendance","type":"A","size_word":8}]}
+};
 
-export async function fetchGrid(date = null) {
-  // date format: "2026-06-08"
-  const targetDate = date || getTodayDate();
+export function fetchGrid(date = null) {
+  const today = date || new Date().toISOString().split("T")[0];
   
-  // Try to get the archive URL for the specific date
-  const url = date
-    ? await findArchiveUrl(targetDate)
-    : BASE_URL;
-
-  const res = await fetch(PROXY + encodeURIComponent(url));
-  const html = await res.text();
-  return parseGameData(html, targetDate);
-}
-
-function getTodayDate() {
-  return new Date().toISOString().split("T")[0];
-}
-
-async function findArchiveUrl(date) {
-  // The listing page contains links to each day's grid
-  const listUrl = `${BASE_URL}/classique/archives`;
-  try {
-    const res = await fetch(PROXY + encodeURIComponent(listUrl));
-    const html = await res.text();
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, "text/html");
-    // Find link matching the date
-    const links = [...doc.querySelectorAll("a[href*='mots-fleches']")];
-    const match = links.find(l => l.href.includes(date.replace(/-/g, "-")));
-    if (match) return "https://jeux.franceinfo.fr" + match.getAttribute("href");
-  } catch (e) {
-    console.warn("Archive lookup failed, using base URL", e);
+  // Cherche la grille du jour, sinon la plus récente
+  let data = GRIDS[today];
+  let usedDate = today;
+  
+  if (!data) {
+    usedDate = Object.keys(GRIDS).sort().reverse()[0];
+    data = GRIDS[usedDate];
+    console.warn(`Grille du ${today} non disponible, utilisation du ${usedDate}`);
   }
-  return BASE_URL;
-}
-
-export function parseGameData(html, date) {
-  // Extract APP_GAME_DATA JSON from the script tag
-  const match = html.match(/var APP_GAME_DATA = JSON\.parse\('(.+?)'\);/s);
-  if (!match) throw new Error("APP_GAME_DATA not found in page");
-
-  // Decode the unicode-escaped JSON string
-  const raw = match[1]
-    .replace(/\\u([0-9a-fA-F]{4})/g, (_, code) => String.fromCharCode(parseInt(code, 16)))
-    .replace(/\\'/g, "'");
-
-  const data = JSON.parse(raw);
 
   return {
-    date,
+    date: usedDate,
     id: data.id,
     rows: parseInt(data.rows),
     cols: parseInt(data.columns),
@@ -61,8 +27,8 @@ export function parseGameData(html, date) {
       id: parseInt(cell.id),
       x: parseInt(cell.x),
       y: parseInt(cell.y),
-      dir: cell.dir,       // RB=right then down, BR=down then right, RR=right, BB=down
-      def: cell.def,       // La définition
+      dir: cell.dir,
+      def: cell.def,
       size: cell.size_word
     })),
     totalWords: data.grid.length
