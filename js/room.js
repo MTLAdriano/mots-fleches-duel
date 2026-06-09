@@ -72,8 +72,8 @@ export async function joinRoom({ roomId, uid, pseudo }) {
   // Already player1? Just reconnect
   if (room.player1 === uid) return room;
 
-  // Join as player2
-  await updateDoc(roomRef, { player2: uid, status: "playing", startedAt: serverTimestamp() });
+  // Join as player2 - status reste "waiting", le host lance manuellement
+  await updateDoc(roomRef, { player2: uid });
 
   await setDoc(doc(db, "rooms", roomId, "players", uid), {
     uid, pseudo, score: 0, elo: 1000, completedAt: null, joinedAt: serverTimestamp()
