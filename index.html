@@ -265,6 +265,7 @@ async function doCreate() {
     S.roomId=await createRoom({uid:S.user.uid,pseudo:p,gridData:S.G,mode:S.mode});
     show("waiting"); qs("#cdisp").textContent=S.roomId;
     history.replaceState(null,"",`#room/${S.roomId}`);
+    // S.started reste false → onRoom déclenchera startGame quand status=playing
     S.unsubRoom=listenRoom(S.roomId,onRoom);
   } catch(e){toast("Erreur: "+e.message);console.error(e);}
 }
@@ -290,6 +291,9 @@ async function onRoom(room) {
   }
   if(room.status==="finished"&&qs("#game.active")) endGame(room);
 }
+
+// Pour le joueur 1 (host), on reset S.started à false après création
+// pour qu'il démarre bien quand le joueur 2 rejoint
 
 function startGame(room) {
   show("game"); buildGrid();
@@ -411,16 +415,7 @@ function buildGrid() {
     });
   });
 
-  // Cases sans aucun mot = noires
-  for (let r=1; r<=rows; r++) {
-    for (let c=1; c<=cols; c++) {
-      const s = cell(c,r);
-      if (!s.classList.contains("play") && !s.getAttribute("data-id-x") && !s.getAttribute("data-id-y")) {
-        s.classList.add("black");
-        s.style.cursor="default";
-      }
-    }
-  }
+  // Pas de cases noires dans Mygamify — toutes les cases sont blanches ou DEF
 
   // 4. Événements clic (comme arrowwords.js initGrid)
   qsa(".column").forEach(col => {
