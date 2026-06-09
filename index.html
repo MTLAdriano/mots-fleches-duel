@@ -672,101 +672,87 @@ function onOpponentUpdate(data) {
 // ── GRID RENDERING ─────────────────────────────────────────────────────────
 function renderGrid() {
   const { rows, cols, grid } = state.gridData;
-  const CELL = 56; // plus grand pour mieux voir
+  const CELL = 52;
   const container = qs("#grid-container");
   container.innerHTML = "";
   container.style.width = (cols * CELL) + "px";
   container.style.height = (rows * CELL) + "px";
 
-  // dir "RB" = cette cellule porte 2 defs : une → et une ↓
-  // dir "BR" = cette cellule porte 2 defs : une ↓ et une →
-  // dir "RR" = une def → seulement
-  // dir "BB" = une def ↓ seulement
-  // Les lettres partent DEPUIS la cellule def dans la direction indiquée
+  // Dans les mots fléchés Mygamify :
+  // - (x,y) = cellule de DÉFINITION (case noire avec texte + flèche)
+  // - Les lettres partent depuis (x+dx, y+dy) avec dx/dy selon la direction
+  // - dir "RB" ou "RR" → le mot va vers la droite (dx=1, dy=0)
+  // - dir "BR" ou "BB" → le mot va vers le bas (dx=0, dy=1)
+  // - Une case peut être à la fois DEF et LETTRE (intersection)
 
-  const defCells = {}; // "x,y" -> [{dir, def, id, size}]
-  const letterCells = {}; // "x,y" -> [{wordId, pos, dir}]
+  const defCells = {};   // "x,y" -> [{dir, def, id, size}]
+  const letterCells = {}; // "x,y" -> [{wordId, pos}]
 
-  grid.forEach(word => {
-    const { x, y, dir, def, id, size } = word;
+  grid.forEach(w => {
+    const x = parseInt(w.x), y = parseInt(w.y);
+    const key = `${x},${y}`;
+    if (!defCells[key]) defCells[key] = [];
+    defCells[key].push(w);
 
-    // Enregistre la cellule de définition
-    if (!defCells[`${x},${y}`]) defCells[`${x},${y}`] = [];
-    defCells[`${x},${y}`].push({ dir, def, id, size });
-
-    // Place les lettres dans les bonnes cases
-    // RB : premier mot va → (R), deuxième mot va ↓ (B)
-    // BR : premier mot va ↓ (B), deuxième mot va → (R)
-    // RR : mot va →
-    // BB : mot va ↓
-    const wordDir = getWordDir(dir);
-    const [dx, dy] = wordDir;
-    for (let i = 1; i <= size; i++) {
-      const lx = x + dx * i;
-      const ly = y + dy * i;
-      const key = `${lx},${ly}`;
-      if (!letterCells[key]) letterCells[key] = [];
-      letterCells[key].push({ wordId: id, pos: i - 1, dir: wordDir });
+    const [dx, dy] = w.dir[0] === "R" ? [1, 0] : [0, 1];
+    for (let i = 1; i <= w.size; i++) {
+      const lx = x + dx * i, ly = y + dy * i;
+      const lkey = `${lx},${ly}`;
+      if (!letterCells[lkey]) letterCells[lkey] = [];
+      letterCells[lkey].push({ wordId: w.id, pos: i - 1 });
     }
   });
 
-  // Render toutes les cellules
   for (let row = 1; row <= rows; row++) {
     for (let col = 1; col <= cols; col++) {
       const key = `${col},${row}`;
+      const isDef = !!defCells[key];
+      const isLetter = !!letterCells[key];
       const el = document.createElement("div");
-      el.className = "grid-cell";
-      el.style.cssText = `
-        position:absolute;
-        left:${(col-1)*CELL}px;
-        top:${(row-1)*CELL}px;
-        width:${CELL}px;
-        height:${CELL}px;
-        border:1px solid var(--border);
-        box-sizing:border-box;
-      `;
+      el.style.cssText = `position:absolute;left:${(col-1)*CELL}px;top:${(row-1)*CELL}px;width:${CELL}px;height:${CELL}px;box-sizing:border-box;border:1px solid #c8c0b0;`;
       el.dataset.x = col;
       el.dataset.y = row;
 
-      if (defCells[key]) {
-        // Cellule définition — fond beige, texte petit avec flèches
-        const defs = defCells[key];
-        el.style.background = "var(--paper2)";
-        el.style.cursor = "pointer";
-        el.style.overflow = "hidden";
+      if (isDef) {
+        // Case définition (noire avec texte)
+        el.style.background = "#1a1a1a";
         el.style.padding = "2px";
-        el.dataset.defs = JSON.stringify(defs);
+        el.style.overflow = "hidden";
+        el.style.cursor = "pointer";
+        el.dataset.defs = JSON.stringify(defCells[key]);
 
-        // Affiche jusqu'à 2 définitions dans la case
-        el.innerHTML = defs.map(d => `
-          <div style="font-size:9px;line-height:1.2;font-family:var(--sans);font-weight:600;color:var(--ink);display:flex;justify-content:space-between;align-items:flex-start;gap:2px;">
-            <span style="flex:1;overflow:hidden;">${d.def}</span>
-            <span style="font-size:10px;flex-shrink:0;color:var(--accent)">${dirArrow(d.dir)}</span>
+        const defs = defCells[key];
+        el.innerHTML = defs.map((d, i) => `
+          <div style="display:flex;align-items:flex-start;gap:1px;${i>0?'margin-top:1px;border-top:1px solid #444;padding-top:1px':''}">
+            <span style="flex:1;font-size:7.5px;line-height:1.2;font-family:sans-serif;font-weight:600;color:#fff;word-break:break-word;">${d.def}</span>
+            <span style="font-size:10px;color:#ff6b35;flex-shrink:0;line-height:1;">${dirArrow(d.dir)}</span>
           </div>
-        `).join('<hr style="margin:1px 0;border-color:var(--border)">');
+        `).join("");
 
-        el.addEventListener("click", () => selectDefCell(defs));
+        el.addEventListener("click", () => {
+          const defs = JSON.parse(el.dataset.defs);
+          const unfinished = defs.find(d => !state.myFoundWords.has(d.id));
+          selectWord((unfinished || defs[0]).id);
+        });
 
-      } else if (letterCells[key]) {
-        // Cellule lettre — blanche, grande, cliquable
+      } else if (isLetter) {
+        // Case lettre (blanche)
         el.style.background = "white";
         el.style.cursor = "pointer";
         el.style.display = "flex";
         el.style.alignItems = "center";
         el.style.justifyContent = "center";
-        el.style.fontSize = "18px";
+        el.style.fontSize = "20px";
         el.style.fontWeight = "700";
-        el.style.fontFamily = "var(--mono)";
-        el.style.textTransform = "uppercase";
+        el.style.fontFamily = "monospace";
         el.dataset.words = JSON.stringify(letterCells[key]);
-        // Span pour la lettre
+
         const span = document.createElement("span");
         span.dataset.letter = "true";
         el.appendChild(span);
 
         el.addEventListener("click", () => {
           const words = JSON.parse(el.dataset.words);
-          // Si intersection de 2 mots, toggle entre les deux
           if (words.length > 1 && state.selectedWordId === words[0].wordId) {
             selectWord(words[1].wordId);
           } else {
@@ -775,23 +761,13 @@ function renderGrid() {
         });
 
       } else {
-        // Case noire (ne devrait quasiment pas exister dans ce format)
-        el.style.background = "var(--ink)";
+        // Case vraiment vide (noire pleine)
+        el.style.background = "#1a1a1a";
       }
 
       container.appendChild(el);
     }
   }
-}
-
-// Retourne le vecteur de direction du MOT (pas de la def)
-// RB = def qui pointe → et ↓ mais le MOT associé va →
-// BR = def qui pointe ↓ et → mais le MOT associé va ↓
-// RR = mot va →, BB = mot va ↓
-function getWordDir(dir) {
-  if (dir === "RR" || dir === "RB") return [1, 0]; // →
-  if (dir === "BB" || dir === "BR") return [0, 1]; // ↓
-  return [1, 0];
 }
 
 function dirArrow(dir) {
@@ -802,58 +778,55 @@ function dirArrow(dir) {
   return "→";
 }
 
-function selectDefCell(defs) {
-  const word = defs.find(d => !state.myFoundWords.has(d.id)) || defs[0];
-  selectWord(word.id);
-}
-
 function selectWord(wordId) {
   state.selectedWordId = wordId;
   const word = state.gridData.grid.find(w => w.id === wordId);
   if (!word) return;
 
-  // Reset highlight
-  qsa(".grid-cell").forEach(el => {
-    el.style.background = el.dataset.words ? "white"
-      : el.dataset.defs ? "var(--paper2)"
-      : "var(--ink)";
+  // Reset toutes les cases lettres
+  qsa("[data-words]").forEach(el => {
+    if (!state.myFoundWords.has(parseInt(JSON.parse(el.dataset.words)[0].wordId))) {
+      el.style.background = "white";
+    }
   });
 
-  const { x, y, dir, size } = word;
-  const [dx, dy] = getWordDir(dir);
-
   // Surligne les cases du mot sélectionné
-  for (let i = 1; i <= size; i++) {
+  const x = word.x, y = word.y;
+  const [dx, dy] = word.dir[0] === "R" ? [1, 0] : [0, 1];
+  for (let i = 1; i <= word.size; i++) {
     const cell = getCellEl(x + dx * i, y + dy * i);
-    if (cell) {
-      cell.style.background = state.myFoundWords.has(wordId) ? "#d4edda" : "#fff9e6";
+    if (cell && !state.myFoundWords.has(wordId)) {
+      cell.style.background = "#fff9e6";
     }
   }
 
-  // Surligne la case définition
-  const defCell = getCellEl(x, y);
-  if (defCell) defCell.style.background = "#fef3cd";
-
-  // Update input area
-  qs("#current-def-dir").textContent = `${dirArrow(dir)} · ${size} lettres`;
+  qs("#current-def-dir").textContent = `${dirArrow(word.dir)} · ${word.size} lettres`;
   qs("#current-def-text").textContent = word.def;
   qs("#word-input").value = "";
   qs("#word-input").focus();
 }
 
-// Affiche les lettres trouvées sur la grille
 function updateLettersOnGrid(wordId, answer) {
   const word = state.gridData.grid.find(w => w.id === wordId);
   if (!word) return;
-  const { x, y, dir, size } = word;
-  const [dx, dy] = getWordDir(dir);
-  for (let i = 1; i <= size; i++) {
-    const cell = getCellEl(x + dx * i, y + dy * i);
+  const [dx, dy] = word.dir[0] === "R" ? [1, 0] : [0, 1];
+  for (let i = 1; i <= word.size; i++) {
+    const cell = getCellEl(word.x + dx * i, word.y + dy * i);
     if (cell) {
       const span = cell.querySelector("[data-letter]");
-      if (span && answer[i-1]) span.textContent = answer[i-1];
-      cell.style.background = "#d4edda"; // vert = correct
+      if (span) span.textContent = answer[i - 1] || "";
+      cell.style.background = "#d4edda";
     }
+  }
+}
+
+function markWordFound(wordId) {
+  const word = state.gridData.grid.find(w => w.id === wordId);
+  if (!word) return;
+  const [dx, dy] = word.dir[0] === "R" ? [1, 0] : [0, 1];
+  for (let i = 1; i <= word.size; i++) {
+    const cell = getCellEl(word.x + dx * i, word.y + dy * i);
+    if (cell) cell.style.background = "#d4edda";
   }
 }
 
@@ -861,19 +834,6 @@ function getCellEl(x, y) {
   return qs(`[data-x="${x}"][data-y="${y}"]`);
 }
 
-// Marque visuellement un mot comme trouvé (depuis Firebase sync)
-function markWordFound(wordId) {
-  const word = state.gridData.grid.find(w => w.id === wordId);
-  if (!word) return;
-  const { x, y, dir, size } = word;
-  const [dx, dy] = getWordDir(dir);
-  for (let i = 1; i <= size; i++) {
-    const cell = getCellEl(x + dx * i, y + dy * i);
-    if (cell) cell.style.background = "#d4edda";
-  }
-}
-
-// Stub pour compatibilité
 function shortenDef(def) {
   return def.length > 20 ? def.substring(0, 18) + "…" : def;
 }
