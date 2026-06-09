@@ -7,233 +7,213 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{--bg:#f2f0eb;--white:#fff;--black:#111;--grey:#d0ccc4;--border:#aaa8a0;--blue:#2563eb;--green:#16a34a;--yellow:#fef3c7;--red:#dc2626}
-    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--black);min-height:100dvh;display:flex;flex-direction:column}
-
-    header{background:var(--black);color:#fff;padding:10px 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
-    .logo{font-size:15px;font-weight:800;letter-spacing:-.02em}
-    .logo em{font-style:normal;color:#f97316}
-
-    .screen{display:none;flex:1;flex-direction:column}
-    .screen.active{display:flex}
+    body{font-family:'Inter',sans-serif;background:#f2f0eb;color:#111;min-height:100dvh;display:flex;flex-direction:column}
+    header{background:#111;color:#fff;padding:10px 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+    .logo{font-size:15px;font-weight:800}.logo em{font-style:normal;color:#f97316}
+    .screen{display:none;flex:1;flex-direction:column}.screen.active{display:flex}
 
     /* LOBBY */
     #lobby{align-items:center;justify-content:center;gap:20px;padding:32px 16px}
-    .lobby-title{font-size:clamp(26px,6vw,46px);font-weight:900;text-align:center;letter-spacing:-.04em;line-height:1.05}
-    .lobby-title b{color:var(--blue)}
+    h1.title{font-size:clamp(26px,6vw,46px);font-weight:900;text-align:center;letter-spacing:-.04em;line-height:1.05}
+    h1.title b{color:#2563eb}
     .card{background:white;border-radius:14px;padding:22px;width:100%;max-width:350px;display:flex;flex-direction:column;gap:14px;box-shadow:0 2px 12px rgba(0,0,0,.07)}
     .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#888;margin-bottom:3px}
-    .inp{width:100%;font-size:15px;padding:10px 13px;border:1.5px solid #e5e5e5;border-radius:9px;outline:none;font-family:inherit;background:#fafafa;transition:border-color .15s}
-    .inp:focus{border-color:var(--black);background:white}
+    input.fi{width:100%;font-size:15px;padding:10px 13px;border:1.5px solid #e5e5e5;border-radius:9px;outline:none;font-family:inherit;background:#fafafa;transition:border-color .15s}
+    input.fi:focus{border-color:#111;background:white}
     .modes{display:flex;border:1.5px solid #e5e5e5;border-radius:9px;overflow:hidden}
-    .mode-btn{flex:1;padding:9px;font-size:13px;font-weight:600;border:none;cursor:pointer;background:#f5f5f5;color:#666;font-family:inherit;transition:all .15s}
-    .mode-btn.on{background:var(--black);color:white}
-    .btn{font-family:inherit;font-size:14px;font-weight:700;padding:11px 18px;border-radius:9px;border:none;cursor:pointer;transition:all .15s;width:100%}
-    .btn-dark{background:var(--black);color:white}.btn-dark:hover{background:#333}
-    .btn-blue{background:var(--blue);color:white}
-    .btn-outline{background:white;color:var(--black);border:1.5px solid #e5e5e5}.btn-outline:hover{background:#f5f5f5}
-    .btn-red{background:var(--red);color:white}
+    .mb{flex:1;padding:9px;font-size:13px;font-weight:600;border:none;cursor:pointer;background:#f5f5f5;color:#666;font-family:inherit;transition:all .15s}
+    .mb.on{background:#111;color:white}
+    .btn{font-family:inherit;font-size:14px;font-weight:700;padding:11px 18px;border-radius:9px;border:none;cursor:pointer;transition:all .15s}
+    .btn-d{background:#111;color:white;width:100%}.btn-d:hover{background:#333}
+    .btn-b{background:#2563eb;color:white}
+    .btn-r{background:#dc2626;color:white}
+    .btn-o{background:white;color:#111;border:1.5px solid #e5e5e5}.btn-o:hover{background:#f5f5f5}
     .sep{display:flex;align-items:center;gap:8px;color:#ccc;font-size:12px}.sep::before,.sep::after{content:'';flex:1;height:1px;background:#eee}
-    .join-row{display:flex;gap:8px}.join-row .inp{flex:1;text-transform:uppercase;letter-spacing:.12em;font-size:16px;font-weight:700}
+    .jr{display:flex;gap:8px}.jr input{flex:1;text-transform:uppercase;letter-spacing:.12em;font-size:16px;font-weight:700}
 
     /* WAITING */
     #waiting{align-items:center;justify-content:center;gap:18px;padding:40px 16px;text-align:center}
-    .code-box{font-size:44px;font-weight:900;letter-spacing:.15em;border:3px dashed #ddd;border-radius:14px;padding:18px 32px;background:white}
-    .pulse-txt{color:#888;font-size:14px}.pulse-txt::after{content:'';animation:dots 1.5s infinite}
+    .codebox{font-size:44px;font-weight:900;letter-spacing:.15em;border:3px dashed #ddd;border-radius:14px;padding:18px 32px;background:white}
+    .pulse::after{content:'';animation:dots 1.5s infinite}
     @keyframes dots{0%{content:'.'}33%{content:'..'}66%{content:'...'}}
-    .copy-btn{background:none;border:none;color:var(--blue);font-size:13px;cursor:pointer;text-decoration:underline;font-family:inherit}
+    .cpbtn{background:none;border:none;color:#2563eb;font-size:13px;cursor:pointer;text-decoration:underline;font-family:inherit}
 
     /* GAME */
     #game{overflow:hidden}
-    .game-bar{background:white;border-bottom:1px solid #e5e5e5;padding:7px 14px;display:flex;align-items:center;gap:14px;flex-shrink:0}
-    .timer{font-size:20px;font-weight:800;font-variant-numeric:tabular-nums;min-width:58px}
-    .timer.warn{color:var(--red)}
-    .score-hdr{font-size:13px;color:#666}.score-hdr strong{color:var(--black);font-size:15px}
-    .game-body{display:flex;flex:1;overflow:hidden}
+    .gbar{background:white;border-bottom:1px solid #e5e5e5;padding:7px 14px;display:flex;align-items:center;gap:14px;flex-shrink:0}
+    .tmr{font-size:20px;font-weight:800;font-variant-numeric:tabular-nums;min-width:58px}
+    .tmr.w{color:#dc2626}
+    .gbody{display:flex;flex:1;overflow:hidden}
+    .gwrap{flex:1;overflow:auto;padding:12px;background:#f2f0eb}
 
-    /* ── GRILLE : copie exacte du style Mygamify arrowwords ── */
-    .grid-wrap{flex:1;overflow:auto;padding:12px;background:#f2f0eb}
-    #grid-scaler{display:inline-block}
-    #grid{display:inline-block;border:1px solid #999;border-bottom:none;border-right:none}
+    /* ── GRILLE exacte Mygamify ── */
+    #grid{display:inline-block;border:1px solid #888;border-bottom:none;border-right:none;line-height:0}
     .rows{display:flex}
-    /* Case par défaut = lettre blanche */
     .column{
-      width:52px;height:52px;
-      border-right:1px solid #999;border-bottom:1px solid #999;
+      width:52px;height:52px;min-width:52px;min-height:52px;
+      border-right:1px solid #888;border-bottom:1px solid #888;
       background:#fff;
-      display:flex;align-items:center;justify-content:center;
       position:relative;
       cursor:pointer;
-      font-size:20px;font-weight:800;text-transform:uppercase;color:#111;
-      user-select:none;
-      flex-shrink:0;
+      display:flex;align-items:center;justify-content:center;
+      user-select:none;flex-shrink:0;
     }
-    .column.black{background:#222;cursor:default}
-    /* Case définition */
-    .column.def{
-      background:#d0ccc4;
-      cursor:pointer;
+    /* Lettre dans case blanche */
+    .column > span.letter{
+      font-size:22px;font-weight:800;text-transform:uppercase;color:#111;
+      pointer-events:none;z-index:1;
+    }
+    /* Case DEF (play) */
+    .column.play{
+      background:#cfcbc3;
       display:flex;flex-direction:column;
       align-items:flex-start;justify-content:flex-start;
-      padding:3px 4px;
-      font-size:inherit;
+      padding:3px 4px 2px;gap:0;cursor:pointer;
     }
-    .column.def:hover{background:#c4c0b8}
-    .def-inner{
-      display:flex;align-items:flex-start;justify-content:space-between;
-      width:100%;gap:2px;flex:1;min-height:0;overflow:hidden;
-    }
-    .def-word{
-      font-size:8px;font-weight:700;line-height:1.2;
-      color:#111;text-transform:uppercase;
-      flex:1;overflow:hidden;word-break:break-word;
-    }
-    .def-arr{font-size:11px;color:#111;flex-shrink:0;line-height:1;margin-top:1px}
-    .def-sep{width:100%;height:1px;background:#b0aca4;flex-shrink:0;margin:1px 0}
+    .column.play:hover{background:#c2beb6}
+    .dblock{display:flex;align-items:flex-start;justify-content:space-between;width:100%;gap:2px;flex:1;min-height:0;overflow:hidden}
+    .dtext{font-size:7.5px;font-weight:700;line-height:1.2;color:#111;text-transform:uppercase;flex:1;word-break:break-word;overflow:hidden}
+    .darr{font-size:10px;color:#111;flex-shrink:0;line-height:1;margin-top:1px;font-weight:900}
+    .dsep{width:100%;height:1px;background:#aba7a0;flex-shrink:0;margin:1px 0}
+    /* Case noire */
+    .column.black{background:#222;cursor:default}
     /* Surlignage */
-    .column.active-letter{background:#fef3c7 !important}
-    .column.correct{background:#dcfce7 !important}
-    .column.selected-def{background:#fde68a !important}
+    .column.select{background:#fef3c7}
+    .column.active{background:#fde68a;border-color:#d97706;z-index:2}
+    .column.validated{background:#d1fae5}
+    .column.play.select,.column.play.active{background:#fde68a}
 
     /* INPUT BAR */
-    .input-bar{background:#f9f9f7;border-top:1px solid #e5e5e5;padding:9px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0}
-    .def-info{flex:1;min-width:0}
-    .def-hint{font-size:11px;color:#999;margin-bottom:1px}
-    .def-main{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .word-inp{font-family:inherit;font-size:17px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;padding:7px 11px;border:2px solid #e5e5e5;border-radius:9px;width:150px;outline:none;background:white;transition:border-color .15s}
-    .word-inp:focus{border-color:var(--black)}
-    .word-inp.err{border-color:var(--red);animation:shake .3s}
+    .ibar{background:#f9f9f7;border-top:1px solid #e5e5e5;padding:9px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+    .dinfo{flex:1;min-width:0}
+    .dhint{font-size:11px;color:#999;margin-bottom:1px}
+    .dmain{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .wi{font-family:inherit;font-size:17px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;padding:7px 11px;border:2px solid #e5e5e5;border-radius:9px;width:150px;outline:none;background:white;transition:border-color .15s}
+    .wi:focus{border-color:#111}
+    .wi.err{border-color:#dc2626;animation:shake .3s}
     @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
-    .ok-btn{padding:9px 14px;font-size:16px}
 
     /* DUEL PANEL */
     .duel{width:250px;flex-shrink:0;border-left:1px solid #e5e5e5;background:white;display:flex;flex-direction:column;overflow:hidden}
-    .psec{padding:12px 14px;border-bottom:1px solid #f0f0f0}
-    .ptitle{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#999;margin-bottom:8px}
-    .scores{display:flex;align-items:center;gap:6px}
-    .sbox{flex:1;text-align:center;padding:8px 6px;border-radius:9px;background:#f8f8f8}
-    .sbox.me{border:2px solid var(--green)}
-    .sname{font-size:10px;color:#888;margin-bottom:3px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .snum{font-size:26px;font-weight:900;line-height:1}
-    .sbox.me .snum{color:var(--green)}
+    .ps{padding:12px 14px;border-bottom:1px solid #f0f0f0}
+    .pt{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#999;margin-bottom:8px}
+    .sc{display:flex;align-items:center;gap:6px}
+    .sb{flex:1;text-align:center;padding:8px 6px;border-radius:9px;background:#f8f8f8}
+    .sb.me{border:2px solid #16a34a}
+    .sn{font-size:10px;color:#888;margin-bottom:3px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .sv{font-size:26px;font-weight:900;line-height:1}
+    .sb.me .sv{color:#16a34a}
     .svs{font-size:10px;font-weight:700;color:#ccc}
-    .prow{margin-bottom:7px}
-    .plbl{display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px;color:#666}
-    .ptrack{height:5px;background:#f0f0f0;border-radius:3px;overflow:hidden}
-    .pfill{height:100%;border-radius:3px;transition:width .4s ease}
-    .pfill.me{background:var(--green)}.pfill.opp{background:var(--blue)}
-    .last-badge{font-size:12px;padding:5px 9px;border-radius:7px;background:#f8f8f8;color:#666;min-height:28px;display:flex;align-items:center}
-    .last-badge.fl{background:#fef9c3;color:#854d0e}
+    .pr{margin-bottom:7px}
+    .pl{display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px;color:#666}
+    .pt2{height:5px;background:#f0f0f0;border-radius:3px;overflow:hidden}
+    .pf{height:100%;border-radius:3px;transition:width .4s ease}
+    .pf.me{background:#16a34a}.pf.op{background:#2563eb}
+    .lb{font-size:12px;padding:5px 9px;border-radius:7px;background:#f8f8f8;color:#666;min-height:28px;display:flex;align-items:center}
+    .lb.fl{background:#fef9c3;color:#854d0e}
     .feed{flex:1;overflow-y:auto;padding:10px 14px;display:flex;flex-direction:column;gap:3px}
     .ev{font-size:11px;padding:5px 9px;border-radius:7px;animation:fi .2s;display:flex;align-items:center;gap:5px}
     @keyframes fi{from{opacity:0;transform:translateX(6px)}}
-    .ev.me{background:#f0fdf4;color:#166534}.ev.opp{background:#eff6ff;color:#1e40af}
-    .evdot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
-    .ev.me .evdot{background:var(--green)}.ev.opp .evdot{background:var(--blue)}
+    .ev.me{background:#f0fdf4;color:#166534}.ev.op{background:#eff6ff;color:#1e40af}
+    .dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+    .ev.me .dot{background:#16a34a}.ev.op .dot{background:#2563eb}
 
     /* END */
     #end{align-items:center;justify-content:center;gap:18px;padding:40px 16px;text-align:center}
-    .end-title{font-size:clamp(34px,8vw,54px);font-weight:900;letter-spacing:-.04em}
-    .end-title.win{color:var(--green)}.end-title.lose{color:var(--red)}.end-title.draw{color:#888}
-    .end-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:360px}
-    .stat{background:white;border-radius:11px;padding:14px 10px}
-    .stat-val{font-size:26px;font-weight:900;line-height:1}
-    .stat-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:#999;margin-top:3px}
-    .end-btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;max-width:360px;width:100%}
-    .end-btns .btn{width:auto;flex:1;min-width:130px}
+    .et{font-size:clamp(34px,8vw,54px);font-weight:900;letter-spacing:-.04em}
+    .et.win{color:#16a34a}.et.lose{color:#dc2626}.et.draw{color:#888}
+    .estats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:360px}
+    .estat{background:white;border-radius:11px;padding:14px 10px}
+    .ev2{font-size:26px;font-weight:900;line-height:1}
+    .el{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:#999;margin-top:3px}
+    .ebtns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;max-width:360px;width:100%}
 
-    .toast{position:fixed;bottom:72px;left:50%;transform:translateX(-50%);background:var(--black);color:white;font-size:13px;font-weight:600;padding:9px 18px;border-radius:999px;z-index:999;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
+    .toast{position:fixed;bottom:72px;left:50%;transform:translateX(-50%);background:#111;color:white;font-size:13px;font-weight:600;padding:9px 18px;border-radius:999px;z-index:999;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
     .toast.on{opacity:1}
-
-    @media(max-width:640px){.duel{display:none}}
+    @media(max-width:640px){.duel{display:none}.column{width:42px;height:42px;min-width:42px;min-height:42px}.column>span.letter{font-size:18px}.dtext{font-size:6.5px}}
   </style>
 </head>
 <body>
-
 <header>
   <div class="logo">Mots Fléchés <em>Duel</em></div>
-  <div style="font-size:12px;color:#888" id="hdr-badge"></div>
+  <div style="font-size:12px;color:#888" id="hbadge"></div>
 </header>
 
 <div id="lobby" class="screen active">
-  <h1 class="lobby-title">Joue contre<br>tes <b>amis</b></h1>
+  <h1 class="title">Joue contre<br>tes <b>amis</b></h1>
   <p style="color:#666;font-size:15px;text-align:center;max-width:340px;line-height:1.5">La grille Franceinfo du jour, en duel temps réel.</p>
   <div class="card">
-    <div><div class="lbl">Ton pseudo</div><input class="inp" id="pseudo" type="text" placeholder="ex: Alice" maxlength="16" autocomplete="off"></div>
+    <div><div class="lbl">Ton pseudo</div><input class="fi" id="pseudo" type="text" placeholder="ex: Alice" maxlength="16" autocomplete="off"></div>
     <div class="modes">
-      <button class="mode-btn on" data-mode="classic">Classique</button>
-      <button class="mode-btn" data-mode="blitz">⚡ Blitz 5min</button>
+      <button class="mb on" data-mode="classic">Classique</button>
+      <button class="mb" data-mode="blitz">⚡ Blitz 5min</button>
     </div>
-    <button class="btn btn-dark" id="btn-create">Créer une partie</button>
+    <button class="btn btn-d" id="btn-create">Créer une partie</button>
     <div class="sep">ou rejoindre</div>
-    <div class="join-row">
-      <input class="inp" id="join-code" type="text" placeholder="CODE" maxlength="6" autocomplete="off">
-      <button class="btn btn-blue" style="width:auto;padding:11px 16px" id="btn-join">Rejoindre</button>
+    <div class="jr">
+      <input class="fi" id="jcode" type="text" placeholder="CODE" maxlength="6" autocomplete="off">
+      <button class="btn btn-b" id="btn-join" style="padding:11px 16px">Rejoindre</button>
     </div>
   </div>
 </div>
 
 <div id="waiting" class="screen">
   <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#999">Code de la partie</p>
-  <div class="code-box" id="code-display">——</div>
+  <div class="codebox" id="cdisp">——</div>
   <p style="font-size:14px;color:#666">Partage ce lien :</p>
-  <button class="copy-btn" id="btn-copy">📋 Copier le lien</button>
-  <p class="pulse-txt">En attente de l'adversaire</p>
-  <button class="btn btn-outline" style="width:auto;margin-top:8px;padding:9px 20px" id="btn-cancel">Annuler</button>
+  <button class="cpbtn" id="btn-copy">📋 Copier le lien</button>
+  <p class="pulse" style="color:#888;font-size:14px">En attente de l'adversaire</p>
+  <button class="btn btn-o" style="margin-top:8px;padding:9px 20px" id="btn-cancel">Annuler</button>
 </div>
 
 <div id="game" class="screen">
-  <div class="game-bar">
-    <div class="timer" id="timer">00:00</div>
-    <div class="score-hdr"><strong id="my-score">0</strong> / <span id="total-words">–</span> mots</div>
+  <div class="gbar">
+    <div class="tmr" id="tmr">00:00</div>
+    <div style="font-size:13px;color:#666"><strong id="myscore" style="font-size:15px;color:#111">0</strong> / <span id="totw">–</span> mots</div>
     <div style="flex:1"></div>
-    <button class="btn btn-outline" style="width:auto;font-size:12px;padding:5px 11px" id="btn-giveup">Abandonner</button>
+    <button class="btn btn-o" style="font-size:12px;padding:5px 11px" id="btn-giveup">Abandonner</button>
   </div>
-  <div class="game-body">
+  <div class="gbody">
     <div style="display:flex;flex-direction:column;flex:1;overflow:hidden">
-      <div class="grid-wrap">
-        <div id="grid-scaler">
-          <div id="grid"></div>
+      <div class="gwrap"><div id="grid"></div></div>
+      <div class="ibar">
+        <div class="dinfo">
+          <div class="dhint" id="dhint">Sélectionne une case</div>
+          <div class="dmain" id="dmain">–</div>
         </div>
-      </div>
-      <div class="input-bar">
-        <div class="def-info">
-          <div class="def-hint" id="def-hint">Sélectionne une case</div>
-          <div class="def-main" id="def-main">–</div>
-        </div>
-        <input class="word-inp" id="word-inp" type="text" placeholder="MOT" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false">
-        <button class="btn btn-dark ok-btn" style="width:auto" id="btn-ok">✓</button>
+        <input class="wi" id="wi" type="text" placeholder="MOT" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false">
+        <button class="btn btn-d" style="padding:9px 14px;font-size:16px" id="btn-ok">✓</button>
       </div>
     </div>
     <div class="duel">
-      <div class="psec"><div class="ptitle">Score</div>
-        <div class="scores">
-          <div class="sbox me"><div class="sname" id="p-my-name">Moi</div><div class="snum" id="p-my-score">0</div></div>
+      <div class="ps"><div class="pt">Score</div>
+        <div class="sc">
+          <div class="sb me"><div class="sn" id="pmyname">Moi</div><div class="sv" id="pmyscore">0</div></div>
           <div class="svs">VS</div>
-          <div class="sbox"><div class="sname" id="p-opp-name">Adversaire</div><div class="snum" id="p-opp-score">0</div></div>
+          <div class="sb"><div class="sn" id="poppname">Adversaire</div><div class="sv" id="poppscore">0</div></div>
         </div>
       </div>
-      <div class="psec"><div class="ptitle">Progression</div>
-        <div class="prow"><div class="plbl"><span id="pg-my-name">Moi</span><span id="pg-my-pct">0%</span></div><div class="ptrack"><div class="pfill me" id="pg-my" style="width:0%"></div></div></div>
-        <div class="prow"><div class="plbl"><span id="pg-opp-name">Adversaire</span><span id="pg-opp-pct">0%</span></div><div class="ptrack"><div class="pfill opp" id="pg-opp" style="width:0%"></div></div></div>
+      <div class="ps"><div class="pt">Progression</div>
+        <div class="pr"><div class="pl"><span id="pgmyn">Moi</span><span id="pgmyp">0%</span></div><div class="pt2"><div class="pf me" id="pgmy" style="width:0%"></div></div></div>
+        <div class="pr"><div class="pl"><span id="pgopn">Adversaire</span><span id="pgopp">0%</span></div><div class="pt2"><div class="pf op" id="pgop" style="width:0%"></div></div></div>
       </div>
-      <div class="psec"><div class="ptitle">Dernier mot adversaire</div><div class="last-badge" id="last-badge">–</div></div>
-      <div class="psec" style="border-bottom:none"><div class="ptitle">Événements</div></div>
+      <div class="ps"><div class="pt">Dernier mot adversaire</div><div class="lb" id="lbadge">–</div></div>
+      <div class="ps" style="border-bottom:none"><div class="pt">Événements</div></div>
       <div class="feed" id="feed"></div>
     </div>
   </div>
 </div>
 
 <div id="end" class="screen">
-  <div class="end-title" id="end-title">–</div>
-  <div class="end-stats">
-    <div class="stat"><div class="stat-val" id="end-score">–</div><div class="stat-lbl">Mots</div></div>
-    <div class="stat"><div class="stat-val" id="end-time">–</div><div class="stat-lbl">Temps</div></div>
-    <div class="stat"><div class="stat-val" id="end-elo" style="font-size:18px">–</div><div class="stat-lbl">Elo</div></div>
+  <div class="et" id="etitle">–</div>
+  <div class="estats">
+    <div class="estat"><div class="ev2" id="escore">–</div><div class="el">Mots</div></div>
+    <div class="estat"><div class="ev2" id="etime">–</div><div class="el">Temps</div></div>
+    <div class="estat"><div class="ev2" id="eelo" style="font-size:18px">–</div><div class="el">Elo</div></div>
   </div>
-  <div class="end-btns">
-    <button class="btn btn-red" id="btn-rematch">Revanche ⚡</button>
-    <button class="btn btn-outline" id="btn-newgame">Nouvelle partie</button>
+  <div class="ebtns">
+    <button class="btn btn-r" id="btn-rematch" style="flex:1;min-width:130px">Revanche ⚡</button>
+    <button class="btn btn-o" id="btn-ng" style="flex:1;min-width:130px">Nouvelle partie</button>
   </div>
 </div>
 
@@ -241,53 +221,49 @@
 
 <script type="module">
 import { initAuth } from "./js/firebase.js";
-import { fetchGrid } from "./js/grid.js";
+import { fetchGrid, getLetterCells, getAxe } from "./js/grid.js";
 import { createRoom, joinRoom, listenRoom, listenOpponentLive, submitWord, finishGame, requestRematch } from "./js/room.js";
 
-// ─── STATE ────────────────────────────────────────────────────────────────
 const S = {
   user:null, pseudo:"", mode:"classic",
-  roomId:null, gridData:null,
-  found: new Set(),
-  selWord: null,
-  startTime:null, timerInterval:null, blitzLeft:300,
-  unsubRoom:null, unsubLive:null, gameStarted:false,
+  roomId:null, G:null,       // G = gridData
+  found:new Set(), selId:null,
+  startTime:null, timerInt:null, blitzLeft:300,
+  unsubRoom:null, unsubLive:null, started:false,
+  // état de sélection comme Mygamify
+  axe:"x",      // axe courant: x (horizontal) ou y (vertical)
 };
 
-// ─── BOOT ─────────────────────────────────────────────────────────────────
 async function boot() {
   S.user = await initAuth();
-  const hash = location.hash.replace("#room/","");
-  if (hash.length===6) qs("#join-code").value = hash.toUpperCase();
-  const saved = localStorage.getItem("mfd-pseudo");
-  if (saved) qs("#pseudo").value = saved;
+  const h = location.hash.replace("#room/","");
+  if (h.length===6) qs("#jcode").value = h.toUpperCase();
+  const sv = localStorage.getItem("mfd-pseudo");
+  if (sv) qs("#pseudo").value = sv;
   bind();
 }
 
 function bind() {
-  qsa(".mode-btn").forEach(b=>b.addEventListener("click",()=>{
-    qsa(".mode-btn").forEach(x=>x.classList.remove("on"));
-    b.classList.add("on"); S.mode=b.dataset.mode;
-  }));
-  qs("#btn-create").addEventListener("click", doCreate);
-  qs("#btn-join").addEventListener("click", doJoin);
-  qs("#join-code").addEventListener("keydown", e=>e.key==="Enter"&&doJoin());
-  qs("#btn-cancel").addEventListener("click", ()=>show("lobby"));
-  qs("#btn-copy").addEventListener("click", copyLink);
-  qs("#btn-ok").addEventListener("click", doValidate);
-  qs("#word-inp").addEventListener("keydown", e=>e.key==="Enter"&&doValidate());
-  qs("#btn-giveup").addEventListener("click", doGiveUp);
-  qs("#btn-rematch").addEventListener("click", doRematch);
-  qs("#btn-newgame").addEventListener("click", ()=>show("lobby"));
+  qsa(".mb").forEach(b=>b.addEventListener("click",()=>{qsa(".mb").forEach(x=>x.classList.remove("on"));b.classList.add("on");S.mode=b.dataset.mode;}));
+  qs("#btn-create").addEventListener("click",doCreate);
+  qs("#btn-join").addEventListener("click",doJoin);
+  qs("#jcode").addEventListener("keydown",e=>e.key==="Enter"&&doJoin());
+  qs("#btn-cancel").addEventListener("click",()=>show("lobby"));
+  qs("#btn-copy").addEventListener("click",copyLink);
+  qs("#btn-ok").addEventListener("click",doValidate);
+  qs("#wi").addEventListener("keydown",e=>e.key==="Enter"&&doValidate());
+  qs("#btn-giveup").addEventListener("click",doGiveUp);
+  qs("#btn-rematch").addEventListener("click",doRematch);
+  qs("#btn-ng").addEventListener("click",()=>show("lobby"));
 }
 
 async function doCreate() {
   const p=getPseudo(); if(!p) return;
   try {
     toast("Chargement…");
-    S.gridData=fetchGrid(); S.pseudo=p; S.found=new Set(); S.gameStarted=false;
-    S.roomId=await createRoom({uid:S.user.uid,pseudo:p,gridData:S.gridData,mode:S.mode});
-    show("waiting"); qs("#code-display").textContent=S.roomId;
+    S.G=fetchGrid(); S.pseudo=p; S.found=new Set(); S.started=false;
+    S.roomId=await createRoom({uid:S.user.uid,pseudo:p,gridData:S.G,mode:S.mode});
+    show("waiting"); qs("#cdisp").textContent=S.roomId;
     history.replaceState(null,"",`#room/${S.roomId}`);
     S.unsubRoom=listenRoom(S.roomId,onRoom);
   } catch(e){toast("Erreur: "+e.message);console.error(e);}
@@ -295,303 +271,305 @@ async function doCreate() {
 
 async function doJoin() {
   const p=getPseudo(); if(!p) return;
-  const code=qs("#join-code").value.trim().toUpperCase();
+  const code=qs("#jcode").value.trim().toUpperCase();
   if(code.length!==6){toast("Code à 6 caractères svp");return;}
   try {
     toast("Connexion…");
-    S.pseudo=p; S.found=new Set(); S.roomId=code; S.gridData=fetchGrid();
+    S.pseudo=p; S.found=new Set(); S.roomId=code; S.G=fetchGrid();
     await joinRoom({roomId:code,uid:S.user.uid,pseudo:p});
     const {doc,getDoc}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
     const {db}=await import("./js/firebase.js");
-    const snap=await getDoc(doc(db,"rooms",code));
-    S.gameStarted=true; startGame(snap.data());
+    S.started=true; startGame((await getDoc(doc(db,"rooms",code))).data());
     S.unsubRoom=listenRoom(code,onRoom);
   } catch(e){toast("Erreur: "+e.message);console.error(e);}
 }
 
 async function onRoom(room) {
-  if(room.status==="playing"&&!S.gameStarted){
-    S.gameStarted=true;
-    if(!S.gridData) S.gridData=fetchGrid();
-    startGame(room);
+  if(room.status==="playing"&&!S.started){
+    S.started=true; if(!S.G) S.G=fetchGrid(); startGame(room);
   }
   if(room.status==="finished"&&qs("#game.active")) endGame(room);
 }
 
 function startGame(room) {
   show("game"); buildGrid();
-  qs("#total-words").textContent=S.gridData.totalWords;
-  qs("#p-my-name").textContent=S.pseudo; qs("#pg-my-name").textContent=S.pseudo;
+  qs("#totw").textContent=S.G.totalWords;
+  qs("#pmyname").textContent=S.pseudo; qs("#pgmyn").textContent=S.pseudo;
   S.startTime=Date.now();
-  S.timerInterval=S.mode==="blitz"?setInterval(tickBlitz,1000):setInterval(tickChron,1000);
+  S.timerInt=S.mode==="blitz"?setInterval(tickB,1000):setInterval(tickC,1000);
   const opp=room.player1===S.user.uid?room.player2:room.player1;
-  if(opp){S.unsubLive=listenOpponentLive(S.roomId,opp,onOpp);loadOppName(opp);}
+  if(opp){S.unsubLive=listenOpponentLive(S.roomId,opp,onOpp);loadOpp(opp);}
 }
 
-async function loadOppName(uid) {
-  try {
+async function loadOpp(uid){
+  try{
     const {doc,getDoc}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
     const {db}=await import("./js/firebase.js");
     const s=await getDoc(doc(db,"rooms",S.roomId,"players",uid));
-    if(s.exists()){const n=s.data().pseudo||"Adversaire";qs("#p-opp-name").textContent=n;qs("#pg-opp-name").textContent=n;}
-  } catch{}
+    if(s.exists()){const n=s.data().pseudo||"Adversaire";qs("#poppname").textContent=n;qs("#pgopn").textContent=n;}
+  }catch{}
 }
 
-function onOpp(data) {
-  const total=S.gridData?.totalWords||1, n=(data.foundWords||[]).length;
-  qs("#p-opp-score").textContent=n;
-  const pct=Math.round(n/total*100);
-  qs("#pg-opp").style.width=pct+"%"; qs("#pg-opp-pct").textContent=pct+"%";
+function onOpp(data){
+  const total=S.G?.totalWords||1,n=(data.foundWords||[]).length;
+  qs("#poppscore").textContent=n;
+  const p=Math.round(n/total*100);
+  qs("#pgop").style.width=p+"%";qs("#pgopp").textContent=p+"%";
   if(data.lastFoundAt&&n>0){
-    const b=qs("#last-badge");
-    b.textContent=`${n} mot${n>1?"s":""} trouvé${n>1?"s":""}`;
-    b.classList.add("fl"); setTimeout(()=>b.classList.remove("fl"),2000);
-    addEv("opp",`+1 mot (${n}/${total})`);
+    const b=qs("#lbadge");b.textContent=`${n} mot${n>1?"s":""} trouvé${n>1?"s":""}`;
+    b.classList.add("fl");setTimeout(()=>b.classList.remove("fl"),2000);
+    addEv("op",`+1 mot (${n}/${total})`);
   }
 }
 
-// ─── GRILLE ────────────────────────────────────────────────────────────────
-// On reproduit EXACTEMENT la structure HTML de Mygamify:
-// - grille de divs.column avec data-column et data-row
-// - Le JS remplit les cases comme arrowwords.js le ferait
-// - cases DEF = fond gris avec texte+flèche
-// - cases lettre = fond blanc avec lettre centrée
-// - cases noires = fond noir
-
+// ── GRILLE ─────────────────────────────────────────────────────────────────
+// Reproduit exactement generateGrid() de arrowwords.js Mygamify
 function buildGrid() {
-  const {rows, cols, words} = S.gridData;
+  const {rows,cols,words} = S.G;
   const grid = qs("#grid");
   grid.innerHTML = "";
 
-  // 1. Construire les maps depuis les données
-  // defMap["x,y"] = [{id, dir, def}] — cases avec définition
-  // letterMap["x,y"] = [{wordId, pos}] — cases avec lettre
-  const defMap = {};
-  const letterMap = {};
-
-  words.forEach(w => {
-    // Case DEF
-    const dk = `${w.x},${w.y}`;
-    if (!defMap[dk]) defMap[dk] = [];
-    defMap[dk].push(w);
-
-    // Cases LETTRES: séquentielles depuis (x+dx, y+dy)
-    // direction: RR ou RB → dx=1,dy=0 (horizontal)
-    //            BB ou BR → dx=0,dy=1 (vertical)
-    const dx = (w.dir==="RR"||w.dir==="RB") ? 1 : 0;
-    const dy = (w.dir==="BB"||w.dir==="BR") ? 1 : 0;
-    for (let i=1; i<=w.size; i++) {
-      const lx=w.x+dx*i, ly=w.y+dy*i;
-      if (lx<1||ly<1||lx>cols||ly>rows) break;
-      const lk=`${lx},${ly}`;
-      if (!letterMap[lk]) letterMap[lk]=[];
-      letterMap[lk].push({wordId:w.id, pos:i-1});
-    }
-  });
-
-  // Sauvegarde dans gridData pour utilisation ultérieure
-  S.gridData.defMap = defMap;
-  S.gridData.letterMap = letterMap;
-
-  // 2. Rendre la grille ligne par ligne (comme Mygamify)
-  for (let row=1; row<=rows; row++) {
+  // 1. Crée la grille vide de divs.column (comme le HTML prérendu de Mygamify)
+  const cellGrid = []; // cellGrid[row-1][col-1] = div.column
+  for (let r=1; r<=rows; r++) {
     const rowEl = document.createElement("div");
     rowEl.className = "rows";
-    for (let col=1; col<=cols; col++) {
-      const key = `${col},${row}`;
+    const rowCells = [];
+    for (let c=1; c<=cols; c++) {
       const cell = document.createElement("div");
       cell.className = "column";
-      cell.dataset.column = col;
-      cell.dataset.row = row;
-
-      if (defMap[key]) {
-        // ── Case DEF ─────────────────────────────────────────
-        cell.classList.add("def");
-        cell.dataset.defs = JSON.stringify(defMap[key].map(d=>d.id));
-
-        defMap[key].forEach((w, i) => {
-          if (i>0) {
-            const sep = document.createElement("div");
-            sep.className = "def-sep"; cell.appendChild(sep);
-          }
-          const inner = document.createElement("div");
-          inner.className = "def-inner";
-          const txt = document.createElement("div");
-          txt.className = "def-word"; txt.textContent = w.def;
-          const arr = document.createElement("div");
-          arr.className = "def-arr"; arr.textContent = arrowFor(w.dir);
-          inner.appendChild(txt); inner.appendChild(arr);
-          cell.appendChild(inner);
-        });
-
-        cell.addEventListener("click", () => {
-          const ids = JSON.parse(cell.dataset.defs);
-          const unfinished = ids.find(id=>!S.found.has(id));
-          pickWord(unfinished??ids[0]);
-        });
-
-      } else if (letterMap[key]) {
-        // ── Case LETTRE ───────────────────────────────────────
-        cell.dataset.words = JSON.stringify(letterMap[key].map(l=>l.wordId));
-        const span = document.createElement("span"); cell.appendChild(span);
-
-        cell.addEventListener("click", () => {
-          const ids = JSON.parse(cell.dataset.words);
-          // Alterner entre les deux mots si intersection
-          if (ids.length>1 && S.selWord===ids[0]) pickWord(ids[1]);
-          else pickWord(ids[0]);
-        });
-
-      } else {
-        // ── Case noire ────────────────────────────────────────
-        cell.classList.add("black");
-      }
-
+      cell.dataset.column = c;
+      cell.dataset.row = r;
+      cell.dataset.index = (r-1)*cols+(c-1);
+      // span pour la lettre (cases blanches)
+      const span = document.createElement("span");
+      span.className = "letter";
+      cell.appendChild(span);
       rowEl.appendChild(cell);
+      rowCells.push(cell);
     }
     grid.appendChild(rowEl);
+    cellGrid.push(rowCells);
   }
-}
 
-function arrowFor(dir) {
-  if(dir==="RR"||dir==="RB") return "→";
-  if(dir==="BB"||dir==="BR") return "↓";
-  return "";
-}
+  // Helper pour accéder à une case
+  function cell(col, row) {
+    if (col<1||row<1||col>cols||row>rows) return null;
+    return cellGrid[row-1][col-1];
+  }
 
-// ─── SÉLECTION MOT ────────────────────────────────────────────────────────
-function pickWord(wordId) {
-  S.selWord = wordId;
-  const w = S.gridData.words.find(x=>x.id===wordId);
-  if (!w) return;
+  // 2. Remplit la grille comme arrowwords.js generateGrid()
+  words.forEach(w => {
+    const cx = w.x, cy = w.y;
+    const axe = w.axe; // "x" ou "y"
 
-  // Reset toutes les cases actives
-  qsa(".column.active-letter").forEach(c=>c.classList.remove("active-letter"));
-  qsa(".column.selected-def").forEach(c=>c.classList.remove("selected-def"));
+    // Case DEF
+    const start = cell(cx, cy);
+    if (!start) return;
+    if (start.classList.contains("play")) {
+      start.classList.add("c_1");
+    } else {
+      start.classList.add("play", "c_0");
+      // Vide le span letter de la case DEF
+      start.querySelector("span").remove();
+    }
 
-  // Direction
-  const dx=(w.dir==="RR"||w.dir==="RB")?1:0;
-  const dy=(w.dir==="BB"||w.dir==="BR")?1:0;
+    // Ajoute la définition dans la case DEF
+    const dblock = document.createElement("div");
+    dblock.className = "dblock";
+    const dtxt = document.createElement("div");
+    dtxt.className = "dtext"; dtxt.textContent = w.def;
+    const darr = document.createElement("div");
+    darr.className = "darr";
+    // Flèche: RR/BR = →, RB/BB = ↓
+    darr.textContent = (w.dir==="RR"||w.dir==="BR") ? "→" : "↓";
+    dblock.appendChild(dtxt); dblock.appendChild(darr);
 
-  // Surligne les cases lettres du mot
-  for (let i=1; i<=w.size; i++) {
-    const cell = cellAt(w.x+dx*i, w.y+dy*i);
-    if (cell && !cell.classList.contains("correct")) {
-      cell.classList.add("active-letter");
+    // Si la case a déjà une def, ajoute un séparateur
+    if (start.querySelector(".dblock")) {
+      const sep = document.createElement("div");
+      sep.className = "dsep";
+      start.appendChild(sep);
+    }
+    start.appendChild(dblock);
+
+    // data-id-axe sur la case DEF
+    if (!start.hasAttribute("data-id-"+axe)) {
+      start.setAttribute("data-id-"+axe, w.id);
+    } else {
+      start.setAttribute("data-id-"+axe+"2", w.id);
+    }
+
+    // 3. Cases lettres
+    const letterCells = getLetterCells(w);
+    letterCells.forEach((lc, j) => {
+      const s = cell(lc.col, lc.row);
+      if (!s) return;
+      s.setAttribute("data-pos-"+axe, j);
+      s.setAttribute("data-id-"+axe, w.id);
+      s.classList.add("w_"+axe+"_"+w.id);
+    });
+  });
+
+  // Cases sans aucun mot = noires
+  for (let r=1; r<=rows; r++) {
+    for (let c=1; c<=cols; c++) {
+      const s = cell(c,r);
+      if (!s.classList.contains("play") && !s.getAttribute("data-id-x") && !s.getAttribute("data-id-y")) {
+        s.classList.add("black");
+        s.style.cursor="default";
+      }
     }
   }
 
-  // Surligne la case DEF
-  const defCell = cellAt(w.x, w.y);
-  if (defCell) defCell.classList.add("selected-def");
-
-  qs("#def-hint").textContent = `${arrowFor(w.dir)} · ${w.size} lettres`;
-  qs("#def-main").textContent = w.def;
-  qs("#word-inp").value = "";
-  qs("#word-inp").focus();
+  // 4. Événements clic (comme arrowwords.js initGrid)
+  qsa(".column").forEach(col => {
+    col.addEventListener("click", () => {
+      if (col.classList.contains("black")) return;
+      onCellClick(col);
+    });
+  });
 }
 
-// ─── VALIDATION ───────────────────────────────────────────────────────────
+function onCellClick(col) {
+  // Logique exacte de arrowwords.js
+  // Si on reclique sur la case active → change d'axe
+  if (col.classList.contains("active") && !col.classList.contains("play")) {
+    const newAxe = S.axe==="x"?"y":"x";
+    if (col.hasAttribute("data-id-"+newAxe)) S.axe = newAxe;
+  }
+  // Si la case n'a pas data-id dans l'axe courant → change d'axe
+  if (!col.hasAttribute("data-id-"+S.axe)) {
+    S.axe = S.axe==="x"?"y":"x";
+  }
+  if (!col.hasAttribute("data-id-"+S.axe)) return; // case sans mot
+
+  const id = parseInt(col.getAttribute("data-id-"+S.axe));
+  S.selId = id;
+
+  // Reset sélection
+  qsa(".column.select,.column.active").forEach(c=>c.classList.remove("select","active"));
+
+  // Sélectionne les cases du mot
+  qsa(".column.w_"+S.axe+"_"+id).forEach(c=>{
+    if (!c.classList.contains("validated")) c.classList.add("select");
+  });
+
+  // Si la case cliquée est une DEF → active la première case lettre
+  let activCell = col;
+  if (col.classList.contains("play")) {
+    const letters = qsa(".column.w_"+S.axe+"_"+id+":not(.play)");
+    if (letters.length) { activCell = letters[0]; }
+  }
+  activCell.classList.add("active");
+  activCell.classList.remove("select");
+
+  // Met à jour l'UI
+  const word = S.G.words.find(w=>w.id===id);
+  if (word) {
+    qs("#dhint").textContent = `${(S.axe==="x"?"→":"↓")} · ${word.size} lettres`;
+    qs("#dmain").textContent = word.def;
+  }
+  qs("#wi").value="";
+  qs("#wi").focus();
+}
+
+// ── VALIDATION ─────────────────────────────────────────────────────────────
 async function doValidate() {
-  if (!S.selWord) return;
-  const inp = qs("#word-inp");
-  const raw = inp.value.trim().toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+  if (!S.selId) return;
+  const inp=qs("#wi");
+  const raw=inp.value.trim().toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
   if (!raw) return;
 
-  const w = S.gridData.words.find(x=>x.id===S.selWord);
-  if (!w) return;
+  const word=S.G.words.find(w=>w.id===S.selId);
+  if (!word) return;
 
-  if (raw.length!==w.size) {
+  if (raw.length!==word.size) {
     inp.classList.add("err"); setTimeout(()=>inp.classList.remove("err"),400);
-    toast(`${w.size} lettres attendues`); return;
+    toast(`${word.size} lettres attendues`); return;
   }
 
-  const ok = await checkWord(S.gridData.id, S.selWord, raw);
+  const ok=await checkWord(S.G.id, S.selId, raw);
   if (!ok) {
     inp.classList.add("err"); setTimeout(()=>inp.classList.remove("err"),400);
     toast("Incorrect… réessaie !"); return;
   }
 
-  const wid = S.selWord;
+  // ✓ Validé
+  const wid=S.selId;
   S.found.add(wid);
-  paintWord(wid, raw);
-  inp.value = ""; S.selWord=null;
-  qs("#def-main").textContent="–"; qs("#def-hint").textContent="Sélectionne une case";
 
-  const n=S.found.size, total=S.gridData.totalWords;
-  qs("#my-score").textContent=n; qs("#p-my-score").textContent=n;
-  const pct=Math.round(n/total*100);
-  qs("#pg-my").style.width=pct+"%"; qs("#pg-my-pct").textContent=pct+"%";
+  // Affiche les lettres + classe validated (comme arrowwords.js)
+  const cells=qsa(".column.w_"+S.axe+"_"+wid+":not(.play)");
+  cells.forEach((c,i)=>{
+    c.classList.remove("select","active");
+    c.classList.add("validated");
+    const span=c.querySelector("span.letter");
+    if (span&&raw[i]) span.textContent=raw[i];
+  });
+
+  inp.value=""; S.selId=null;
+  qs("#dmain").textContent="–"; qs("#dhint").textContent="Sélectionne une case";
+
+  const n=S.found.size, total=S.G.totalWords;
+  qs("#myscore").textContent=n; qs("#pmyscore").textContent=n;
+  const p=Math.round(n/total*100);
+  qs("#pgmy").style.width=p+"%"; qs("#pgmyp").textContent=p+"%";
   addEv("me",`+1 mot (${n}/${total})`);
   await submitWord({roomId:S.roomId,uid:S.user.uid,wordId:wid,totalFound:n,totalWords:total});
 }
 
-async function checkWord(gridId, wordId, answer) {
-  try {
-    const res=await fetch(`https://sdk.mygamify.fr/mots-fleches/verifier/${gridId}`,{
+async function checkWord(gridId,wordId,answer){
+  try{
+    const r=await fetch(`https://sdk.mygamify.fr/mots-fleches/verifier/${gridId}`,{
       method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({wordId,answer})
     });
-    return (await res.json()).correct===true;
-  } catch { return true; }
+    return (await r.json()).correct===true;
+  }catch{return true;}
 }
 
-function paintWord(wordId, answer) {
-  const w=S.gridData.words.find(x=>x.id===wordId); if(!w) return;
-  const dx=(w.dir==="RR"||w.dir==="RB")?1:0;
-  const dy=(w.dir==="BB"||w.dir==="BR")?1:0;
-  for (let i=1; i<=w.size; i++) {
-    const cell=cellAt(w.x+dx*i,w.y+dy*i); if(!cell) continue;
-    cell.classList.remove("active-letter","selected-def");
-    cell.classList.add("correct");
-    const span=cell.querySelector("span");
-    if(span&&answer) span.textContent=answer[i-1]||"";
-  }
-}
-
-// ─── TIMERS ───────────────────────────────────────────────────────────────
-function tickChron(){qs("#timer").textContent=fmt(Math.floor((Date.now()-S.startTime)/1000));}
-function tickBlitz(){S.blitzLeft--;qs("#timer").textContent=fmt(S.blitzLeft);if(S.blitzLeft<=30)qs("#timer").classList.add("warn");if(S.blitzLeft<=0){clearInterval(S.timerInterval);finishGame({roomId:S.roomId,uid:S.user.uid});}}
+// ── TIMERS ──────────────────────────────────────────────────────────────────
+function tickC(){qs("#tmr").textContent=fmt(Math.floor((Date.now()-S.startTime)/1000));}
+function tickB(){S.blitzLeft--;qs("#tmr").textContent=fmt(S.blitzLeft);if(S.blitzLeft<=30)qs("#tmr").classList.add("w");if(S.blitzLeft<=0){clearInterval(S.timerInt);finishGame({roomId:S.roomId,uid:S.user.uid});}}
 function fmt(s){return`${Math.floor(s/60).toString().padStart(2,"0")}:${(s%60).toString().padStart(2,"0")}`;}
 
-// ─── END ──────────────────────────────────────────────────────────────────
+// ── END ─────────────────────────────────────────────────────────────────────
 function endGame(room){
-  if(S.timerInterval)clearInterval(S.timerInterval);
-  if(S.unsubRoom)S.unsubRoom(); if(S.unsubLive)S.unsubLive();
-  const win=room.winner===S.user.uid, noW=!room.winner;
-  const el=qs("#end-title");
-  if(noW){el.textContent="Égalité !";el.className="end-title draw";}
-  else if(win){el.textContent="Victoire ! 🎉";el.className="end-title win";}
-  else{el.textContent="Défaite…";el.className="end-title lose";}
+  if(S.timerInt)clearInterval(S.timerInt);
+  if(S.unsubRoom)S.unsubRoom();if(S.unsubLive)S.unsubLive();
+  const win=room.winner===S.user.uid,noW=!room.winner;
+  const el=qs("#etitle");
+  if(noW){el.textContent="Égalité !";el.className="et draw";}
+  else if(win){el.textContent="Victoire ! 🎉";el.className="et win";}
+  else{el.textContent="Défaite…";el.className="et lose";}
   const elapsed=S.startTime?Math.floor((Date.now()-S.startTime)/1000):0;
-  qs("#end-score").textContent=S.found.size; qs("#end-time").textContent=fmt(elapsed);
-  qs("#end-elo").textContent=win?"+16":"−16"; show("end");
+  qs("#escore").textContent=S.found.size;qs("#etime").textContent=fmt(elapsed);
+  qs("#eelo").textContent=win?"+16":"−16";show("end");
 }
 async function doGiveUp(){
-  if(!confirm("Abandonner la partie ?"))return;
+  if(!confirm("Abandonner ?"))return;
   const {doc,getDoc}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
   const {db}=await import("./js/firebase.js");
-  const snap=await getDoc(doc(db,"rooms",S.roomId));
-  const room=snap.data();
-  const opp=room.player1===S.user.uid?room.player2:room.player1;
+  const r=(await getDoc(doc(db,"rooms",S.roomId))).data();
+  const opp=r.player1===S.user.uid?r.player2:r.player1;
   await finishGame({roomId:S.roomId,uid:opp||S.user.uid});
 }
 async function doRematch(){
   try{
-    const nid=await requestRematch({roomId:S.roomId,uid:S.user.uid,pseudo:S.pseudo,gridData:S.gridData,mode:S.mode});
-    S.roomId=nid; S.found=new Set(); S.gameStarted=false;
-    show("waiting"); qs("#code-display").textContent=nid;
+    const nid=await requestRematch({roomId:S.roomId,uid:S.user.uid,pseudo:S.pseudo,gridData:S.G,mode:S.mode});
+    S.roomId=nid;S.found=new Set();S.started=false;
+    show("waiting");qs("#cdisp").textContent=nid;
     history.replaceState(null,"",`#room/${nid}`);
     S.unsubRoom=listenRoom(nid,onRoom);
   }catch(e){toast("Erreur: "+e.message);}
 }
 
-// ─── UTILS ────────────────────────────────────────────────────────────────
+// ── UTILS ────────────────────────────────────────────────────────────────────
 function getPseudo(){const p=qs("#pseudo").value.trim();if(!p){toast("Entre ton pseudo d'abord");qs("#pseudo").focus();return null;}localStorage.setItem("mfd-pseudo",p);return p;}
 function show(id){qsa(".screen").forEach(s=>s.classList.remove("active"));qs("#"+id).classList.add("active");}
-function cellAt(x,y){return qs(`.column[data-column="${x}"][data-row="${y}"]`);}
-function addEv(who,txt){const feed=qs("#feed");const el=document.createElement("div");el.className=`ev ${who}`;el.innerHTML=`<span class="evdot"></span>${txt}`;feed.prepend(el);while(feed.children.length>25)feed.lastChild.remove();}
-function copyLink(){const url=`${location.origin}${location.pathname}#room/${S.roomId}`;navigator.clipboard.writeText(url).then(()=>toast("Lien copié !"));}
-let _tt;function toast(msg){const t=qs("#toast");t.textContent=msg;t.classList.add("on");clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove("on"),2500);}
+function addEv(who,txt){const f=qs("#feed");const el=document.createElement("div");el.className=`ev ${who}`;el.innerHTML=`<span class="dot"></span>${txt}`;f.prepend(el);while(f.children.length>25)f.lastChild.remove();}
+function copyLink(){navigator.clipboard.writeText(`${location.origin}${location.pathname}#room/${S.roomId}`).then(()=>toast("Lien copié !"));}
+let _t;function toast(msg){const t=qs("#toast");t.textContent=msg;t.classList.add("on");clearTimeout(_t);_t=setTimeout(()=>t.classList.remove("on"),2500);}
 const qs=s=>document.querySelector(s);const qsa=s=>document.querySelectorAll(s);
 
 boot().catch(console.error);
