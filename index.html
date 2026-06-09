@@ -542,6 +542,7 @@ async function startCreate() {
     state.pseudo = pseudo;
     state.myFoundWords = new Set();
 
+    gameStarted = false;
     state.roomId = await createRoom({
       uid: state.user.uid,
       pseudo,
@@ -573,8 +574,16 @@ async function startJoin() {
     state.pseudo = pseudo;
     state.myFoundWords = new Set();
     state.roomId = code;
+    state.gridData = fetchGrid(); // Charge la grille immédiatement
 
     await joinRoom({ roomId: code, uid: state.user.uid, pseudo });
+    // Démarre la partie directement — joinRoom met le status à "playing"
+    showScreen("game");
+    const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    const { db } = await import("./js/firebase.js");
+    const snap = await getDoc(doc(db, "rooms", code));
+    const room = snap.data();
+    startGame(room);
     state.unsubRoom = listenRoom(code, onRoomUpdate);
   } catch (e) {
     showToast("Erreur : " + e.message);
@@ -583,18 +592,19 @@ async function startJoin() {
 }
 
 // ── ROOM UPDATES ───────────────────────────────────────────────────────────
+let gameStarted = false;
 async function onRoomUpdate(room) {
-  if (room.status === "playing" && !state.gridData) {
-    // Joiner: load the grid
-    showToast("Chargement de la grille…");
-    state.gridData = fetchGrid();
+  // Joueur 1 : démarre quand joueur 2 rejoint
+  if (room.status === "playing" && !gameStarted) {
+    gameStarted = true;
+    if (!state.gridData) state.gridData = fetchGrid();
+    if (!qs("#screen-game.active")) {
+      showScreen("game");
+      startGame(room);
+    }
   }
 
-  if (room.status === "playing" && qs("#screen-game:not(.active)")) {
-    startGame(room);
-  }
-
-  if (room.status === "finished") {
+  if (room.status === "finished" && qs("#screen-game.active")) {
     endGame(room);
   }
 }
