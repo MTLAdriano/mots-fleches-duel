@@ -286,8 +286,11 @@ async function doJoin() {
 }
 
 async function onRoom(room) {
-  if(room.status==="playing"&&!S.started){
-    S.started=true; if(!S.G) S.G=fetchGrid(); startGame(room);
+  // Démarre la partie si status=playing et qu'on est encore en attente
+  if(room.status==="playing" && qs("#waiting.active")) {
+    S.started=true;
+    if(!S.G) S.G=fetchGrid();
+    startGame(room);
   }
   if(room.status==="finished"&&qs("#game.active")) endGame(room);
 }
