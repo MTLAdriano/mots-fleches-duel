@@ -4,394 +4,272 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mots Fléchés Duel</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --ink: #0f0f0f;
-      --paper: #f5f0e8;
-      --paper2: #ede8df;
-      --accent: #d4380d;
-      --accent2: #1a6b3c;
-      --muted: #7a7060;
-      --border: #c8c0b0;
-      --radius: 10px;
-      --mono: 'DM Mono', monospace;
-      --sans: 'Syne', sans-serif;
+      --bg: #f2f2f2;
+      --white: #ffffff;
+      --black: #111111;
+      --grey-cell: #d8d8d8;
+      --grey-border: #aaaaaa;
+      --blue: #2563eb;
+      --green: #16a34a;
+      --yellow: #fef08a;
+      --red: #dc2626;
+      --cell: 70px;
     }
-
-    body {
-      font-family: var(--sans);
-      background: var(--paper);
-      color: var(--ink);
-      min-height: 100dvh;
-      display: flex;
-      flex-direction: column;
-    }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--black); min-height: 100dvh; display: flex; flex-direction: column; }
 
     /* ── HEADER ── */
-    header {
-      padding: 1.25rem 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1.5px solid var(--border);
-    }
-    .logo { font-size: 1.1rem; font-weight: 800; letter-spacing: -0.03em; }
-    .logo span { color: var(--accent); }
-    .player-badge {
-      font-family: var(--mono);
-      font-size: 0.75rem;
-      color: var(--muted);
-      display: flex; align-items: center; gap: 8px;
-    }
-    .player-badge strong { color: var(--ink); }
+    header { background: var(--black); color: white; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; }
+    .logo { font-size: 16px; font-weight: 800; letter-spacing: -0.02em; }
+    .logo span { color: #f97316; }
+    .player-badge { font-size: 12px; color: #aaa; }
 
     /* ── SCREENS ── */
-    .screen { display: none; flex: 1; }
+    .screen { display: none; flex: 1; flex-direction: column; }
     .screen.active { display: flex; }
 
     /* ── LOBBY ── */
-    #screen-lobby {
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 2rem;
-      padding: 2rem;
-    }
-    .lobby-title { font-size: clamp(2rem, 6vw, 3.5rem); font-weight: 800; text-align: center; letter-spacing: -0.04em; line-height: 1.1; }
-    .lobby-title em { font-style: normal; color: var(--accent); }
-    .lobby-subtitle { color: var(--muted); font-size: 1rem; text-align: center; max-width: 380px; }
-
-    .pseudo-form {
-      display: flex; flex-direction: column; gap: 0.75rem;
-      width: 100%; max-width: 340px;
-    }
-    .pseudo-form label { font-size: 0.8rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
-    .pseudo-form input {
-      font-family: var(--mono); font-size: 1rem; padding: 0.75rem 1rem;
-      border: 1.5px solid var(--border); border-radius: var(--radius);
-      background: white; color: var(--ink); outline: none;
-      transition: border-color 0.15s;
-    }
-    .pseudo-form input:focus { border-color: var(--ink); }
-
-    .mode-toggle {
-      display: flex; gap: 0; border: 1.5px solid var(--border);
-      border-radius: var(--radius); overflow: hidden; width: 100%; max-width: 340px;
-    }
-    .mode-btn {
-      flex: 1; padding: 0.65rem; font-family: var(--sans); font-size: 0.85rem; font-weight: 600;
-      border: none; cursor: pointer; background: var(--paper2); color: var(--muted);
-      transition: all 0.15s;
-    }
-    .mode-btn.active { background: var(--ink); color: var(--paper); }
-
-    .btn {
-      font-family: var(--sans); font-size: 0.9rem; font-weight: 700;
-      padding: 0.8rem 1.5rem; border-radius: var(--radius); border: 1.5px solid var(--ink);
-      cursor: pointer; transition: all 0.15s; letter-spacing: -0.01em;
-    }
-    .btn-primary { background: var(--ink); color: var(--paper); }
-    .btn-primary:hover { background: #2a2a2a; }
-    .btn-secondary { background: transparent; color: var(--ink); }
-    .btn-secondary:hover { background: var(--paper2); }
-    .btn-accent { background: var(--accent); color: white; border-color: var(--accent); }
-    .btn-accent:hover { background: #b52e08; }
-    .btn-green { background: var(--accent2); color: white; border-color: var(--accent2); }
-
-    .lobby-actions { display: flex; flex-direction: column; gap: 0.75rem; width: 100%; max-width: 340px; }
-
-    .join-row { display: flex; gap: 0.5rem; }
-    .join-row input {
-      flex: 1; font-family: var(--mono); font-size: 1rem; padding: 0.75rem 1rem;
-      border: 1.5px solid var(--border); border-radius: var(--radius);
-      background: white; color: var(--ink); outline: none; text-transform: uppercase;
-      letter-spacing: 0.1em;
-    }
-    .join-row input:focus { border-color: var(--ink); }
-    .divider { display: flex; align-items: center; gap: 1rem; color: var(--muted); font-size: 0.8rem; }
-    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    #screen-lobby { align-items: center; justify-content: center; gap: 24px; padding: 40px 20px; }
+    .lobby-title { font-size: clamp(28px, 6vw, 48px); font-weight: 900; text-align: center; letter-spacing: -0.04em; line-height: 1.05; }
+    .lobby-title em { font-style: normal; color: var(--blue); }
+    .lobby-sub { color: #666; font-size: 15px; text-align: center; max-width: 360px; line-height: 1.5; }
+    .lobby-card { background: white; border-radius: 16px; padding: 24px; width: 100%; max-width: 360px; display: flex; flex-direction: column; gap: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+    .field-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #888; margin-bottom: 4px; }
+    .field-input { width: 100%; font-size: 15px; padding: 10px 14px; border: 1.5px solid #e5e5e5; border-radius: 10px; outline: none; font-family: inherit; transition: border-color .15s; background: #fafafa; }
+    .field-input:focus { border-color: var(--black); background: white; }
+    .mode-toggle { display: flex; border: 1.5px solid #e5e5e5; border-radius: 10px; overflow: hidden; }
+    .mode-btn { flex: 1; padding: 10px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; background: #f5f5f5; color: #666; font-family: inherit; transition: all .15s; }
+    .mode-btn.active { background: var(--black); color: white; }
+    .btn { font-family: inherit; font-size: 14px; font-weight: 700; padding: 12px 20px; border-radius: 10px; border: none; cursor: pointer; transition: all .15s; }
+    .btn-primary { background: var(--black); color: white; }
+    .btn-primary:hover { background: #333; }
+    .btn-blue { background: var(--blue); color: white; }
+    .btn-green { background: var(--green); color: white; }
+    .btn-red { background: var(--red); color: white; }
+    .btn-outline { background: white; color: var(--black); border: 1.5px solid #e5e5e5; }
+    .btn-outline:hover { background: #f5f5f5; }
+    .divider { display: flex; align-items: center; gap: 10px; color: #bbb; font-size: 12px; }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #e5e5e5; }
+    .join-row { display: flex; gap: 8px; }
+    .join-row .field-input { flex: 1; text-transform: uppercase; letter-spacing: 0.12em; font-size: 16px; font-weight: 700; }
 
     /* ── WAITING ── */
-    #screen-waiting {
-      flex-direction: column; align-items: center; justify-content: center;
-      gap: 1.5rem; padding: 2rem; text-align: center;
-    }
-    .room-code-display {
-      font-family: var(--mono); font-size: 3rem; font-weight: 500;
-      letter-spacing: 0.2em; color: var(--ink);
-      border: 2px dashed var(--border); border-radius: var(--radius);
-      padding: 1.25rem 2rem;
-    }
-    .waiting-pulse { color: var(--muted); font-size: 0.95rem; }
-    .waiting-pulse::after { content: ''; animation: dots 1.5s infinite; }
-    @keyframes dots { 0%{content:'.'} 33%{content:'..'} 66%{content:'...'} 100%{content:''} }
-    .copy-link-btn { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); text-decoration: underline; cursor: pointer; background: none; border: none; }
+    #screen-waiting { align-items: center; justify-content: center; gap: 20px; padding: 40px 20px; text-align: center; }
+    .room-code { font-size: 48px; font-weight: 900; letter-spacing: 0.15em; border: 3px dashed #ddd; border-radius: 16px; padding: 20px 36px; background: white; }
+    .waiting-text { color: #666; font-size: 14px; }
+    .waiting-text::after { content: ''; animation: dots 1.5s infinite; }
+    @keyframes dots { 0%{content:'.'} 33%{content:'..'} 66%{content:'...'} }
+    .copy-btn { background: none; border: none; color: var(--blue); font-size: 13px; cursor: pointer; text-decoration: underline; font-family: inherit; }
 
-    /* ── GAME ── */
-    #screen-game {
+    /* ── GAME LAYOUT ── */
+    #screen-game { flex-direction: column; overflow: hidden; }
+    .game-bar { background: white; border-bottom: 1px solid #e5e5e5; padding: 8px 16px; display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
+    .game-timer { font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; min-width: 64px; }
+    .game-timer.warning { color: var(--red); }
+    .game-score { font-size: 13px; color: #666; }
+    .game-score strong { color: var(--black); font-size: 15px; }
+    .game-body { display: flex; flex: 1; overflow: hidden; }
+    .grid-wrap { flex: 1; overflow: auto; padding: 20px; display: flex; align-items: flex-start; justify-content: flex-start; }
+    .grid-container { position: relative; flex-shrink: 0; }
+
+    /* ── GRID CELLS ── */
+    .cell { position: absolute; border: 1px solid var(--grey-border); }
+
+    /* Case définition (grise) */
+    .cell-def {
+      background: var(--grey-cell);
+      padding: 4px 6px;
+      display: flex;
       flex-direction: column;
-    }
-    .game-layout {
-      display: grid;
-      grid-template-columns: 1fr 280px;
-      flex: 1; overflow: hidden;
-    }
-    @media (max-width: 700px) {
-      .game-layout { grid-template-columns: 1fr; }
-      .duel-panel { border-left: none; border-top: 1.5px solid var(--border); }
-    }
-
-    /* ── GAME HEADER ── */
-    .game-header {
-      padding: 0.75rem 1.5rem;
-      border-bottom: 1.5px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between;
-      background: white;
-    }
-    .timer-display {
-      font-family: var(--mono); font-size: 1.3rem; font-weight: 500;
-      letter-spacing: 0.05em;
-    }
-    .timer-display.warning { color: var(--accent); }
-    .score-my { font-size: 0.85rem; color: var(--muted); }
-    .score-my strong { color: var(--ink); font-size: 1rem; }
-
-    /* ── GRID AREA ── */
-    .grid-area {
-      overflow: auto; padding: 1.5rem;
-      display: flex; align-items: flex-start; justify-content: center;
-    }
-    .grid-container {
-      position: relative;
-    }
-    .grid-cell {
-      position: absolute;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; border: 0.5px solid var(--border);
-      background: white; font-family: var(--mono);
-      font-size: 0.85rem; font-weight: 500;
-      text-transform: uppercase; color: var(--ink);
-      transition: background 0.1s;
+      justify-content: space-between;
+      cursor: pointer;
       user-select: none;
     }
-    .grid-cell.black { background: var(--ink); border-color: var(--ink); cursor: default; }
-    .grid-cell.selected { background: #fef3cd; border-color: #e6ac00; z-index: 2; }
-    .grid-cell.correct { background: #d4edda; border-color: #82c996; }
-    .grid-cell.active-word { background: #fff9e6; }
-    .grid-cell.def-cell {
-      font-family: var(--sans); font-size: 0.55rem; font-weight: 600;
-      line-height: 1.2; padding: 2px 3px; color: var(--ink);
-      cursor: pointer; background: var(--paper2);
-      display: flex; flex-direction: column; align-items: flex-start;
-      justify-content: flex-start; text-align: left;
+    .cell-def:hover { background: #c8c8c8; }
+    .cell-def-text {
+      font-size: 9px;
+      font-weight: 600;
+      line-height: 1.25;
+      color: var(--black);
+      text-transform: uppercase;
+      word-break: break-word;
+      flex: 1;
     }
-    .grid-cell .arrow-indicator {
-      position: absolute; bottom: 1px; right: 2px;
-      font-size: 0.55rem; color: var(--muted); line-height: 1;
+    .cell-def-sep { height: 1px; background: #bbb; margin: 2px 0; flex-shrink: 0; }
+    .cell-def-arrow {
+      font-size: 11px;
+      color: var(--black);
+      text-align: right;
+      flex-shrink: 0;
+      line-height: 1;
     }
 
-    /* ── INPUT AREA ── */
-    .input-area {
-      padding: 0.75rem 1.5rem;
-      background: var(--paper2); border-top: 1.5px solid var(--border);
-      display: flex; align-items: center; gap: 1rem;
+    /* Case lettre (blanche) */
+    .cell-letter {
+      background: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--black);
+      text-transform: uppercase;
     }
-    .current-def {
-      flex: 1; font-size: 0.9rem; color: var(--ink);
+    .cell-letter:hover { background: #f5f5f5; }
+    .cell-letter.active { background: var(--yellow); border-color: #ca8a04; z-index: 2; }
+    .cell-letter.found { background: #dcfce7; }
+    .cell-letter.selected-word { background: #fef9c3; }
+
+    /* Case noire */
+    .cell-black { background: var(--black); }
+
+    /* ── INPUT BAR ── */
+    .input-bar { background: #f8f8f8; border-top: 1px solid #e5e5e5; padding: 10px 16px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+    .input-def-wrap { flex: 1; min-width: 0; }
+    .input-def-hint { font-size: 11px; color: #888; margin-bottom: 2px; }
+    .input-def-text { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .word-input {
+      font-family: inherit;
+      font-size: 18px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 8px 12px;
+      border: 2px solid #e5e5e5;
+      border-radius: 10px;
+      width: 160px;
+      outline: none;
+      background: white;
+      transition: border-color .15s;
     }
-    .current-def .def-dir {
-      font-family: var(--mono); font-size: 0.7rem; color: var(--muted);
-      margin-bottom: 0.2rem;
-    }
-    #word-input {
-      font-family: var(--mono); font-size: 1rem; padding: 0.5rem 0.75rem;
-      border: 1.5px solid var(--border); border-radius: var(--radius);
-      background: white; color: var(--ink); outline: none;
-      text-transform: uppercase; letter-spacing: 0.1em; width: 160px;
-    }
-    #word-input:focus { border-color: var(--ink); }
-    #word-input.error { border-color: var(--accent); animation: shake 0.3s; }
+    .word-input:focus { border-color: var(--black); }
+    .word-input.error { border-color: var(--red); animation: shake .3s; }
     @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
+    .validate-btn { padding: 10px 16px; font-size: 18px; }
 
     /* ── DUEL PANEL ── */
-    .duel-panel {
-      border-left: 1.5px solid var(--border);
-      display: flex; flex-direction: column;
-      background: white;
-    }
-    .duel-section {
-      padding: 1rem 1.25rem;
-      border-bottom: 1px solid var(--border);
-    }
-    .duel-label {
-      font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.1em; color: var(--muted); margin-bottom: 0.5rem;
-    }
-
-    /* Scores */
-    .scores-row { display: flex; align-items: center; gap: 0.5rem; }
-    .score-box {
-      flex: 1; text-align: center; padding: 0.75rem 0.5rem;
-      border-radius: var(--radius); background: var(--paper2);
-    }
-    .score-box.me { border: 2px solid var(--accent2); }
-    .score-box .score-name { font-size: 0.7rem; color: var(--muted); margin-bottom: 0.25rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .score-box .score-num { font-family: var(--mono); font-size: 1.5rem; font-weight: 500; }
-    .score-box.me .score-num { color: var(--accent2); }
-    .score-vs { font-size: 0.7rem; color: var(--muted); font-weight: 700; }
-
-    /* Progress bars */
-    .progress-wrap { margin-bottom: 0.5rem; }
-    .progress-name { font-size: 0.75rem; margin-bottom: 0.3rem; display: flex; justify-content: space-between; }
-    .progress-bar-bg { height: 8px; background: var(--paper2); border-radius: 4px; overflow: hidden; }
-    .progress-bar-fill { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
-    .progress-bar-fill.me { background: var(--accent2); }
-    .progress-bar-fill.opp { background: var(--accent); }
-
-    /* Last found */
-    .last-found-badge {
-      font-family: var(--mono); font-size: 0.8rem;
-      padding: 0.35rem 0.6rem; border-radius: 6px;
-      background: var(--paper2); color: var(--muted);
-      min-height: 2rem; display: flex; align-items: center;
-    }
-    .last-found-badge.new { background: #fff3cd; color: #856404; }
-
-    /* Events feed */
-    .events-feed {
-      flex: 1; overflow-y: auto; padding: 0.75rem 1.25rem;
-      display: flex; flex-direction: column; gap: 0.4rem;
-    }
-    .event-item {
-      font-size: 0.75rem; padding: 0.35rem 0.6rem; border-radius: 6px;
-      display: flex; align-items: center; gap: 0.5rem;
-      animation: slideIn 0.25s ease;
-    }
-    @keyframes slideIn { from { opacity:0; transform:translateX(8px); } }
-    .event-item.me { background: #e8f5e9; color: #1a6b3c; }
-    .event-item.opp { background: #fde8e4; color: #9c2a0a; }
+    .duel-panel { width: 260px; flex-shrink: 0; border-left: 1px solid #e5e5e5; background: white; display: flex; flex-direction: column; overflow: hidden; }
+    .panel-section { padding: 14px 16px; border-bottom: 1px solid #f0f0f0; }
+    .panel-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #999; margin-bottom: 10px; }
+    .scores-row { display: flex; align-items: center; gap: 8px; }
+    .score-box { flex: 1; text-align: center; padding: 10px 8px; border-radius: 10px; background: #f8f8f8; }
+    .score-box.me { border: 2px solid var(--green); }
+    .score-name { font-size: 11px; color: #888; margin-bottom: 4px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .score-num { font-size: 28px; font-weight: 900; line-height: 1; }
+    .score-box.me .score-num { color: var(--green); }
+    .score-vs { font-size: 11px; font-weight: 700; color: #ccc; }
+    .prog-row { margin-bottom: 8px; }
+    .prog-label { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px; color: #666; }
+    .prog-track { height: 6px; background: #f0f0f0; border-radius: 3px; overflow: hidden; }
+    .prog-fill { height: 100%; border-radius: 3px; transition: width .4s ease; }
+    .prog-fill.me { background: var(--green); }
+    .prog-fill.opp { background: var(--blue); }
+    .last-badge { font-size: 12px; padding: 6px 10px; border-radius: 8px; background: #f8f8f8; color: #666; min-height: 30px; display: flex; align-items: center; }
+    .last-badge.flash { background: #fef9c3; color: #854d0e; }
+    .events-feed { flex: 1; overflow-y: auto; padding: 12px 16px; display: flex; flex-direction: column; gap: 4px; }
+    .event { font-size: 12px; padding: 6px 10px; border-radius: 8px; animation: fadein .2s; display: flex; align-items: center; gap: 6px; }
+    @keyframes fadein { from{opacity:0;transform:translateX(8px)} }
+    .event.me { background: #f0fdf4; color: #166534; }
+    .event.opp { background: #eff6ff; color: #1e40af; }
     .event-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-    .event-item.me .event-dot { background: var(--accent2); }
-    .event-item.opp .event-dot { background: var(--accent); }
+    .event.me .event-dot { background: var(--green); }
+    .event.opp .event-dot { background: var(--blue); }
 
     /* ── END SCREEN ── */
-    #screen-end {
-      flex-direction: column; align-items: center; justify-content: center;
-      gap: 1.5rem; padding: 2rem; text-align: center;
-    }
-    .end-result { font-size: clamp(2.5rem, 8vw, 4rem); font-weight: 800; letter-spacing: -0.04em; }
-    .end-result.win { color: var(--accent2); }
-    .end-result.lose { color: var(--accent); }
-    .end-result.draw { color: var(--muted); }
-    .end-stats {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;
-      width: 100%; max-width: 400px;
-    }
-    .end-stat {
-      background: var(--paper2); border-radius: var(--radius); padding: 1rem;
-    }
-    .end-stat .stat-val { font-family: var(--mono); font-size: 1.5rem; font-weight: 500; }
-    .end-stat .stat-lbl { font-size: 0.7rem; color: var(--muted); margin-top: 0.25rem; text-transform: uppercase; letter-spacing: 0.06em; }
-    .elo-delta { font-family: var(--mono); font-size: 1rem; }
-    .elo-delta.pos { color: var(--accent2); }
-    .elo-delta.neg { color: var(--accent); }
-    .end-actions { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+    #screen-end { align-items: center; justify-content: center; gap: 20px; padding: 40px 20px; text-align: center; }
+    .end-title { font-size: clamp(36px, 8vw, 56px); font-weight: 900; letter-spacing: -0.04em; }
+    .end-title.win { color: var(--green); }
+    .end-title.lose { color: var(--red); }
+    .end-title.draw { color: #888; }
+    .end-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; max-width: 380px; }
+    .stat-box { background: white; border-radius: 12px; padding: 16px 12px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+    .stat-val { font-size: 28px; font-weight: 900; line-height: 1; }
+    .stat-lbl { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: #999; margin-top: 4px; }
+    .end-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
 
     /* ── TOAST ── */
-    .toast {
-      position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
-      background: var(--ink); color: var(--paper); font-family: var(--mono);
-      font-size: 0.85rem; padding: 0.65rem 1.25rem; border-radius: 999px;
-      z-index: 100; opacity: 0; transition: opacity 0.2s; pointer-events: none;
-      white-space: nowrap;
-    }
+    .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--black); color: white; font-size: 13px; font-weight: 600; padding: 10px 20px; border-radius: 999px; z-index: 999; opacity: 0; transition: opacity .2s; pointer-events: none; white-space: nowrap; }
     .toast.show { opacity: 1; }
 
-    /* ── UTILS ── */
-    .hidden { display: none !important; }
-    .text-muted { color: var(--muted); }
-    .text-mono { font-family: var(--mono); }
+    @media (max-width: 680px) {
+      .duel-panel { display: none; }
+      :root { --cell: 52px; }
+      .cell-def-text { font-size: 7px; }
+      .cell-letter { font-size: 18px; }
+    }
   </style>
 </head>
 <body>
 
 <header>
   <div class="logo">Mots Fléchés <span>Duel</span></div>
-  <div class="player-badge">
-    <span id="header-pseudo"></span>
-    <span id="header-elo" class="text-mono"></span>
-  </div>
+  <div class="player-badge" id="header-badge"></div>
 </header>
 
-<!-- ── LOBBY ── -->
+<!-- LOBBY -->
 <div id="screen-lobby" class="screen active">
   <h1 class="lobby-title">Joue contre<br>tes <em>amis</em></h1>
-  <p class="lobby-subtitle">Grille du Franceinfo du jour, en duel temps réel. Le premier à finir gagne.</p>
-
-  <div class="pseudo-form">
-    <label for="pseudo-input">Ton pseudo</label>
-    <input type="text" id="pseudo-input" placeholder="ex: Alice" maxlength="16" autocomplete="off">
-  </div>
-
-  <div class="mode-toggle">
-    <button class="mode-btn active" data-mode="classic">Classique</button>
-    <button class="mode-btn" data-mode="blitz">⚡ Blitz 5min</button>
-  </div>
-
-  <div class="lobby-actions">
-    <button class="btn btn-primary" id="btn-create">Créer une partie</button>
+  <p class="lobby-sub">La grille du Franceinfo du jour, en duel temps réel. Le premier à finir gagne.</p>
+  <div class="lobby-card">
+    <div>
+      <div class="field-label">Ton pseudo</div>
+      <input class="field-input" id="pseudo-input" type="text" placeholder="ex: Alice" maxlength="16" autocomplete="off">
+    </div>
+    <div class="mode-toggle">
+      <button class="mode-btn active" data-mode="classic">Classique</button>
+      <button class="mode-btn" data-mode="blitz">⚡ Blitz 5min</button>
+    </div>
+    <button class="btn btn-primary" id="btn-create" style="width:100%">Créer une partie</button>
     <div class="divider">ou rejoindre</div>
     <div class="join-row">
-      <input type="text" id="join-code" placeholder="CODE" maxlength="6" autocomplete="off">
-      <button class="btn btn-secondary" id="btn-join">Rejoindre</button>
+      <input class="field-input" id="join-code" type="text" placeholder="CODE" maxlength="6" autocomplete="off">
+      <button class="btn btn-blue" id="btn-join">Rejoindre</button>
     </div>
   </div>
 </div>
 
-<!-- ── WAITING ── -->
+<!-- WAITING -->
 <div id="screen-waiting" class="screen">
-  <p class="text-muted" style="font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;font-weight:700">Code de la partie</p>
-  <div class="room-code-display" id="display-room-code">------</div>
-  <p>Partage ce lien à ton adversaire :</p>
-  <button class="copy-link-btn" id="btn-copy-link">📋 Copier le lien</button>
-  <p class="waiting-pulse">En attente de l'adversaire</p>
-  <button class="btn btn-secondary" id="btn-cancel-wait">Annuler</button>
+  <p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#999">Code de la partie</p>
+  <div class="room-code" id="display-room-code">——</div>
+  <p style="font-size:14px;color:#666">Partage ce lien :</p>
+  <button class="copy-btn" id="btn-copy-link">📋 Copier le lien</button>
+  <p class="waiting-text">En attente de l'adversaire</p>
+  <button class="btn btn-outline" id="btn-cancel-wait" style="margin-top:8px">Annuler</button>
 </div>
 
-<!-- ── GAME ── -->
+<!-- GAME -->
 <div id="screen-game" class="screen">
-  <div class="game-header">
-    <div class="timer-display" id="game-timer">00:00</div>
-    <div class="score-my">
-      <strong id="my-score-header">0</strong> / <span id="total-words-header">–</span> mots
-    </div>
-    <button class="btn btn-secondary" style="font-size:0.8rem;padding:0.4rem 0.75rem" id="btn-give-up">Abandonner</button>
+  <div class="game-bar">
+    <div class="game-timer" id="game-timer">00:00</div>
+    <div class="game-score"><strong id="my-score-header">0</strong> / <span id="total-words-header">–</span> mots</div>
+    <div style="flex:1"></div>
+    <button class="btn btn-outline" style="font-size:12px;padding:6px 12px" id="btn-give-up">Abandonner</button>
   </div>
 
-  <div class="game-layout">
-    <!-- GRID -->
-    <div style="display:flex;flex-direction:column;overflow:hidden;">
-      <div class="grid-area" id="grid-area">
+  <div class="game-body">
+    <div style="display:flex;flex-direction:column;flex:1;overflow:hidden">
+      <div class="grid-wrap" id="grid-wrap">
         <div class="grid-container" id="grid-container"></div>
       </div>
-      <div class="input-area">
-        <div class="current-def" id="current-def">
-          <div class="def-dir" id="current-def-dir">Sélectionne un mot</div>
-          <div id="current-def-text">–</div>
+      <div class="input-bar">
+        <div class="input-def-wrap">
+          <div class="input-def-hint" id="input-hint">Sélectionne une case</div>
+          <div class="input-def-text" id="input-def">–</div>
         </div>
-        <input type="text" id="word-input" placeholder="RÉPONSE" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false">
-        <button class="btn btn-primary" id="btn-validate" style="padding:0.5rem 1rem">→</button>
+        <input class="word-input" id="word-input" type="text" placeholder="MOT" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false">
+        <button class="btn btn-primary validate-btn" id="btn-validate">✓</button>
       </div>
     </div>
 
-    <!-- DUEL PANEL -->
     <div class="duel-panel">
-      <div class="duel-section">
-        <div class="duel-label">Score</div>
+      <div class="panel-section">
+        <div class="panel-title">Score</div>
         <div class="scores-row">
           <div class="score-box me">
             <div class="score-name" id="panel-my-name">Moi</div>
@@ -404,62 +282,40 @@
           </div>
         </div>
       </div>
-
-      <div class="duel-section">
-        <div class="duel-label">Progression</div>
-        <div class="progress-wrap">
-          <div class="progress-name">
-            <span id="prog-my-name">Moi</span>
-            <span id="prog-my-pct">0%</span>
-          </div>
-          <div class="progress-bar-bg">
-            <div class="progress-bar-fill me" id="prog-my-bar" style="width:0%"></div>
-          </div>
+      <div class="panel-section">
+        <div class="panel-title">Progression</div>
+        <div class="prog-row">
+          <div class="prog-label"><span id="prog-my-name">Moi</span><span id="prog-my-pct">0%</span></div>
+          <div class="prog-track"><div class="prog-fill me" id="prog-my-bar" style="width:0%"></div></div>
         </div>
-        <div class="progress-wrap" style="margin-top:0.5rem">
-          <div class="progress-name">
-            <span id="prog-opp-name">Adversaire</span>
-            <span id="prog-opp-pct">0%</span>
-          </div>
-          <div class="progress-bar-bg">
-            <div class="progress-bar-fill opp" id="prog-opp-bar" style="width:0%"></div>
-          </div>
+        <div class="prog-row">
+          <div class="prog-label"><span id="prog-opp-name">Adversaire</span><span id="prog-opp-pct">0%</span></div>
+          <div class="prog-track"><div class="prog-fill opp" id="prog-opp-bar" style="width:0%"></div></div>
         </div>
       </div>
-
-      <div class="duel-section">
-        <div class="duel-label">Dernier mot adversaire</div>
-        <div class="last-found-badge" id="last-found-badge">–</div>
+      <div class="panel-section">
+        <div class="panel-title">Dernier mot adversaire</div>
+        <div class="last-badge" id="last-badge">–</div>
       </div>
-
-      <div class="duel-section" style="border-bottom:none">
-        <div class="duel-label">Événements</div>
+      <div class="panel-section" style="border-bottom:none">
+        <div class="panel-title">Événements</div>
       </div>
       <div class="events-feed" id="events-feed"></div>
     </div>
   </div>
 </div>
 
-<!-- ── END ── -->
+<!-- END -->
 <div id="screen-end" class="screen">
-  <div class="end-result" id="end-result-text">Bravo !</div>
+  <div class="end-title" id="end-title">–</div>
   <div class="end-stats">
-    <div class="end-stat">
-      <div class="stat-val" id="end-my-score">–</div>
-      <div class="stat-lbl">Mots trouvés</div>
-    </div>
-    <div class="end-stat">
-      <div class="stat-val" id="end-time">–</div>
-      <div class="stat-lbl">Temps</div>
-    </div>
-    <div class="end-stat">
-      <div class="stat-val elo-delta" id="end-elo-delta">–</div>
-      <div class="stat-lbl">Elo</div>
-    </div>
+    <div class="stat-box"><div class="stat-val" id="end-score">–</div><div class="stat-lbl">Mots</div></div>
+    <div class="stat-box"><div class="stat-val" id="end-time">–</div><div class="stat-lbl">Temps</div></div>
+    <div class="stat-box"><div class="stat-val" id="end-elo" style="font-size:20px">–</div><div class="stat-lbl">Elo</div></div>
   </div>
   <div class="end-actions">
-    <button class="btn btn-accent" id="btn-rematch">Revanche ⚡</button>
-    <button class="btn btn-secondary" id="btn-new-game">Nouvelle partie</button>
+    <button class="btn btn-red" id="btn-rematch">Revanche ⚡</button>
+    <button class="btn btn-outline" id="btn-new-game">Nouvelle partie</button>
   </div>
 </div>
 
@@ -468,301 +324,234 @@
 <script type="module">
 import { initAuth } from "./js/firebase.js";
 import { fetchGrid } from "./js/grid.js";
-import {
-  createRoom, joinRoom, listenRoom, listenOpponentLive,
-  submitWord, finishGame, requestRematch
-} from "./js/room.js";
+import { createRoom, joinRoom, listenRoom, listenOpponentLive, submitWord, finishGame, requestRematch } from "./js/room.js";
 
-// ── STATE ──────────────────────────────────────────────────────────────────
-let state = {
-  user: null,
-  pseudo: "",
-  mode: "classic",
-  roomId: null,
-  gridData: null,
-  myFoundWords: new Set(),     // word IDs found
+// ─── STATE ────────────────────────────────────────────────────────────────
+const S = {
+  user: null, pseudo: "", mode: "classic",
+  roomId: null, gridData: null,
+  myFoundWords: new Set(),
   selectedWordId: null,
-  startTime: null,
-  timerInterval: null,
-  blitzRemaining: 300,
-  unsubRoom: null,
-  unsubLive: null,
-  opponentData: {},
-  myElo: 1000,
+  startTime: null, timerInterval: null, blitzRemaining: 300,
+  unsubRoom: null, unsubLive: null,
+  gameStarted: false,
 };
 
-// ── INIT ───────────────────────────────────────────────────────────────────
-async function init() {
-  state.user = await initAuth();
-
-  // Check URL for room code (shared link)
-  const hash = window.location.hash.replace("#room/", "");
-  if (hash.length === 6) {
-    qs("#join-code").value = hash.toUpperCase();
-  }
-
-  // Restore pseudo from localStorage
+// ─── BOOT ─────────────────────────────────────────────────────────────────
+async function boot() {
+  S.user = await initAuth();
+  const hash = location.hash.replace("#room/", "");
+  if (hash.length === 6) qs("#join-code").value = hash.toUpperCase();
   const saved = localStorage.getItem("mfd-pseudo");
   if (saved) qs("#pseudo-input").value = saved;
-
-  setupLobbyListeners();
+  bindLobby();
 }
 
-// ── LOBBY LISTENERS ────────────────────────────────────────────────────────
-function setupLobbyListeners() {
-  // Mode toggle
-  qsa(".mode-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      qsa(".mode-btn").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      state.mode = btn.dataset.mode;
-    });
-  });
-
-  qs("#btn-create").addEventListener("click", startCreate);
-  qs("#btn-join").addEventListener("click", startJoin);
-  qs("#join-code").addEventListener("keydown", e => { if (e.key === "Enter") startJoin(); });
+// ─── LOBBY ────────────────────────────────────────────────────────────────
+function bindLobby() {
+  qsa(".mode-btn").forEach(b => b.addEventListener("click", () => {
+    qsa(".mode-btn").forEach(x => x.classList.remove("active"));
+    b.classList.add("active");
+    S.mode = b.dataset.mode;
+  }));
+  qs("#btn-create").addEventListener("click", doCreate);
+  qs("#btn-join").addEventListener("click", doJoin);
+  qs("#join-code").addEventListener("keydown", e => e.key === "Enter" && doJoin());
   qs("#btn-cancel-wait").addEventListener("click", () => showScreen("lobby"));
-  qs("#btn-copy-link").addEventListener("click", copyRoomLink);
-  qs("#btn-validate").addEventListener("click", validateWord);
-  qs("#word-input").addEventListener("keydown", e => { if (e.key === "Enter") validateWord(); });
-  qs("#btn-give-up").addEventListener("click", giveUp);
+  qs("#btn-copy-link").addEventListener("click", copyLink);
+  qs("#btn-validate").addEventListener("click", doValidate);
+  qs("#word-input").addEventListener("keydown", e => e.key === "Enter" && doValidate());
+  qs("#btn-give-up").addEventListener("click", doGiveUp);
   qs("#btn-rematch").addEventListener("click", doRematch);
   qs("#btn-new-game").addEventListener("click", () => showScreen("lobby"));
 }
 
-// ── CREATE GAME ─────────────────────────────────────────────────────────────
-async function startCreate() {
-  const pseudo = getPseudo();
-  if (!pseudo) return;
-
+async function doCreate() {
+  const pseudo = getPseudo(); if (!pseudo) return;
   try {
-    showToast("Chargement de la grille…");
-    state.gridData = fetchGrid();
-    state.pseudo = pseudo;
-    state.myFoundWords = new Set();
-
-    gameStarted = false;
-    state.roomId = await createRoom({
-      uid: state.user.uid,
-      pseudo,
-      gridData: state.gridData,
-      mode: state.mode
-    });
-
+    toast("Chargement…");
+    S.gridData = fetchGrid();
+    S.pseudo = pseudo; S.myFoundWords = new Set(); S.gameStarted = false;
+    S.roomId = await createRoom({ uid: S.user.uid, pseudo, gridData: S.gridData, mode: S.mode });
     showScreen("waiting");
-    qs("#display-room-code").textContent = state.roomId;
-    window.history.replaceState(null, "", `#room/${state.roomId}`);
-
-    // Listen for player2 joining
-    state.unsubRoom = listenRoom(state.roomId, onRoomUpdate);
-  } catch (e) {
-    showToast("Erreur : " + e.message);
-    console.error(e);
-  }
+    qs("#display-room-code").textContent = S.roomId;
+    history.replaceState(null, "", `#room/${S.roomId}`);
+    S.unsubRoom = listenRoom(S.roomId, onRoom);
+  } catch(e) { toast("Erreur : " + e.message); console.error(e); }
 }
 
-// ── JOIN GAME ──────────────────────────────────────────────────────────────
-async function startJoin() {
-  const pseudo = getPseudo();
-  if (!pseudo) return;
+async function doJoin() {
+  const pseudo = getPseudo(); if (!pseudo) return;
   const code = qs("#join-code").value.trim().toUpperCase();
-  if (code.length !== 6) { showToast("Code à 6 caractères svp"); return; }
-
+  if (code.length !== 6) { toast("Code à 6 caractères svp"); return; }
   try {
-    showToast("Connexion…");
-    state.pseudo = pseudo;
-    state.myFoundWords = new Set();
-    state.roomId = code;
-    state.gridData = fetchGrid(); // Charge la grille immédiatement
-
-    await joinRoom({ roomId: code, uid: state.user.uid, pseudo });
-    // Démarre la partie directement — joinRoom met le status à "playing"
-    showScreen("game");
+    toast("Connexion…");
+    S.pseudo = pseudo; S.myFoundWords = new Set(); S.roomId = code;
+    S.gridData = fetchGrid();
+    await joinRoom({ roomId: code, uid: S.user.uid, pseudo });
     const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
     const { db } = await import("./js/firebase.js");
     const snap = await getDoc(doc(db, "rooms", code));
-    const room = snap.data();
-    startGame(room);
-    state.unsubRoom = listenRoom(code, onRoomUpdate);
-  } catch (e) {
-    showToast("Erreur : " + e.message);
-    console.error(e);
-  }
+    S.gameStarted = true;
+    startGame(snap.data());
+    S.unsubRoom = listenRoom(code, onRoom);
+  } catch(e) { toast("Erreur : " + e.message); console.error(e); }
 }
 
-// ── ROOM UPDATES ───────────────────────────────────────────────────────────
-let gameStarted = false;
-async function onRoomUpdate(room) {
-  // Joueur 1 : démarre quand joueur 2 rejoint
-  if (room.status === "playing" && !gameStarted) {
-    gameStarted = true;
-    if (!state.gridData) state.gridData = fetchGrid();
-    if (!qs("#screen-game.active")) {
-      showScreen("game");
-      startGame(room);
-    }
+// ─── ROOM LISTENER ────────────────────────────────────────────────────────
+async function onRoom(room) {
+  if (room.status === "playing" && !S.gameStarted) {
+    S.gameStarted = true;
+    if (!S.gridData) S.gridData = fetchGrid();
+    startGame(room);
   }
-
   if (room.status === "finished" && qs("#screen-game.active")) {
     endGame(room);
   }
 }
 
-// ── START GAME ─────────────────────────────────────────────────────────────
+// ─── START GAME ───────────────────────────────────────────────────────────
 function startGame(room) {
   showScreen("game");
-  renderGrid();
-
-  const total = state.gridData.totalWords;
-  qs("#total-words-header").textContent = total;
-  qs("#panel-my-name").textContent = state.pseudo;
-  qs("#prog-my-name").textContent = state.pseudo;
-
-  // Start timer
-  state.startTime = Date.now();
-  if (state.mode === "blitz") {
-    state.blitzRemaining = room.blitzDuration || 300;
-    state.timerInterval = setInterval(tickBlitz, 1000);
+  buildGrid();
+  qs("#total-words-header").textContent = S.gridData.totalWords;
+  qs("#panel-my-name").textContent = S.pseudo;
+  qs("#prog-my-name").textContent = S.pseudo;
+  S.startTime = Date.now();
+  if (S.mode === "blitz") {
+    S.blitzRemaining = room.blitzDuration || 300;
+    S.timerInterval = setInterval(tickBlitz, 1000);
   } else {
-    state.timerInterval = setInterval(tickChronometer, 1000);
+    S.timerInterval = setInterval(tickChron, 1000);
   }
-
-  // Listen to opponent
-  const opponentUid = room.player1 === state.user.uid ? room.player2 : room.player1;
-  if (opponentUid) {
-    state.unsubLive = listenOpponentLive(state.roomId, opponentUid, onOpponentUpdate);
-    // Get opponent pseudo from firestore (already loaded in room.players via separate listener)
-    getOpponentPseudo(room, opponentUid);
+  const oppUid = room.player1 === S.user.uid ? room.player2 : room.player1;
+  if (oppUid) {
+    S.unsubLive = listenOpponentLive(S.roomId, oppUid, onOpp);
+    loadOppName(oppUid);
   }
 }
 
-async function getOpponentPseudo(room, opponentUid) {
-  const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-  const { db } = await import("./js/firebase.js");
-  const snap = await getDoc(doc(db, "rooms", state.roomId, "players", opponentUid));
-  if (snap.exists()) {
-    const name = snap.data().pseudo || "Adversaire";
-    qs("#panel-opp-name").textContent = name;
-    qs("#prog-opp-name").textContent = name;
-  }
+async function loadOppName(uid) {
+  try {
+    const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    const { db } = await import("./js/firebase.js");
+    const snap = await getDoc(doc(db, "rooms", S.roomId, "players", uid));
+    if (snap.exists()) {
+      const n = snap.data().pseudo || "Adversaire";
+      qs("#panel-opp-name").textContent = n;
+      qs("#prog-opp-name").textContent = n;
+    }
+  } catch {}
 }
 
-// ── OPPONENT LIVE UPDATE ───────────────────────────────────────────────────
-function onOpponentUpdate(data) {
-  state.opponentData = data;
-  const total = state.gridData?.totalWords || 1;
+// ─── OPPONENT UPDATES ─────────────────────────────────────────────────────
+function onOpp(data) {
+  const total = S.gridData?.totalWords || 1;
   const found = (data.foundWords || []).length;
-
   qs("#panel-opp-score").textContent = found;
-  const pct = Math.round((found / total) * 100);
+  const pct = Math.round(found / total * 100);
   qs("#prog-opp-bar").style.width = pct + "%";
   qs("#prog-opp-pct").textContent = pct + "%";
-
-  // Last found notification
   if (data.lastFoundAt && found > 0) {
-    const badge = qs("#last-found-badge");
-    badge.textContent = `${found} mot${found > 1 ? 's' : ''} trouvé${found > 1 ? 's' : ''}`;
-    badge.classList.add("new");
-    setTimeout(() => badge.classList.remove("new"), 2000);
-    addEvent("opp", `+1 mot (${found} au total)`);
+    const b = qs("#last-badge");
+    b.textContent = `${found} mot${found > 1 ? "s" : ""} trouvé${found > 1 ? "s" : ""}`;
+    b.classList.add("flash");
+    setTimeout(() => b.classList.remove("flash"), 2000);
+    addEvent("opp", `+1 mot (${found}/${total})`);
   }
 }
 
-// ── GRID RENDERING ─────────────────────────────────────────────────────────
-function renderGrid() {
-  const { rows, cols, grid } = state.gridData;
-  const CELL = 52;
+// ─── GRID BUILD ───────────────────────────────────────────────────────────
+function buildGrid() {
+  const { rows, cols, grid } = S.gridData;
+  const C = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--cell")) || 70;
   const container = qs("#grid-container");
   container.innerHTML = "";
-  container.style.width = (cols * CELL) + "px";
-  container.style.height = (rows * CELL) + "px";
+  container.style.width = cols * C + "px";
+  container.style.height = rows * C + "px";
 
-  // Dans les mots fléchés Mygamify :
-  // - (x,y) = cellule de DÉFINITION (case noire avec texte + flèche)
-  // - Les lettres partent depuis (x+dx, y+dy) avec dx/dy selon la direction
-  // - dir "RB" ou "RR" → le mot va vers la droite (dx=1, dy=0)
-  // - dir "BR" ou "BB" → le mot va vers le bas (dx=0, dy=1)
-  // - Une case peut être à la fois DEF et LETTRE (intersection)
-
-  const defCells = {};   // "x,y" -> [{dir, def, id, size}]
-  const letterCells = {}; // "x,y" -> [{wordId, pos}]
+  // 1. Construire les maps
+  const defMap = {};    // "x,y" -> [{id,dir,def,size}]
+  const letterMap = {}; // "x,y" -> [{wordId,pos}]
 
   grid.forEach(w => {
-    const x = parseInt(w.x), y = parseInt(w.y);
-    const key = `${x},${y}`;
-    if (!defCells[key]) defCells[key] = [];
-    defCells[key].push(w);
-
-    const [dx, dy] = w.dir[0] === "R" ? [1, 0] : [0, 1];
+    const x = w.x, y = w.y, key = `${x},${y}`;
+    if (!defMap[key]) defMap[key] = [];
+    defMap[key].push(w);
+    const dx = w.dir[0] === "R" ? 1 : 0;
+    const dy = w.dir[0] === "R" ? 0 : 1;
     for (let i = 1; i <= w.size; i++) {
-      const lx = x + dx * i, ly = y + dy * i;
-      const lkey = `${lx},${ly}`;
-      if (!letterCells[lkey]) letterCells[lkey] = [];
-      letterCells[lkey].push({ wordId: w.id, pos: i - 1 });
+      const lk = `${x+dx*i},${y+dy*i}`;
+      if (!letterMap[lk]) letterMap[lk] = [];
+      letterMap[lk].push({ wordId: w.id, pos: i - 1 });
     }
   });
 
+  // 2. Rendre chaque case
   for (let row = 1; row <= rows; row++) {
     for (let col = 1; col <= cols; col++) {
       const key = `${col},${row}`;
-      const isDef = !!defCells[key];
-      const isLetter = !!letterCells[key];
       const el = document.createElement("div");
-      el.style.cssText = `position:absolute;left:${(col-1)*CELL}px;top:${(row-1)*CELL}px;width:${CELL}px;height:${CELL}px;box-sizing:border-box;border:1px solid #c8c0b0;`;
+      el.className = "cell";
+      el.style.left = (col-1)*C + "px";
+      el.style.top  = (row-1)*C + "px";
+      el.style.width  = C + "px";
+      el.style.height = C + "px";
       el.dataset.x = col;
       el.dataset.y = row;
 
-      if (isDef) {
-        // Case définition (noire avec texte)
-        el.style.background = "#1a1a1a";
-        el.style.padding = "2px";
-        el.style.overflow = "hidden";
-        el.style.cursor = "pointer";
-        el.dataset.defs = JSON.stringify(defCells[key]);
+      if (defMap[key]) {
+        // ── Case définition ──────────────────────────────────────
+        el.classList.add("cell-def");
+        el.dataset.defs = JSON.stringify(defMap[key]);
+        const defs = defMap[key];
 
-        const defs = defCells[key];
-        el.innerHTML = defs.map((d, i) => `
-          <div style="display:flex;align-items:flex-start;gap:1px;${i>0?'margin-top:1px;border-top:1px solid #444;padding-top:1px':''}">
-            <span style="flex:1;font-size:7.5px;line-height:1.2;font-family:sans-serif;font-weight:600;color:#fff;word-break:break-word;">${d.def}</span>
-            <span style="font-size:10px;color:#ff6b35;flex-shrink:0;line-height:1;">${dirArrow(d.dir)}</span>
-          </div>
-        `).join("");
+        defs.forEach((d, i) => {
+          if (i > 0) {
+            const sep = document.createElement("div");
+            sep.className = "cell-def-sep";
+            el.appendChild(sep);
+          }
+          const row_el = document.createElement("div");
+          row_el.style.cssText = "display:flex;justify-content:space-between;align-items:flex-start;gap:2px;flex:1;min-height:0;";
 
-        el.addEventListener("click", () => {
-          const defs = JSON.parse(el.dataset.defs);
-          const unfinished = defs.find(d => !state.myFoundWords.has(d.id));
-          selectWord((unfinished || defs[0]).id);
+          const txt = document.createElement("div");
+          txt.className = "cell-def-text";
+          txt.textContent = d.def;
+
+          const arr = document.createElement("div");
+          arr.className = "cell-def-arrow";
+          arr.textContent = arrow(d.dir);
+
+          row_el.appendChild(txt);
+          row_el.appendChild(arr);
+          el.appendChild(row_el);
         });
 
-      } else if (isLetter) {
-        // Case lettre (blanche)
-        el.style.background = "white";
-        el.style.cursor = "pointer";
-        el.style.display = "flex";
-        el.style.alignItems = "center";
-        el.style.justifyContent = "center";
-        el.style.fontSize = "20px";
-        el.style.fontWeight = "700";
-        el.style.fontFamily = "monospace";
-        el.dataset.words = JSON.stringify(letterCells[key]);
+        el.addEventListener("click", () => {
+          const ds = JSON.parse(el.dataset.defs);
+          const unfinished = ds.find(d => !S.myFoundWords.has(d.id));
+          pickWord((unfinished || ds[0]).id);
+        });
+
+      } else if (letterMap[key]) {
+        // ── Case lettre ──────────────────────────────────────────
+        el.classList.add("cell-letter");
+        el.dataset.words = JSON.stringify(letterMap[key]);
+        el.dataset.key = key;
 
         const span = document.createElement("span");
-        span.dataset.letter = "true";
         el.appendChild(span);
 
         el.addEventListener("click", () => {
-          const words = JSON.parse(el.dataset.words);
-          if (words.length > 1 && state.selectedWordId === words[0].wordId) {
-            selectWord(words[1].wordId);
-          } else {
-            selectWord(words[0].wordId);
-          }
+          const ws = JSON.parse(el.dataset.words);
+          if (ws.length > 1 && S.selectedWordId === ws[0].wordId) pickWord(ws[1].wordId);
+          else pickWord(ws[0].wordId);
         });
 
       } else {
-        // Case vraiment vide (noire pleine)
-        el.style.background = "#1a1a1a";
+        // ── Case noire ───────────────────────────────────────────
+        el.classList.add("cell-black");
       }
 
       container.appendChild(el);
@@ -770,272 +559,202 @@ function renderGrid() {
   }
 }
 
-function dirArrow(dir) {
+function arrow(dir) {
   if (dir === "RR") return "→";
   if (dir === "BB") return "↓";
   if (dir === "RB") return "→↓";
   if (dir === "BR") return "↓→";
-  return "→";
+  return "";
 }
 
-function selectWord(wordId) {
-  state.selectedWordId = wordId;
-  const word = state.gridData.grid.find(w => w.id === wordId);
-  if (!word) return;
+// ─── WORD SELECTION ───────────────────────────────────────────────────────
+function pickWord(wordId) {
+  S.selectedWordId = wordId;
+  const w = S.gridData.grid.find(x => x.id === wordId);
+  if (!w) return;
 
-  // Reset toutes les cases lettres
-  qsa("[data-words]").forEach(el => {
-    if (!state.myFoundWords.has(parseInt(JSON.parse(el.dataset.words)[0].wordId))) {
-      el.style.background = "white";
+  // Reset highlight
+  qsa(".cell-letter").forEach(el => {
+    if (!S.myFoundWords.has(parseInt(JSON.parse(el.dataset.words)[0].wordId))) {
+      el.classList.remove("selected-word", "active");
     }
   });
 
-  // Surligne les cases du mot sélectionné
-  const x = word.x, y = word.y;
-  const [dx, dy] = word.dir[0] === "R" ? [1, 0] : [0, 1];
-  for (let i = 1; i <= word.size; i++) {
-    const cell = getCellEl(x + dx * i, y + dy * i);
-    if (cell && !state.myFoundWords.has(wordId)) {
-      cell.style.background = "#fff9e6";
-    }
+  // Highlight mot sélectionné
+  const dx = w.dir[0] === "R" ? 1 : 0;
+  const dy = w.dir[0] === "R" ? 0 : 1;
+  for (let i = 1; i <= w.size; i++) {
+    const cell = cellAt(w.x + dx*i, w.y + dy*i);
+    if (cell && !S.myFoundWords.has(wordId)) cell.classList.add("selected-word");
   }
 
-  qs("#current-def-dir").textContent = `${dirArrow(word.dir)} · ${word.size} lettres`;
-  qs("#current-def-text").textContent = word.def;
+  qs("#input-hint").textContent = `${arrow(w.dir)} · ${w.size} lettres`;
+  qs("#input-def").textContent = w.def;
   qs("#word-input").value = "";
   qs("#word-input").focus();
 }
 
-function updateLettersOnGrid(wordId, answer) {
-  const word = state.gridData.grid.find(w => w.id === wordId);
-  if (!word) return;
-  const [dx, dy] = word.dir[0] === "R" ? [1, 0] : [0, 1];
-  for (let i = 1; i <= word.size; i++) {
-    const cell = getCellEl(word.x + dx * i, word.y + dy * i);
-    if (cell) {
-      const span = cell.querySelector("[data-letter]");
-      if (span) span.textContent = answer[i - 1] || "";
-      cell.style.background = "#d4edda";
-    }
-  }
-}
-
-function markWordFound(wordId) {
-  const word = state.gridData.grid.find(w => w.id === wordId);
-  if (!word) return;
-  const [dx, dy] = word.dir[0] === "R" ? [1, 0] : [0, 1];
-  for (let i = 1; i <= word.size; i++) {
-    const cell = getCellEl(word.x + dx * i, word.y + dy * i);
-    if (cell) cell.style.background = "#d4edda";
-  }
-}
-
-function getCellEl(x, y) {
-  return qs(`[data-x="${x}"][data-y="${y}"]`);
-}
-
-function shortenDef(def) {
-  return def.length > 20 ? def.substring(0, 18) + "…" : def;
-}
-
-// ── VALIDATE WORD ──────────────────────────────────────────────────────────
-async function validateWord() {
-  if (!state.selectedWordId) return;
+// ─── VALIDATE ─────────────────────────────────────────────────────────────
+async function doValidate() {
+  if (!S.selectedWordId) return;
   const input = qs("#word-input");
-  const answer = input.value.trim().toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-  if (!answer) return;
+  const raw = input.value.trim().toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  if (!raw) return;
 
-  const word = state.gridData.grid.find(w => w.id === state.selectedWordId);
-  if (!word) return;
+  const w = S.gridData.grid.find(x => x.id === S.selectedWordId);
+  if (!w) return;
 
-  if (answer.length !== word.size) {
+  if (raw.length !== w.size) {
     input.classList.add("error");
     setTimeout(() => input.classList.remove("error"), 400);
-    showToast(`${word.size} lettres attendues`);
+    toast(`${w.size} lettres attendues`);
     return;
   }
 
-  // Validation via API Mygamify — si ça échoue on accepte quand même (longueur ok)
-  const correct = await checkAnswer(state.gridData.id, state.selectedWordId, answer);
-  if (!correct) {
+  const ok = await checkWord(S.gridData.id, S.selectedWordId, raw);
+  if (!ok) {
     input.classList.add("error");
     setTimeout(() => input.classList.remove("error"), 400);
-    showToast("Incorrect… réessaie !");
+    toast("Incorrect… réessaie !");
     return;
   }
 
-  // ✓ Mot trouvé — affiche les lettres sur la grille
-  const foundWordId = state.selectedWordId;
-  state.myFoundWords.add(foundWordId);
-  updateLettersOnGrid(foundWordId, answer); // ← affiche les lettres
+  // ✓ Correct
+  const wid = S.selectedWordId;
+  S.myFoundWords.add(wid);
+  paintWord(wid, raw);
   input.value = "";
-  state.selectedWordId = null;
-  qs("#current-def-text").textContent = "–";
-  qs("#current-def-dir").textContent = "Sélectionne un mot";
+  S.selectedWordId = null;
+  qs("#input-def").textContent = "–";
+  qs("#input-hint").textContent = "Sélectionne une case";
 
-  const found = state.myFoundWords.size;
-  const total = state.gridData.totalWords;
-
-  // Update UI
+  const found = S.myFoundWords.size;
+  const total = S.gridData.totalWords;
   qs("#my-score-header").textContent = found;
   qs("#panel-my-score").textContent = found;
-  const pct = Math.round((found / total) * 100);
+  const pct = Math.round(found / total * 100);
   qs("#prog-my-bar").style.width = pct + "%";
   qs("#prog-my-pct").textContent = pct + "%";
-  addEvent("me", `+1 mot trouvé (${found}/${total})`);
+  addEvent("me", `+1 mot (${found}/${total})`);
 
-  // Sync to Firebase
-  await submitWord({
-    roomId: state.roomId,
-    uid: state.user.uid,
-    wordId: foundWordId,
-    totalFound: found,
-    totalWords: total
-  });
+  await submitWord({ roomId: S.roomId, uid: S.user.uid, wordId: wid, totalFound: found, totalWords: total });
 }
 
-async function checkAnswer(gridId, wordId, answer) {
-  // Use franceinfo's verify endpoint via the Mygamify SDK
+async function checkWord(gridId, wordId, answer) {
   try {
-    const url = `https://sdk.mygamify.fr/mots-fleches/verifier/${gridId}`;
-    const res = await fetch(url, {
+    const res = await fetch(`https://sdk.mygamify.fr/mots-fleches/verifier/${gridId}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ wordId, answer })
     });
-    const data = await res.json();
-    return data.correct === true;
-  } catch {
-    // Fallback: trust the answer (length already checked)
-    return true;
+    const d = await res.json();
+    return d.correct === true;
+  } catch { return true; } // fallback: accepte si API injoignable
+}
+
+function paintWord(wordId, answer) {
+  const w = S.gridData.grid.find(x => x.id === wordId);
+  if (!w) return;
+  const dx = w.dir[0] === "R" ? 1 : 0;
+  const dy = w.dir[0] === "R" ? 0 : 1;
+  for (let i = 1; i <= w.size; i++) {
+    const cell = cellAt(w.x + dx*i, w.y + dy*i);
+    if (cell) {
+      cell.classList.remove("selected-word", "active");
+      cell.classList.add("found");
+      const span = cell.querySelector("span");
+      if (span && answer) span.textContent = answer[i-1] || "";
+    }
   }
 }
 
-// ── TIMERS ─────────────────────────────────────────────────────────────────
-function tickChronometer() {
-  const elapsed = Math.floor((Date.now() - state.startTime) / 1000);
-  qs("#game-timer").textContent = formatTime(elapsed);
+// ─── TIMERS ───────────────────────────────────────────────────────────────
+function tickChron() {
+  const e = Math.floor((Date.now() - S.startTime) / 1000);
+  qs("#game-timer").textContent = fmt(e);
 }
-
 function tickBlitz() {
-  state.blitzRemaining--;
-  const el = qs("#game-timer");
-  el.textContent = formatTime(state.blitzRemaining);
-  if (state.blitzRemaining <= 30) el.classList.add("warning");
-  if (state.blitzRemaining <= 0) {
-    clearInterval(state.timerInterval);
-    finishGame({ roomId: state.roomId, uid: state.user.uid });
-  }
+  S.blitzRemaining--;
+  qs("#game-timer").textContent = fmt(S.blitzRemaining);
+  if (S.blitzRemaining <= 30) qs("#game-timer").classList.add("warning");
+  if (S.blitzRemaining <= 0) { clearInterval(S.timerInterval); finishGame({ roomId: S.roomId, uid: S.user.uid }); }
 }
+function fmt(s) { return `${Math.floor(s/60).toString().padStart(2,"0")}:${(s%60).toString().padStart(2,"0")}`; }
 
-function formatTime(secs) {
-  const m = Math.floor(secs / 60).toString().padStart(2, "0");
-  const s = (secs % 60).toString().padStart(2, "0");
-  return `${m}:${s}`;
-}
-
-// ── END GAME ───────────────────────────────────────────────────────────────
+// ─── END GAME ─────────────────────────────────────────────────────────────
 function endGame(room) {
-  if (state.timerInterval) clearInterval(state.timerInterval);
-  if (state.unsubRoom) state.unsubRoom();
-  if (state.unsubLive) state.unsubLive();
-
-  const iWon = room.winner === state.user.uid;
-  const elapsed = state.startTime ? Math.floor((Date.now() - state.startTime) / 1000) : 0;
-
+  if (S.timerInterval) clearInterval(S.timerInterval);
+  if (S.unsubRoom) S.unsubRoom();
+  if (S.unsubLive) S.unsubLive();
+  const win = room.winner === S.user.uid;
+  const noWinner = !room.winner;
+  const el = qs("#end-title");
+  if (noWinner) { el.textContent = "Égalité !"; el.className = "end-title draw"; }
+  else if (win)  { el.textContent = "Victoire ! 🎉"; el.className = "end-title win"; }
+  else           { el.textContent = "Défaite…"; el.className = "end-title lose"; }
+  const elapsed = S.startTime ? Math.floor((Date.now() - S.startTime) / 1000) : 0;
+  qs("#end-score").textContent = S.myFoundWords.size;
+  qs("#end-time").textContent = fmt(elapsed);
+  qs("#end-elo").textContent = win ? "+16" : "−16";
   showScreen("end");
-  const resultEl = qs("#end-result-text");
-  if (!room.winner) {
-    resultEl.textContent = "Égalité !";
-    resultEl.className = "end-result draw";
-  } else if (iWon) {
-    resultEl.textContent = "Victoire ! 🎉";
-    resultEl.className = "end-result win";
-  } else {
-    resultEl.textContent = "Défaite…";
-    resultEl.className = "end-result lose";
-  }
-
-  qs("#end-my-score").textContent = state.myFoundWords.size;
-  qs("#end-time").textContent = formatTime(elapsed);
-  // Elo delta shown after computed (async update in room service)
-  qs("#end-elo-delta").textContent = iWon ? "+16" : "−16"; // approx
 }
 
-async function giveUp() {
+async function doGiveUp() {
   if (!confirm("Abandonner la partie ?")) return;
-  const { finishGame: fg } = await import("./js/room.js");
-  // Mark opponent as winner
   const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
   const { db } = await import("./js/firebase.js");
-  const snap = await getDoc(doc(db, "rooms", state.roomId));
+  const snap = await getDoc(doc(db, "rooms", S.roomId));
   const room = snap.data();
-  const opponentUid = room.player1 === state.user.uid ? room.player2 : room.player1;
-  await fg({ roomId: state.roomId, uid: opponentUid || state.user.uid });
+  const opp = room.player1 === S.user.uid ? room.player2 : room.player1;
+  await finishGame({ roomId: S.roomId, uid: opp || S.user.uid });
 }
 
 async function doRematch() {
   try {
-    const newRoomId = await requestRematch({
-      roomId: state.roomId,
-      uid: state.user.uid,
-      pseudo: state.pseudo,
-      gridData: state.gridData,
-      mode: state.mode
-    });
-    state.roomId = newRoomId;
-    state.myFoundWords = new Set();
+    const newId = await requestRematch({ roomId: S.roomId, uid: S.user.uid, pseudo: S.pseudo, gridData: S.gridData, mode: S.mode });
+    S.roomId = newId; S.myFoundWords = new Set(); S.gameStarted = false;
     showScreen("waiting");
-    qs("#display-room-code").textContent = newRoomId;
-    window.history.replaceState(null, "", `#room/${newRoomId}`);
-    state.unsubRoom = listenRoom(newRoomId, onRoomUpdate);
-  } catch (e) {
-    showToast("Erreur : " + e.message);
-  }
+    qs("#display-room-code").textContent = newId;
+    history.replaceState(null, "", `#room/${newId}`);
+    S.unsubRoom = listenRoom(newId, onRoom);
+  } catch(e) { toast("Erreur : " + e.message); }
 }
 
-// ── UTILS ──────────────────────────────────────────────────────────────────
+// ─── UTILS ────────────────────────────────────────────────────────────────
 function getPseudo() {
   const p = qs("#pseudo-input").value.trim();
-  if (!p) { showToast("Entre ton pseudo d'abord"); qs("#pseudo-input").focus(); return null; }
+  if (!p) { toast("Entre ton pseudo d'abord"); qs("#pseudo-input").focus(); return null; }
   localStorage.setItem("mfd-pseudo", p);
   return p;
 }
-
 function showScreen(name) {
   qsa(".screen").forEach(s => s.classList.remove("active"));
   qs(`#screen-${name}`).classList.add("active");
 }
-
+function cellAt(x, y) { return qs(`[data-x="${x}"][data-y="${y}"]`); }
 function addEvent(who, text) {
   const feed = qs("#events-feed");
   const el = document.createElement("div");
-  el.className = `event-item ${who}`;
+  el.className = `event ${who}`;
   el.innerHTML = `<span class="event-dot"></span>${text}`;
   feed.prepend(el);
-  // Keep max 20 events
-  while (feed.children.length > 20) feed.lastChild.remove();
+  while (feed.children.length > 25) feed.lastChild.remove();
 }
-
-function copyRoomLink() {
-  const url = `${location.origin}${location.pathname}#room/${state.roomId}`;
-  navigator.clipboard.writeText(url).then(() => showToast("Lien copié !"));
+function copyLink() {
+  const url = `${location.origin}${location.pathname}#room/${S.roomId}`;
+  navigator.clipboard.writeText(url).then(() => toast("Lien copié !"));
 }
-
-let toastTimeout;
-function showToast(msg) {
+let toastTimer;
+function toast(msg) {
   const t = qs("#toast");
-  t.textContent = msg;
-  t.classList.add("show");
-  clearTimeout(toastTimeout);
-  toastTimeout = setTimeout(() => t.classList.remove("show"), 2500);
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 2500);
 }
+function qs(s) { return document.querySelector(s); }
+function qsa(s) { return document.querySelectorAll(s); }
 
-function qs(sel) { return document.querySelector(sel); }
-function qsa(sel) { return document.querySelectorAll(sel); }
-
-// ── BOOT ───────────────────────────────────────────────────────────────────
-init().catch(console.error);
+boot().catch(console.error);
 </script>
 </body>
 </html>
