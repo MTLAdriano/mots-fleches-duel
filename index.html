@@ -221,9 +221,10 @@
 <div class="toast" id="toast"></div>
 
 <script type="module">
-import { initAuth } from "./js/firebase.js";
+import { initAuth, db } from "./js/firebase.js";
 import { fetchGrid, getLetterCells, getAxe } from "./js/grid.js";
 import { createRoom, joinRoom, listenRoom, listenOpponentLive, submitWord, finishGame, requestRematch } from "./js/room.js";
+import { doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const S = {
   user:null, pseudo:"", mode:"classic",
@@ -272,15 +273,16 @@ async function doCreate() {
     S.unsubRoom=listenRoom(S.roomId,onRoom);
     // Poll de secours pour détecter le joueur 2
     S._pollInterval = setInterval(async()=>{
-      const {doc,getDoc}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-      const {db}=await import("./js/firebase.js");
-      const snap=await getDoc(doc(db,"rooms",S.roomId));
-      if(snap.exists()&&snap.data().player2&&qs("#waiting.active")){
-        qs("#waiting-status").textContent="✅ Joueur 2 connecté !";
-        qs("#waiting-status").classList.remove("pulse");
-        qs("#btn-launch").style.display="block";
-        clearInterval(S._pollInterval);
-      }
+      try {
+        const snap=await getDoc(doc(db,"rooms",S.roomId));
+        console.log("poll host:", snap.data()?.player2);
+        if(snap.exists()&&snap.data().player2&&qs("#waiting.active")){
+          qs("#waiting-status").textContent="✅ Joueur 2 connecté !";
+          qs("#waiting-status").classList.remove("pulse");
+          qs("#btn-launch").style.display="block";
+          clearInterval(S._pollInterval);
+        }
+      } catch(e){console.error("poll error",e);}
     },2000);
   } catch(e){toast("Erreur: "+e.message);console.error(e);}
 }
@@ -293,21 +295,20 @@ async function doJoin() {
     toast("Connexion…");
     S.pseudo=p; S.found=new Set(); S.roomId=code; S.G=fetchGrid();
     await joinRoom({roomId:code,uid:S.user.uid,pseudo:p});
-    // Joueur 2 : attend que le joueur 1 lance (poll toutes les 2s)
     show("waiting");
     qs("#cdisp").textContent=code;
     qs("#waiting-status").textContent="En attente du lancement...";
     qs("#btn-launch").style.display="none";
     S.unsubRoom=listenRoom(code,onRoom);
-    // Poll de secours si listener ne marche pas
     S._pollInterval = setInterval(async()=>{
-      const {doc,getDoc}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-      const {db}=await import("./js/firebase.js");
-      const snap=await getDoc(doc(db,"rooms",code));
-      if(snap.exists()&&snap.data().status==="playing"&&qs("#waiting.active")){
-        clearInterval(S._pollInterval);
-        startGame(snap.data());
-      }
+      try {
+        const snap=await getDoc(doc(db,"rooms",code));
+        console.log("poll joueur2:", snap.data()?.status);
+        if(snap.exists()&&snap.data().status==="playing"&&qs("#waiting.active")){
+          clearInterval(S._pollInterval);
+          startGame(snap.data());
+        }
+      } catch(e){console.error("poll error",e);}
     },2000);
   } catch(e){toast("Erreur: "+e.message);console.error(e);}
 }
@@ -328,8 +329,6 @@ async function onRoom(room) {
 
 async function doLaunch() {
   try {
-    const {doc,updateDoc,getDoc,serverTimestamp}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-    const {db}=await import("./js/firebase.js");
     await updateDoc(doc(db,"rooms",S.roomId),{status:"playing",startedAt:serverTimestamp()});
     const snap=await getDoc(doc(db,"rooms",S.roomId));
     startGame(snap.data());
@@ -351,8 +350,6 @@ function startGame(room) {
 
 async function loadOpp(uid){
   try{
-    const {doc,getDoc}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-    const {db}=await import("./js/firebase.js");
     const s=await getDoc(doc(db,"rooms",S.roomId,"players",uid));
     if(s.exists()){const n=s.data().pseudo||"Adversaire";qs("#poppname").textContent=n;qs("#pgopn").textContent=n;}
   }catch{}
@@ -587,8 +584,6 @@ function endGame(room){
 }
 async function doGiveUp(){
   if(!confirm("Abandonner ?"))return;
-  const {doc,getDoc}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-  const {db}=await import("./js/firebase.js");
   const r=(await getDoc(doc(db,"rooms",S.roomId))).data();
   const opp=r.player1===S.user.uid?r.player2:r.player1;
   await finishGame({roomId:S.roomId,uid:opp||S.user.uid});
