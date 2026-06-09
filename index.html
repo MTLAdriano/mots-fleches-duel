@@ -162,7 +162,8 @@
   <div class="codebox" id="cdisp">——</div>
   <p style="font-size:14px;color:#666">Partage ce lien :</p>
   <button class="cpbtn" id="btn-copy">📋 Copier le lien</button>
-  <p class="pulse" style="color:#888;font-size:14px">En attente de l'adversaire</p>
+  <div id="waiting-status" class="pulse" style="color:#888;font-size:14px">En attente du joueur 2</div>
+  <button class="btn btn-d" id="btn-launch" style="margin-top:8px;padding:12px 32px;display:none">🚀 Lancer la partie</button>
   <button class="btn btn-o" style="margin-top:8px;padding:9px 20px" id="btn-cancel">Annuler</button>
 </div>
 
@@ -249,6 +250,7 @@ function bind() {
   qs("#btn-join").addEventListener("click",doJoin);
   qs("#jcode").addEventListener("keydown",e=>e.key==="Enter"&&doJoin());
   qs("#btn-cancel").addEventListener("click",()=>show("lobby"));
+  qs("#btn-launch").addEventListener("click",doLaunch);
   qs("#btn-copy").addEventListener("click",copyLink);
   qs("#btn-ok").addEventListener("click",doValidate);
   qs("#wi").addEventListener("keydown",e=>e.key==="Enter"&&doValidate());
@@ -287,14 +289,33 @@ async function doJoin() {
 }
 
 async function onRoom(room) {
-  console.log("onRoom:", room.status, "waiting active:", !!qs("#waiting.active"));
-  // Démarre la partie si status=playing et qu'on est encore en attente
+  // Joueur 2 vient de rejoindre → montre le bouton lancer au joueur 1
+  if(room.status==="waiting" && room.player2 && qs("#waiting.active")) {
+    qs("#waiting-status").textContent = "✅ Joueur 2 connecté !";
+    qs("#waiting-status").classList.remove("pulse");
+    qs("#btn-launch").style.display = "block";
+  }
+  // Joueur 2 : la partie démarre quand le joueur 1 lance
   if(room.status==="playing" && qs("#waiting.active")) {
-    S.started=true;
     if(!S.G) S.G=fetchGrid();
     startGame(room);
   }
   if(room.status==="finished"&&qs("#game.active")) endGame(room);
+}
+
+async function doLaunch() {
+  try {
+    const {doc, updateDoc, serverTimestamp} = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    const {db} = await import("./js/firebase.js");
+    await updateDoc(doc(db,"rooms",S.roomId), {
+      status: "playing",
+      startedAt: serverTimestamp()
+    });
+    // Lance la partie pour le joueur 1 directement
+    const {getDoc} = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    const snap = await getDoc(doc(db,"rooms",S.roomId));
+    startGame(snap.data());
+  } catch(e){toast("Erreur: "+e.message);console.error(e);}
 }
 
 // Pour le joueur 1 (host), on reset S.started à false après création
