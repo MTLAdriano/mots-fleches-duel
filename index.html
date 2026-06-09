@@ -79,9 +79,10 @@
     .column.black{background:#222;cursor:default}
     /* Surlignage */
     .column.select{background:#fef3c7}
-    .column.active{background:#fde68a;border-color:#d97706;z-index:2}
+    .column.active{background:#fde68a;z-index:2;outline:2px solid #d97706}
     .column.validated{background:#d1fae5}
-    .column.play.select,.column.play.active{background:#fde68a}
+    .column.validated span.letter{color:#065f46;font-weight:900}
+    .column.play.select,.column.play.active{outline:2px solid #d97706}
 
     /* INPUT BAR */
     .ibar{background:#f9f9f7;border-top:1px solid #e5e5e5;padding:9px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0}
@@ -339,7 +340,7 @@ async function doLaunch() {
 // pour qu'il démarre bien quand le joueur 2 rejoint
 
 function startGame(room) {
-  show("game"); buildGrid();
+  show("game"); buildGrid(); initKeyboard();
   qs("#totw").textContent=S.G.totalWords;
   qs("#pmyname").textContent=S.pseudo; qs("#pgmyn").textContent=S.pseudo;
   S.startTime=Date.now();
@@ -467,92 +468,171 @@ function buildGrid() {
   });
 }
 
+// Variables globales clavier (comme arrowwords.js)
+let current_case = null;
+let current_id = 0;
+let checkTimeout = null;
+
 function onCellClick(col) {
-  // Logique exacte de arrowwords.js
-  // Si on reclique sur la case active → change d'axe
+  // Logique exacte arrowwords.js initGrid click handler
   if (col.classList.contains("active") && !col.classList.contains("play")) {
     const newAxe = S.axe==="x"?"y":"x";
     if (col.hasAttribute("data-id-"+newAxe)) S.axe = newAxe;
   }
-  // Si la case n'a pas data-id dans l'axe courant → change d'axe
   if (!col.hasAttribute("data-id-"+S.axe)) {
     S.axe = S.axe==="x"?"y":"x";
   }
-  if (!col.hasAttribute("data-id-"+S.axe)) return; // case sans mot
+  if (!col.hasAttribute("data-id-"+S.axe)) return;
 
   const id = parseInt(col.getAttribute("data-id-"+S.axe));
-  S.selId = id;
+  current_id = id; S.selId = id;
 
-  // Reset sélection
   qsa(".column.select,.column.active").forEach(c=>c.classList.remove("select","active"));
-
-  // Sélectionne les cases du mot
   qsa(".column.w_"+S.axe+"_"+id).forEach(c=>{
-    if (!c.classList.contains("validated")) c.classList.add("select");
+    if(!c.classList.contains("validated")) c.classList.add("select");
   });
 
-  // Si la case cliquée est une DEF → active la première case lettre
+  // Si DEF → première case lettre non validée
   let activCell = col;
   if (col.classList.contains("play")) {
-    const letters = qsa(".column.w_"+S.axe+"_"+id+":not(.play)");
-    if (letters.length) { activCell = letters[0]; }
+    const letters = [...qsa(".column.w_"+S.axe+"_"+id+":not(.play)")];
+    const firstEmpty = letters.find(c=>!c.classList.contains("validated")) || letters[0];
+    if (firstEmpty) activCell = firstEmpty;
+  }
+  // Si case active déjà validée → première case non validée
+  if (activCell.classList.contains("validated")) {
+    const empty = [...qsa(".column.w_"+S.axe+"_"+id+":not(.play):not(.validated)")];
+    if (empty.length) activCell = empty[0];
   }
   activCell.classList.add("active");
   activCell.classList.remove("select");
+  current_case = activCell;
 
-  // Met à jour l'UI
   const word = S.G.words.find(w=>w.id===id);
   if (word) {
-    qs("#dhint").textContent = `${(S.axe==="x"?"→":"↓")} · ${word.size} lettres`;
+    qs("#dhint").textContent = `${S.axe==="x"?"→":"↓"} · ${word.size} lettres`;
     qs("#dmain").textContent = word.def;
   }
-  qs("#wi").value="";
-  qs("#wi").focus();
 }
 
-// ── VALIDATION ─────────────────────────────────────────────────────────────
-async function doValidate() {
-  if (!S.selId) return;
-  const inp=qs("#wi");
-  const raw=inp.value.trim().toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
-  if (!raw) return;
+// ── CLAVIER ────────────────────────────────────────────────────────────────
+// Logique exacte de keyboard.js Mygamify
+function initKeyboard() {
+  document.addEventListener("keydown", e => {
+    if (!current_case || !qs("#game.active")) return;
+    const key = e.key;
 
-  const word=S.G.words.find(w=>w.id===S.selId);
-  if (!word) return;
+    if (isLetter(key)) {
+      if (!current_case.classList.contains("validated")) {
+        current_case.querySelector("span.letter").textContent = key.toUpperCase();
+        current_case.classList.add("last_played");
+      }
+      const pos = parseInt(current_case.getAttribute("data-pos-"+S.axe));
+      const nextCase = qs(".column.w_"+S.axe+"_"+current_id+"[data-pos-"+S.axe+"='"+(pos+1)+"']");
+      checkCase(nextCase, false);
+      scheduleCheck();
+    }
 
-  if (raw.length!==word.size) {
-    inp.classList.add("err"); setTimeout(()=>inp.classList.remove("err"),400);
-    toast(`${word.size} lettres attendues`); return;
-  }
+    if (key==="Backspace"||key==="Delete") {
+      if (!current_case.classList.contains("validated")) {
+        current_case.querySelector("span.letter").textContent = "";
+        current_case.classList.remove("last_played");
+      }
+      const pos = parseInt(current_case.getAttribute("data-pos-"+S.axe));
+      const prevCase = qs(".column.w_"+S.axe+"_"+current_id+"[data-pos-"+S.axe+"='"+(pos-1)+"']");
+      checkCase(prevCase, true);
+      scheduleCheck();
+    }
 
-  const ok=await checkWord(S.G.id, S.selId, raw);
-  if (!ok) {
-    inp.classList.add("err"); setTimeout(()=>inp.classList.remove("err"),400);
-    toast("Incorrect… réessaie !"); return;
-  }
-
-  // ✓ Validé
-  const wid=S.selId;
-  S.found.add(wid);
-
-  // Affiche les lettres + classe validated (comme arrowwords.js)
-  const cells=qsa(".column.w_"+S.axe+"_"+wid+":not(.play)");
-  cells.forEach((c,i)=>{
-    c.classList.remove("select","active");
-    c.classList.add("validated");
-    const span=c.querySelector("span.letter");
-    if (span&&raw[i]) span.textContent=raw[i];
+    // Flèches directionnelles
+    if (S.axe==="x") {
+      if (key==="ArrowRight") { const pos=parseInt(current_case.getAttribute("data-pos-x")); checkCase(qs(".column.w_x_"+current_id+"[data-pos-x='"+(pos+1)+"']"),false); }
+      if (key==="ArrowLeft")  { const pos=parseInt(current_case.getAttribute("data-pos-x")); checkCase(qs(".column.w_x_"+current_id+"[data-pos-x='"+(pos-1)+"']"),true); }
+    }
+    if (S.axe==="y") {
+      if (key==="ArrowDown") { const pos=parseInt(current_case.getAttribute("data-pos-y")); checkCase(qs(".column.w_y_"+current_id+"[data-pos-y='"+(pos+1)+"']"),false); }
+      if (key==="ArrowUp")   { const pos=parseInt(current_case.getAttribute("data-pos-y")); checkCase(qs(".column.w_y_"+current_id+"[data-pos-y='"+(pos-1)+"']"),true); }
+    }
   });
+}
 
-  inp.value=""; S.selId=null;
+function isLetter(str) {
+  return str.length===1 && /[a-zA-ZÀ-ÿ]/i.test(str);
+}
+
+// Déplace la case active (logique exacte checkCase de keyboard.js)
+function checkCase(newCase, isBack) {
+  if (newCase && !newCase.classList.contains("validated")) {
+    current_case.classList.remove("active");
+    current_case = newCase;
+    current_case.classList.add("active");
+    current_case.classList.remove("select");
+  }
+  // Saute les cases validées
+  while (newCase && newCase.classList.contains("validated")) {
+    const pos = parseInt(newCase.getAttribute("data-pos-"+S.axe));
+    newCase = isBack
+      ? qs(".column.w_"+S.axe+"_"+current_id+"[data-pos-"+S.axe+"='"+(pos-1)+"']")
+      : qs(".column.w_"+S.axe+"_"+current_id+"[data-pos-"+S.axe+"='"+(pos+1)+"']");
+    if (newCase && !newCase.classList.contains("validated")) {
+      current_case.classList.remove("active");
+      current_case = newCase;
+      current_case.classList.add("active");
+    }
+  }
+}
+
+// Vérifie le mot après 500ms (logique checkWords de arrowwords.js)
+function scheduleCheck() {
+  if (checkTimeout) clearTimeout(checkTimeout);
+  checkTimeout = setTimeout(async () => {
+    if (!current_id || !S.selId) return;
+    // Lit les lettres dans les cases du mot courant
+    const cells = [...qsa(".column.w_"+S.axe+"_"+current_id+":not(.play)")];
+    const word = S.G.words.find(w=>w.id===current_id);
+    if (!word) return;
+    const letters = cells.map(c=>c.querySelector("span.letter")?.textContent||"");
+    if (letters.some(l=>!l)) return; // mot incomplet
+    const answer = letters.join("").toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+    if (answer.length!==word.size) return;
+    await validateWord(current_id, answer);
+  }, 500);
+}
+
+async function validateWord(wordId, answer) {
+  const ok = await checkWord(S.G.id, wordId, answer);
+  if (!ok) return;
+
+  // Marque comme validé
+  S.found.add(wordId);
+  const axe = S.G.words.find(w=>w.id===wordId)?.axe || S.axe;
+  qsa(".column.w_"+axe+"_"+wordId+":not(.play)").forEach(c=>{
+    c.classList.remove("select","active","last_played");
+    c.classList.add("validated");
+  });
+  current_case = null; S.selId = null; current_id = 0;
   qs("#dmain").textContent="–"; qs("#dhint").textContent="Sélectionne une case";
+  qsa(".column.select,.column.active").forEach(c=>c.classList.remove("select","active"));
 
   const n=S.found.size, total=S.G.totalWords;
   qs("#myscore").textContent=n; qs("#pmyscore").textContent=n;
   const p=Math.round(n/total*100);
   qs("#pgmy").style.width=p+"%"; qs("#pgmyp").textContent=p+"%";
-  addEv("me",`+1 mot (${n}/${total})`);
-  await submitWord({roomId:S.roomId,uid:S.user.uid,wordId:wid,totalFound:n,totalWords:total});
+  addEv("me",`✓ mot trouvé (${n}/${total})`);
+  toast("✓ Bravo !");
+  await submitWord({roomId:S.roomId,uid:S.user.uid,wordId,totalFound:n,totalWords:total});
+}
+
+async function doValidate() {
+  // Bouton valider manuel — lit le champ input
+  if (!S.selId) return;
+  const inp=qs("#wi");
+  const raw=inp.value.trim().toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+  if (!raw) return;
+  const word=S.G.words.find(w=>w.id===S.selId);
+  if (!word||raw.length!==word.size) { toast(`${word?.size||"?"} lettres attendues`); return; }
+  inp.value="";
+  await validateWord(S.selId, raw);
 }
 
 async function checkWord(gridId,wordId,answer){
