@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -879,24 +878,6 @@ function shortenDef(def) {
   return def.length > 20 ? def.substring(0, 18) + "…" : def;
 }
 
-function selectWord_UNUSED(wordId) {
-  // kept for reference
-  const word = state.gridData.grid.find(w => w.id === wordId);
-  if (!word) return;
-  const { x, y, dir, size } = word;
-  const [dx, dy] = getWordDir(dir);
-  for (let i = 1; i <= size; i++) {
-    const cell = getCellEl(x + dx * i, y + dy * i);
-    if (cell) cell.classList.add("active-word");
-  }
-
-  // Update input area
-  qs("#current-def-dir").textContent = `${dirArrow(dir)} (${size} lettres)`;
-  qs("#current-def-text").textContent = word.def;
-  qs("#word-input").value = "";
-  qs("#word-input").focus();
-}
-
 // ── VALIDATE WORD ──────────────────────────────────────────────────────────
 async function validateWord() {
   if (!state.selectedWordId) return;
@@ -968,21 +949,6 @@ async function checkAnswer(gridId, wordId, answer) {
     // Fallback: trust the answer (length already checked)
     return true;
   }
-}
-
-function markWordFound(wordId) {
-  const word = state.gridData.grid.find(w => w.id === wordId);
-  if (!word) return;
-  const { x, y, dir, size } = word;
-  const [dx, dy] = getDirection(dir);
-  for (let i = 1; i <= size; i++) {
-    const cell = getCellEl(x + dx * i, y + dy * i);
-    if (cell) { cell.classList.add("correct"); cell.classList.remove("active-word"); }
-  }
-}
-
-function getCellEl(x, y) {
-  return qs(`[data-x="${x}"][data-y="${y}"]`);
 }
 
 // ── TIMERS ─────────────────────────────────────────────────────────────────
