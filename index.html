@@ -270,6 +270,18 @@ async function doCreate() {
     // S.started reste false → onRoom déclenchera startGame quand status=playing
     console.log("Room créée:", S.roomId, "- en attente du joueur 2");
     S.unsubRoom=listenRoom(S.roomId,onRoom);
+    // Poll de secours pour détecter le joueur 2
+    S._pollInterval = setInterval(async()=>{
+      const {doc,getDoc}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+      const {db}=await import("./js/firebase.js");
+      const snap=await getDoc(doc(db,"rooms",S.roomId));
+      if(snap.exists()&&snap.data().player2&&qs("#waiting.active")){
+        qs("#waiting-status").textContent="✅ Joueur 2 connecté !";
+        qs("#waiting-status").classList.remove("pulse");
+        qs("#btn-launch").style.display="block";
+        clearInterval(S._pollInterval);
+      }
+    },2000);
   } catch(e){toast("Erreur: "+e.message);console.error(e);}
 }
 
@@ -281,22 +293,33 @@ async function doJoin() {
     toast("Connexion…");
     S.pseudo=p; S.found=new Set(); S.roomId=code; S.G=fetchGrid();
     await joinRoom({roomId:code,uid:S.user.uid,pseudo:p});
-    const {doc,getDoc}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-    const {db}=await import("./js/firebase.js");
-    S.started=true; startGame((await getDoc(doc(db,"rooms",code))).data());
+    // Joueur 2 : attend que le joueur 1 lance (poll toutes les 2s)
+    show("waiting");
+    qs("#cdisp").textContent=code;
+    qs("#waiting-status").textContent="En attente du lancement...";
+    qs("#btn-launch").style.display="none";
     S.unsubRoom=listenRoom(code,onRoom);
+    // Poll de secours si listener ne marche pas
+    S._pollInterval = setInterval(async()=>{
+      const {doc,getDoc}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+      const {db}=await import("./js/firebase.js");
+      const snap=await getDoc(doc(db,"rooms",code));
+      if(snap.exists()&&snap.data().status==="playing"&&qs("#waiting.active")){
+        clearInterval(S._pollInterval);
+        startGame(snap.data());
+      }
+    },2000);
   } catch(e){toast("Erreur: "+e.message);console.error(e);}
 }
 
 async function onRoom(room) {
-  // Joueur 2 vient de rejoindre → montre le bouton lancer au joueur 1
   if(room.status==="waiting" && room.player2 && qs("#waiting.active")) {
-    qs("#waiting-status").textContent = "✅ Joueur 2 connecté !";
+    qs("#waiting-status").textContent="✅ Joueur 2 connecté !";
     qs("#waiting-status").classList.remove("pulse");
-    qs("#btn-launch").style.display = "block";
+    qs("#btn-launch").style.display="block";
   }
-  // Joueur 2 : la partie démarre quand le joueur 1 lance
   if(room.status==="playing" && qs("#waiting.active")) {
+    if(S._pollInterval) clearInterval(S._pollInterval);
     if(!S.G) S.G=fetchGrid();
     startGame(room);
   }
@@ -305,15 +328,10 @@ async function onRoom(room) {
 
 async function doLaunch() {
   try {
-    const {doc, updateDoc, serverTimestamp} = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-    const {db} = await import("./js/firebase.js");
-    await updateDoc(doc(db,"rooms",S.roomId), {
-      status: "playing",
-      startedAt: serverTimestamp()
-    });
-    // Lance la partie pour le joueur 1 directement
-    const {getDoc} = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-    const snap = await getDoc(doc(db,"rooms",S.roomId));
+    const {doc,updateDoc,getDoc,serverTimestamp}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    const {db}=await import("./js/firebase.js");
+    await updateDoc(doc(db,"rooms",S.roomId),{status:"playing",startedAt:serverTimestamp()});
+    const snap=await getDoc(doc(db,"rooms",S.roomId));
     startGame(snap.data());
   } catch(e){toast("Erreur: "+e.message);console.error(e);}
 }
