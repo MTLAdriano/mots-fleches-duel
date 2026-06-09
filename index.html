@@ -266,6 +266,7 @@ async function doCreate() {
     show("waiting"); qs("#cdisp").textContent=S.roomId;
     history.replaceState(null,"",`#room/${S.roomId}`);
     // S.started reste false → onRoom déclenchera startGame quand status=playing
+    console.log("Room créée:", S.roomId, "- en attente du joueur 2");
     S.unsubRoom=listenRoom(S.roomId,onRoom);
   } catch(e){toast("Erreur: "+e.message);console.error(e);}
 }
@@ -286,6 +287,7 @@ async function doJoin() {
 }
 
 async function onRoom(room) {
+  console.log("onRoom:", room.status, "waiting active:", !!qs("#waiting.active"));
   // Démarre la partie si status=playing et qu'on est encore en attente
   if(room.status==="playing" && qs("#waiting.active")) {
     S.started=true;
