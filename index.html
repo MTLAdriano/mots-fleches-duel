@@ -521,11 +521,13 @@ function initKeyboard() {
   document.addEventListener("keydown", e => {
     if (!current_case || !qs("#game.active")) return;
     const key = e.key;
+    if (!isLetter(key) && key!=="Backspace" && key!=="Delete" && !key.startsWith("Arrow")) return;
+    e.preventDefault();
 
     if (isLetter(key)) {
-      if (!current_case.classList.contains("validated")) {
-        current_case.querySelector("span.letter").textContent = key.toUpperCase();
-        current_case.classList.add("last_played");
+      if (!current_case.classList.contains("validated") && !current_case.classList.contains("play")) {
+        const span = current_case.querySelector("span.letter");
+        if (span) { span.textContent = key.toUpperCase(); current_case.classList.add("last_played"); }
       }
       const pos = parseInt(current_case.getAttribute("data-pos-"+S.axe));
       const nextCase = qs(".column.w_"+S.axe+"_"+current_id+"[data-pos-"+S.axe+"='"+(pos+1)+"']");
@@ -534,9 +536,9 @@ function initKeyboard() {
     }
 
     if (key==="Backspace"||key==="Delete") {
-      if (!current_case.classList.contains("validated")) {
-        current_case.querySelector("span.letter").textContent = "";
-        current_case.classList.remove("last_played");
+      if (!current_case.classList.contains("validated") && !current_case.classList.contains("play")) {
+        const span = current_case.querySelector("span.letter");
+        if (span) { span.textContent = ""; current_case.classList.remove("last_played"); }
       }
       const pos = parseInt(current_case.getAttribute("data-pos-"+S.axe));
       const prevCase = qs(".column.w_"+S.axe+"_"+current_id+"[data-pos-"+S.axe+"='"+(pos-1)+"']");
