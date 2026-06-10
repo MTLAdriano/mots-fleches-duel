@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mots Fléchés Duel</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- jQuery comme Mygamify -->
+  <script src="https://code.jquery.com/jquery-3.6.1.slim.min.js"></script>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'Inter',sans-serif;background:#f2f0eb;color:#111;min-height:100dvh;display:flex;flex-direction:column}
@@ -46,53 +48,64 @@
     .gbody{display:flex;flex:1;overflow:hidden}
     .gwrap{flex:1;overflow:auto;padding:12px;background:#f2f0eb}
 
-    /* ── GRILLE exacte Mygamify ── */
-    #grid{display:inline-block;border:1px solid #888;border-bottom:none;border-right:none;line-height:0}
-    .rows{display:flex}
-    .column{
-      width:52px;height:52px;min-width:52px;min-height:52px;
-      border-right:1px solid #888;border-bottom:1px solid #888;
-      background:#fff;
-      position:relative;
-      cursor:pointer;
-      display:flex;align-items:center;justify-content:center;
-      user-select:none;flex-shrink:0;
+    /* ── GRILLE EXACTE MYGAMIFY ── */
+    #grid-container{overflow:hidden;border:1px solid #ccc;border-radius:8px;background:#fff;position:relative;margin:0 auto}
+    #grid-scaler{position:absolute;top:-1px;left:-1px}
+    #grid{position:relative;border:none;touch-action:none}
+    #grid .rows{display:flex}
+    #grid .column{
+      vertical-align:middle;border:0;padding:0;
+      user-select:none;float:left;display:block;
+      cursor:pointer;position:relative;
     }
-    /* Lettre dans case blanche */
-    .column > span.letter{
-      font-size:22px;font-weight:800;text-transform:uppercase;color:#111;
-      pointer-events:none;z-index:1;
+    #grid .column span{
+      width:100%;height:100%;display:flex;
+      font-weight:bold;text-transform:uppercase;
+      font-size:4vw;text-align:center;
+      align-items:center;justify-content:center;
+      border-right:solid 1px #ddd;
+      border-bottom:solid 1px #ddd;
+      line-height:0!important;
     }
-    /* Case DEF (play) */
-    .column.play{
-      background:#cfcbc3;
-      display:flex;flex-direction:column;
-      align-items:flex-start;justify-content:flex-start;
-      padding:3px 4px 2px;gap:0;cursor:pointer;
+    /* Cases DEF (play) — style hideDef de Mygamify */
+    #grid .column.c_0 span,#grid .column.c_1 span{
+      display:flex;flex-direction:column;justify-content:center;align-items:center;
+      flex-wrap:nowrap;padding:2px;background-color:#d0ccc4;
     }
-    .column.play:hover{background:#c2beb6}
-    .dblock{display:flex;align-items:flex-start;justify-content:space-between;width:100%;gap:2px;flex:1;min-height:0;overflow:hidden}
-    .dtext{font-size:7.5px;font-weight:700;line-height:1.2;color:#111;text-transform:uppercase;flex:1;word-break:break-word;overflow:hidden}
-    .darr{font-size:10px;color:#111;flex-shrink:0;line-height:1;margin-top:1px;font-weight:900}
-    .dsep{width:100%;height:1px;background:#aba7a0;flex-shrink:0;margin:1px 0}
-    /* Case noire */
-    .column.black{background:#222;cursor:default}
-    /* Surlignage */
-    .column.select{background:#fef3c7}
-    .column.active{background:#fde68a;z-index:2;outline:2px solid #d97706}
-    .column.validated{background:#d1fae5}
-    .column.validated span.letter{color:#065f46;font-weight:900}
-    .column.play.select,.column.play.active{outline:2px solid #d97706}
+    #grid .column.c_0 span div,#grid .column.c_1 span div{
+      position:initial;width:100%;text-align:center;padding:0.25vw 2px;
+      background:#d0ccc4;color:#111;font-size:1.1vw;line-height:1.1vw;
+      word-break:break-word;font-weight:600;hyphens:auto;
+      margin:auto;height:100%;display:flex;align-items:center;
+      justify-content:center;box-shadow:inset 1px 1px 0px black;border:0!important;
+      padding-top:3px;
+    }
+    #grid .column.c_1 span div:nth-child(2){border-top:1px solid #21353F!important}
+    /* Flèches */
+    #grid .column.tl span{
+      background-image:url('https://sdk.mygamify.fr/examples/franceinfo/icons/left.svg')!important;
+      background-size:4vw;background-clip:content-box;
+      background-position:0 center;background-repeat:no-repeat;
+    }
+    #grid .column.tt span::after{
+      content:' ';position:absolute;width:100%;height:100%;top:0;left:0;
+      background-image:url('https://sdk.mygamify.fr/examples/franceinfo/icons/top.svg')!important;
+      background-size:4vw;background-clip:content-box;
+      background-position:center 0;background-repeat:no-repeat;
+      pointer-events:none;
+    }
+    /* Sélection et validation */
+    #grid .column.select span{background:#fef3c7!important;background-color:#fef3c7!important}
+    #grid .column.active span{background:#fde68a!important;background-color:#fde68a!important;outline:2px solid #d97706}
+    #grid .column.validated span{background:#d1fae5!important;background-color:#d1fae5!important}
+    #grid .column.c_0.select span,#grid .column.c_0.active span{background:#fde68a!important}
+    #grid .column.c_0.select span div,#grid .column.c_0.active span div{background:#fde68a!important;color:#111}
 
     /* INPUT BAR */
     .ibar{background:#f9f9f7;border-top:1px solid #e5e5e5;padding:9px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0}
     .dinfo{flex:1;min-width:0}
     .dhint{font-size:11px;color:#999;margin-bottom:1px}
     .dmain{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .wi{font-family:inherit;font-size:17px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;padding:7px 11px;border:2px solid #e5e5e5;border-radius:9px;width:150px;outline:none;background:white;transition:border-color .15s}
-    .wi:focus{border-color:#111}
-    .wi.err{border-color:#dc2626;animation:shake .3s}
-    @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
 
     /* DUEL PANEL */
     .duel{width:250px;flex-shrink:0;border-left:1px solid #e5e5e5;background:white;display:flex;flex-direction:column;overflow:hidden}
@@ -131,7 +144,7 @@
 
     .toast{position:fixed;bottom:72px;left:50%;transform:translateX(-50%);background:#111;color:white;font-size:13px;font-weight:600;padding:9px 18px;border-radius:999px;z-index:999;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
     .toast.on{opacity:1}
-    @media(max-width:640px){.duel{display:none}.column{width:42px;height:42px;min-width:42px;min-height:42px}.column>span.letter{font-size:18px}.dtext{font-size:6.5px}}
+    @media(max-width:640px){.duel{display:none}}
   </style>
 </head>
 <body>
@@ -153,7 +166,7 @@
     <div class="sep">ou rejoindre</div>
     <div class="jr">
       <input class="fi" id="jcode" type="text" placeholder="CODE" maxlength="6" autocomplete="off">
-      <button class="btn btn-b" id="btn-join" style="padding:11px 16px">Rejoindre</button>
+      <button class="btn btn-b" style="padding:11px 16px" id="btn-join">Rejoindre</button>
     </div>
   </div>
 </div>
@@ -163,7 +176,7 @@
   <div class="codebox" id="cdisp">——</div>
   <p style="font-size:14px;color:#666">Partage ce lien :</p>
   <button class="cpbtn" id="btn-copy">📋 Copier le lien</button>
-  <div id="waiting-status" class="pulse" style="color:#888;font-size:14px">En attente du joueur 2</div>
+  <div id="wstatus" class="pulse" style="color:#888;font-size:14px">En attente du joueur 2</div>
   <button class="btn btn-d" id="btn-launch" style="margin-top:8px;padding:12px 32px;display:none">🚀 Lancer la partie</button>
   <button class="btn btn-o" style="margin-top:8px;padding:9px 20px" id="btn-cancel">Annuler</button>
 </div>
@@ -177,14 +190,18 @@
   </div>
   <div class="gbody">
     <div style="display:flex;flex-direction:column;flex:1;overflow:hidden">
-      <div class="gwrap"><div id="grid"></div></div>
+      <div class="gwrap">
+        <div id="grid-container">
+          <div id="grid-scaler">
+            <div id="grid"></div>
+          </div>
+        </div>
+      </div>
       <div class="ibar">
         <div class="dinfo">
-          <div class="dhint" id="dhint">Sélectionne une case</div>
+          <div class="dhint" id="dhint">Clique sur une case pour commencer</div>
           <div class="dmain" id="dmain">–</div>
         </div>
-        <input class="wi" id="wi" type="text" placeholder="MOT" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false">
-        <button class="btn btn-d" style="padding:9px 14px;font-size:16px" id="btn-ok">✓</button>
       </div>
     </div>
     <div class="duel">
@@ -221,472 +238,361 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- Variables globales nécessaires pour arrowwords.js -->
+<script>
+// Stub des variables globales Mygamify
+var APP_GAME_DATA = null;
+var APP_GAME_SLUG = 'arrowwords';
+var APP_CHECK_URL = '';
+var APP_QUERY = '';
+var APP_AUTO_SAVE = false;
+var APP_USER = false;
+
+// Variables globales arrowwords.js
+var can_touch = true;
+var current_case = null;
+var current_id = 0;
+var current_axe = "x";
+var word_ids = [];
+var wordsFound = [];
+var nd_child = false;
+var current_scale = 1;
+var showDef = false; // On utilise hideDef mode
+var last_pos = 1;
+var count_h = 0, count_v = 0, last_h = 0, last_v = 0;
+var helper = [];
+var allWords = [];
+var lastCount = 0;
+var checkTimeout = null;
+
+// Fonctions stub
+function checkWords(notify, callback) { if(callback) callback(); }
+function enterKey() {}
+
+// Notre état de jeu
+var DUEL = {
+  user: null, pseudo: "", mode: "classic",
+  roomId: null, G: null,
+  found: new Set(),
+  startTime: null, timerInt: null, blitzLeft: 300,
+  unsubRoom: null, unsubLive: null,
+  _pollInterval: null
+};
+</script>
+
 <script type="module">
 import { initAuth, db } from "./js/firebase.js";
-import { fetchGrid, getLetterCells, getAxe } from "./js/grid.js";
+import { fetchGrid, getLetterCells } from "./js/grid.js";
 import { createRoom, joinRoom, listenRoom, listenOpponentLive, submitWord, finishGame, requestRematch } from "./js/room.js";
 import { doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const S = {
-  user:null, pseudo:"", mode:"classic",
-  roomId:null, G:null,       // G = gridData
-  found:new Set(), selId:null,
-  startTime:null, timerInt:null, blitzLeft:300,
-  unsubRoom:null, unsubLive:null, started:false,
-  // état de sélection comme Mygamify
-  axe:"x",      // axe courant: x (horizontal) ou y (vertical)
-};
-
+// ── BOOT ──────────────────────────────────────────────────────────────────
 async function boot() {
-  S.user = await initAuth();
+  DUEL.user = await initAuth();
   const h = location.hash.replace("#room/","");
-  if (h.length===6) qs("#jcode").value = h.toUpperCase();
+  if (h.length===6) document.getElementById("jcode").value = h.toUpperCase();
   const sv = localStorage.getItem("mfd-pseudo");
-  if (sv) qs("#pseudo").value = sv;
+  if (sv) document.getElementById("pseudo").value = sv;
   bind();
 }
 
 function bind() {
-  qsa(".mb").forEach(b=>b.addEventListener("click",()=>{qsa(".mb").forEach(x=>x.classList.remove("on"));b.classList.add("on");S.mode=b.dataset.mode;}));
-  qs("#btn-create").addEventListener("click",doCreate);
-  qs("#btn-join").addEventListener("click",doJoin);
-  qs("#jcode").addEventListener("keydown",e=>e.key==="Enter"&&doJoin());
-  qs("#btn-cancel").addEventListener("click",()=>show("lobby"));
-  qs("#btn-launch").addEventListener("click",doLaunch);
-  qs("#btn-copy").addEventListener("click",copyLink);
-  qs("#btn-ok").addEventListener("click",doValidate);
-  qs("#wi").addEventListener("keydown",e=>e.key==="Enter"&&doValidate());
-  qs("#btn-giveup").addEventListener("click",doGiveUp);
-  qs("#btn-rematch").addEventListener("click",doRematch);
-  qs("#btn-ng").addEventListener("click",()=>show("lobby"));
+  document.querySelectorAll(".mb").forEach(b=>b.addEventListener("click",()=>{
+    document.querySelectorAll(".mb").forEach(x=>x.classList.remove("on"));
+    b.classList.add("on"); DUEL.mode=b.dataset.mode;
+  }));
+  document.getElementById("btn-create").addEventListener("click",doCreate);
+  document.getElementById("btn-join").addEventListener("click",doJoin);
+  document.getElementById("jcode").addEventListener("keydown",e=>e.key==="Enter"&&doJoin());
+  document.getElementById("btn-cancel").addEventListener("click",()=>show("lobby"));
+  document.getElementById("btn-launch").addEventListener("click",doLaunch);
+  document.getElementById("btn-copy").addEventListener("click",copyLink);
+  document.getElementById("btn-giveup").addEventListener("click",doGiveUp);
+  document.getElementById("btn-rematch").addEventListener("click",doRematch);
+  document.getElementById("btn-ng").addEventListener("click",()=>show("lobby"));
 }
 
 async function doCreate() {
   const p=getPseudo(); if(!p) return;
   try {
     toast("Chargement…");
-    S.G=fetchGrid(); S.pseudo=p; S.found=new Set(); S.started=false;
-    S.roomId=await createRoom({uid:S.user.uid,pseudo:p,gridData:S.G,mode:S.mode});
-    show("waiting"); qs("#cdisp").textContent=S.roomId;
-    history.replaceState(null,"",`#room/${S.roomId}`);
-    // S.started reste false → onRoom déclenchera startGame quand status=playing
-    console.log("Room créée:", S.roomId, "- en attente du joueur 2");
-    S.unsubRoom=listenRoom(S.roomId,onRoom);
-    // Poll de secours pour détecter le joueur 2
-    S._pollInterval = setInterval(async()=>{
+    DUEL.G=fetchGrid(); DUEL.pseudo=p; DUEL.found=new Set();
+    DUEL.roomId=await createRoom({uid:DUEL.user.uid,pseudo:p,gridData:DUEL.G,mode:DUEL.mode});
+    show("waiting");
+    document.getElementById("cdisp").textContent=DUEL.roomId;
+    history.replaceState(null,"",`#room/${DUEL.roomId}`);
+    DUEL.unsubRoom=listenRoom(DUEL.roomId,onRoom);
+    DUEL._pollInterval=setInterval(async()=>{
       try {
-        const snap=await getDoc(doc(db,"rooms",S.roomId));
-        console.log("poll host:", snap.data()?.player2);
-        if(snap.exists()&&snap.data().player2&&qs("#waiting.active")){
-          qs("#waiting-status").textContent="✅ Joueur 2 connecté !";
-          qs("#waiting-status").classList.remove("pulse");
-          qs("#btn-launch").style.display="block";
-          clearInterval(S._pollInterval);
+        const snap=await getDoc(doc(db,"rooms",DUEL.roomId));
+        if(snap.exists()&&snap.data().player2&&document.getElementById("waiting").classList.contains("active")){
+          document.getElementById("wstatus").textContent="✅ Joueur 2 connecté !";
+          document.getElementById("wstatus").classList.remove("pulse");
+          document.getElementById("btn-launch").style.display="block";
+          clearInterval(DUEL._pollInterval);
         }
-      } catch(e){console.error("poll error",e);}
+      } catch(e){console.error(e);}
     },2000);
   } catch(e){toast("Erreur: "+e.message);console.error(e);}
 }
 
 async function doJoin() {
   const p=getPseudo(); if(!p) return;
-  const code=qs("#jcode").value.trim().toUpperCase();
+  const code=document.getElementById("jcode").value.trim().toUpperCase();
   if(code.length!==6){toast("Code à 6 caractères svp");return;}
   try {
     toast("Connexion…");
-    S.pseudo=p; S.found=new Set(); S.roomId=code; S.G=fetchGrid();
-    await joinRoom({roomId:code,uid:S.user.uid,pseudo:p});
+    DUEL.pseudo=p; DUEL.found=new Set(); DUEL.roomId=code; DUEL.G=fetchGrid();
+    await joinRoom({roomId:code,uid:DUEL.user.uid,pseudo:p});
     show("waiting");
-    qs("#cdisp").textContent=code;
-    qs("#waiting-status").textContent="En attente du lancement...";
-    qs("#btn-launch").style.display="none";
-    S.unsubRoom=listenRoom(code,onRoom);
-    S._pollInterval = setInterval(async()=>{
+    document.getElementById("cdisp").textContent=code;
+    document.getElementById("wstatus").textContent="En attente du lancement...";
+    document.getElementById("btn-launch").style.display="none";
+    DUEL.unsubRoom=listenRoom(code,onRoom);
+    DUEL._pollInterval=setInterval(async()=>{
       try {
         const snap=await getDoc(doc(db,"rooms",code));
-        console.log("poll joueur2:", snap.data()?.status);
-        if(snap.exists()&&snap.data().status==="playing"&&qs("#waiting.active")){
-          clearInterval(S._pollInterval);
+        if(snap.exists()&&snap.data().status==="playing"&&document.getElementById("waiting").classList.contains("active")){
+          clearInterval(DUEL._pollInterval);
           startGame(snap.data());
         }
-      } catch(e){console.error("poll error",e);}
+      } catch(e){console.error(e);}
     },2000);
   } catch(e){toast("Erreur: "+e.message);console.error(e);}
 }
 
 async function onRoom(room) {
-  if(room.status==="waiting" && room.player2 && qs("#waiting.active")) {
-    qs("#waiting-status").textContent="✅ Joueur 2 connecté !";
-    qs("#waiting-status").classList.remove("pulse");
-    qs("#btn-launch").style.display="block";
-  }
-  if(room.status==="playing" && qs("#waiting.active")) {
-    if(S._pollInterval) clearInterval(S._pollInterval);
-    if(!S.G) S.G=fetchGrid();
+  if(room.status==="playing"&&document.getElementById("waiting").classList.contains("active")){
+    if(DUEL._pollInterval) clearInterval(DUEL._pollInterval);
+    if(!DUEL.G) DUEL.G=fetchGrid();
     startGame(room);
   }
-  if(room.status==="finished"&&qs("#game.active")) endGame(room);
+  if(room.status==="finished"&&document.getElementById("game").classList.contains("active")) endGame(room);
 }
 
 async function doLaunch() {
   try {
-    await updateDoc(doc(db,"rooms",S.roomId),{status:"playing",startedAt:serverTimestamp()});
-    const snap=await getDoc(doc(db,"rooms",S.roomId));
+    if(DUEL._pollInterval) clearInterval(DUEL._pollInterval);
+    await updateDoc(doc(db,"rooms",DUEL.roomId),{status:"playing",startedAt:serverTimestamp()});
+    const snap=await getDoc(doc(db,"rooms",DUEL.roomId));
     startGame(snap.data());
   } catch(e){toast("Erreur: "+e.message);console.error(e);}
 }
 
-// Pour le joueur 1 (host), on reset S.started à false après création
-// pour qu'il démarre bien quand le joueur 2 rejoint
-
+// ── START GAME ─────────────────────────────────────────────────────────────
 function startGame(room) {
-  show("game"); buildGrid(); initKeyboard();
-  qs("#totw").textContent=S.G.totalWords;
-  qs("#pmyname").textContent=S.pseudo; qs("#pgmyn").textContent=S.pseudo;
-  S.startTime=Date.now();
-  S.timerInt=S.mode==="blitz"?setInterval(tickB,1000):setInterval(tickC,1000);
-  const opp=room.player1===S.user.uid?room.player2:room.player1;
-  if(opp){S.unsubLive=listenOpponentLive(S.roomId,opp,onOpp);loadOpp(opp);}
+  show("game");
+  
+  // Expose APP_GAME_DATA globalement pour arrowwords.js
+  window.APP_GAME_DATA = {
+    id: DUEL.G.id,
+    rows: DUEL.G.rows,
+    columns: DUEL.G.cols,
+    grid: DUEL.G.words.map(w => ({
+      id: w.id,
+      x: w.x - 1, // arrowwords utilise index 0-based si sw=1, mais nos données sont 1-based
+      y: w.y - 1,
+      dir: w.dir,
+      def: w.def,
+      size_word: w.size
+    })),
+    discovery: 1,
+    next_grid_id: null,
+    level: 1
+  };
+
+  // Override checkWords pour intégrer notre validation
+  window.checkWords = async function(notify, callback) {
+    if(callback) callback();
+    await syncValidated();
+  };
+
+  document.getElementById("totw").textContent=DUEL.G.totalWords;
+  document.getElementById("pmyname").textContent=DUEL.pseudo;
+  document.getElementById("pgmyn").textContent=DUEL.pseudo;
+
+  // Construit la grille HTML comme Mygamify
+  buildMygamifyGrid();
+  
+  // Lance le timer
+  DUEL.startTime=Date.now();
+  DUEL.timerInt=DUEL.mode==="blitz"?setInterval(tickB,1000):setInterval(tickC,1000);
+  
+  const opp=room.player1===DUEL.user.uid?room.player2:room.player1;
+  if(opp){DUEL.unsubLive=listenOpponentLive(DUEL.roomId,opp,onOpp);loadOpp(opp);}
+}
+
+// ── GRILLE ─────────────────────────────────────────────────────────────────
+function buildMygamifyGrid() {
+  const rows = DUEL.G.rows;
+  const cols = DUEL.G.cols;
+  
+  // Calcule la taille des cases
+  const gridWrap = document.querySelector(".gwrap");
+  const availW = gridWrap.clientWidth - 24;
+  const cellSize = Math.min(52, Math.floor(availW / cols));
+
+  // Construit le HTML de la grille (exactement comme Mygamify)
+  let html = '';
+  for(let r = 1; r <= rows; r++) {
+    html += '<div class="rows">';
+    for(let c = 1; c <= cols; c++) {
+      html += `<div class="column" data-column="${c}" data-row="${r}" data-index="${(r-1)*cols+(c-1)}"><span></span></div>`;
+    }
+    html += '</div>';
+  }
+  document.getElementById("grid").innerHTML = html;
+  
+  // Taille des cases
+  document.querySelectorAll("#grid .column").forEach(col => {
+    col.style.width = cellSize+"px";
+    col.style.height = cellSize+"px";
+  });
+  document.querySelectorAll("#grid .rows").forEach(row => {
+    row.style.height = cellSize+"px";
+  });
+  document.getElementById("grid").style.width = (cellSize*cols)+"px";
+  document.getElementById("grid").style.height = (cellSize*rows)+"px";
+  document.getElementById("grid-container").style.width = (cellSize*cols)+"px";
+  document.getElementById("grid-container").style.height = (cellSize*rows)+"px";
+  document.getElementById("grid-scaler").style.width = (cellSize*cols)+"px";
+  document.getElementById("grid-scaler").style.height = (cellSize*rows)+"px";
+
+  // Ajuste la taille des polices
+  const fontSize = Math.max(10, cellSize * 0.45);
+  document.querySelectorAll("#grid .column span").forEach(s => {
+    s.style.fontSize = fontSize+"px";
+  });
+  document.querySelectorAll("#grid .column.c_0 span div, #grid .column.c_1 span div").forEach(d => {
+    d.style.fontSize = Math.max(7, cellSize * 0.14)+"px";
+    d.style.lineHeight = Math.max(8, cellSize * 0.15)+"px";
+  });
+
+  // Appelle generateGrid() de arrowwords.js
+  if(typeof generateGrid === 'function') {
+    generateGrid();
+  }
+}
+
+// Synchronise les mots validés avec Firebase
+async function syncValidated() {
+  const newlyFound = [];
+  DUEL.G.words.forEach(w => {
+    if(DUEL.found.has(w.id)) return;
+    const axe = (w.dir==="RR"||w.dir==="BR") ? "x" : "y";
+    const cells = document.querySelectorAll(`.column[data-id-${axe}="${w.id}"]:not(.play)`);
+    let word = "";
+    cells.forEach(c => { word += (c.querySelector("span")?.textContent||"").trim(); });
+    if(word.length === w.size && document.querySelectorAll(`.column.w_${axe}_${w.id}.validated:not(.play)`).length === w.size) {
+      newlyFound.push(w.id);
+    }
+  });
+  
+  for(const wid of newlyFound) {
+    DUEL.found.add(wid);
+    const n=DUEL.found.size, total=DUEL.G.totalWords;
+    document.getElementById("myscore").textContent=n;
+    document.getElementById("pmyscore").textContent=n;
+    const p=Math.round(n/total*100);
+    document.getElementById("pgmy").style.width=p+"%";
+    document.getElementById("pgmyp").textContent=p+"%";
+    addEv("me",`✓ mot (${n}/${total})`);
+    toast("✓ Bravo !");
+    await submitWord({roomId:DUEL.roomId,uid:DUEL.user.uid,wordId:wid,totalFound:n,totalWords:total});
+    
+    // Met à jour la définition affichée
+    const word = DUEL.G.words.find(w=>w.id===wid);
+    if(word) {
+      document.getElementById("dhint").textContent="Sélectionne une case";
+      document.getElementById("dmain").textContent="–";
+    }
+  }
 }
 
 async function loadOpp(uid){
   try{
-    const s=await getDoc(doc(db,"rooms",S.roomId,"players",uid));
-    if(s.exists()){const n=s.data().pseudo||"Adversaire";qs("#poppname").textContent=n;qs("#pgopn").textContent=n;}
+    const s=await getDoc(doc(db,"rooms",DUEL.roomId,"players",uid));
+    if(s.exists()){const n=s.data().pseudo||"Adversaire";document.getElementById("poppname").textContent=n;document.getElementById("pgopn").textContent=n;}
   }catch{}
 }
 
 function onOpp(data){
-  const total=S.G?.totalWords||1,n=(data.foundWords||[]).length;
-  qs("#poppscore").textContent=n;
+  const total=DUEL.G?.totalWords||1,n=(data.foundWords||[]).length;
+  document.getElementById("poppscore").textContent=n;
   const p=Math.round(n/total*100);
-  qs("#pgop").style.width=p+"%";qs("#pgopp").textContent=p+"%";
+  document.getElementById("pgop").style.width=p+"%";document.getElementById("pgopp").textContent=p+"%";
   if(data.lastFoundAt&&n>0){
-    const b=qs("#lbadge");b.textContent=`${n} mot${n>1?"s":""} trouvé${n>1?"s":""}`;
+    const b=document.getElementById("lbadge");
+    b.textContent=`${n} mot${n>1?"s":""} trouvé${n>1?"s":""}`;
     b.classList.add("fl");setTimeout(()=>b.classList.remove("fl"),2000);
     addEv("op",`+1 mot (${n}/${total})`);
   }
 }
 
-// ── GRILLE ─────────────────────────────────────────────────────────────────
-// Reproduit exactement generateGrid() de arrowwords.js Mygamify
-function buildGrid() {
-  const {rows,cols,words} = S.G;
-  const grid = qs("#grid");
-  grid.innerHTML = "";
-
-  // 1. Crée la grille vide de divs.column (comme le HTML prérendu de Mygamify)
-  const cellGrid = []; // cellGrid[row-1][col-1] = div.column
-  for (let r=1; r<=rows; r++) {
-    const rowEl = document.createElement("div");
-    rowEl.className = "rows";
-    const rowCells = [];
-    for (let c=1; c<=cols; c++) {
-      const cell = document.createElement("div");
-      cell.className = "column";
-      cell.dataset.column = c;
-      cell.dataset.row = r;
-      cell.dataset.index = (r-1)*cols+(c-1);
-      // span pour la lettre (cases blanches)
-      const span = document.createElement("span");
-      span.className = "letter";
-      cell.appendChild(span);
-      rowEl.appendChild(cell);
-      rowCells.push(cell);
-    }
-    grid.appendChild(rowEl);
-    cellGrid.push(rowCells);
-  }
-
-  // Helper pour accéder à une case
-  function cell(col, row) {
-    if (col<1||row<1||col>cols||row>rows) return null;
-    return cellGrid[row-1][col-1];
-  }
-
-  // 2. Remplit la grille comme arrowwords.js generateGrid()
-  words.forEach(w => {
-    const cx = w.x, cy = w.y;
-    const axe = w.axe; // "x" ou "y"
-
-    // Case DEF
-    const start = cell(cx, cy);
-    if (!start) return;
-    if (start.classList.contains("play")) {
-      start.classList.add("c_1");
-    } else {
-      start.classList.add("play", "c_0");
-      // Vide le span letter de la case DEF
-      start.querySelector("span").remove();
-    }
-
-    // Ajoute la définition dans la case DEF
-    const dblock = document.createElement("div");
-    dblock.className = "dblock";
-    const dtxt = document.createElement("div");
-    dtxt.className = "dtext"; dtxt.textContent = w.def;
-    const darr = document.createElement("div");
-    darr.className = "darr";
-    // Flèche: RR/BR = →, RB/BB = ↓
-    darr.textContent = (w.dir==="RR"||w.dir==="BR") ? "→" : "↓";
-    dblock.appendChild(dtxt); dblock.appendChild(darr);
-
-    // Si la case a déjà une def, ajoute un séparateur
-    if (start.querySelector(".dblock")) {
-      const sep = document.createElement("div");
-      sep.className = "dsep";
-      start.appendChild(sep);
-    }
-    start.appendChild(dblock);
-
-    // data-id-axe sur la case DEF
-    if (!start.hasAttribute("data-id-"+axe)) {
-      start.setAttribute("data-id-"+axe, w.id);
-    } else {
-      start.setAttribute("data-id-"+axe+"2", w.id);
-    }
-
-    // 3. Cases lettres
-    const letterCells = getLetterCells(w);
-    letterCells.forEach((lc, j) => {
-      const s = cell(lc.col, lc.row);
-      if (!s) return;
-      s.setAttribute("data-pos-"+axe, j);
-      s.setAttribute("data-id-"+axe, w.id);
-      s.classList.add("w_"+axe+"_"+w.id);
-    });
-  });
-
-  // 4. Délégation d'événements sur la grille entière (plus fiable)
-  const gridEl = qs("#grid");
-  gridEl.addEventListener("click", e => {
-    const col = e.target.closest(".column");
-    if (!col) return;
-    onCellClick(col);
-  });
-}
-
-// Variables globales clavier (comme arrowwords.js)
-let current_case = null;
-let current_id = 0;
-let checkTimeout = null;
-
-function onCellClick(col) {
-  // Logique exacte arrowwords.js initGrid click handler
-  if (col.classList.contains("active") && !col.classList.contains("play")) {
-    const newAxe = S.axe==="x"?"y":"x";
-    if (col.hasAttribute("data-id-"+newAxe)) S.axe = newAxe;
-  }
-  if (!col.hasAttribute("data-id-"+S.axe)) {
-    S.axe = S.axe==="x"?"y":"x";
-  }
-  if (!col.hasAttribute("data-id-"+S.axe)) return;
-
-  const id = parseInt(col.getAttribute("data-id-"+S.axe));
-  current_id = id; S.selId = id;
-
-  qsa(".column.select,.column.active").forEach(c=>c.classList.remove("select","active"));
-  qsa(".column.w_"+S.axe+"_"+id).forEach(c=>{
-    if(!c.classList.contains("validated")) c.classList.add("select");
-  });
-
-  // Si DEF → première case lettre non validée
-  let activCell = col;
-  if (col.classList.contains("play")) {
-    const letters = [...qsa(".column.w_"+S.axe+"_"+id+":not(.play)")];
-    const firstEmpty = letters.find(c=>!c.classList.contains("validated")) || letters[0];
-    if (firstEmpty) activCell = firstEmpty;
-  }
-  // Si case active déjà validée → première case non validée
-  if (activCell.classList.contains("validated")) {
-    const empty = [...qsa(".column.w_"+S.axe+"_"+id+":not(.play):not(.validated)")];
-    if (empty.length) activCell = empty[0];
-  }
-  activCell.classList.add("active");
-  activCell.classList.remove("select");
-  current_case = activCell;
-
-  const word = S.G.words.find(w=>w.id===id);
-  if (word) {
-    qs("#dhint").textContent = `${S.axe==="x"?"→":"↓"} · ${word.size} lettres`;
-    qs("#dmain").textContent = word.def;
-  }
-}
-
-// ── CLAVIER ────────────────────────────────────────────────────────────────
-// Logique exacte de keyboard.js Mygamify
-function initKeyboard() {
-  document.addEventListener("keydown", e => {
-    if (!current_case || !qs("#game.active")) return;
-    const key = e.key;
-    if (!isLetter(key) && key!=="Backspace" && key!=="Delete" && !key.startsWith("Arrow")) return;
-    e.preventDefault();
-
-    if (isLetter(key)) {
-      if (!current_case.classList.contains("validated") && !current_case.classList.contains("play")) {
-        const span = current_case.querySelector("span.letter");
-        if (span) { span.textContent = key.toUpperCase(); current_case.classList.add("last_played"); }
-      }
-      const pos = parseInt(current_case.getAttribute("data-pos-"+S.axe));
-      const nextCase = qs(".column.w_"+S.axe+"_"+current_id+"[data-pos-"+S.axe+"='"+(pos+1)+"']");
-      checkCase(nextCase, false);
-      scheduleCheck();
-    }
-
-    if (key==="Backspace"||key==="Delete") {
-      if (!current_case.classList.contains("validated") && !current_case.classList.contains("play")) {
-        const span = current_case.querySelector("span.letter");
-        if (span) { span.textContent = ""; current_case.classList.remove("last_played"); }
-      }
-      const pos = parseInt(current_case.getAttribute("data-pos-"+S.axe));
-      const prevCase = qs(".column.w_"+S.axe+"_"+current_id+"[data-pos-"+S.axe+"='"+(pos-1)+"']");
-      checkCase(prevCase, true);
-      scheduleCheck();
-    }
-
-    // Flèches directionnelles
-    if (S.axe==="x") {
-      if (key==="ArrowRight") { const pos=parseInt(current_case.getAttribute("data-pos-x")); checkCase(qs(".column.w_x_"+current_id+"[data-pos-x='"+(pos+1)+"']"),false); }
-      if (key==="ArrowLeft")  { const pos=parseInt(current_case.getAttribute("data-pos-x")); checkCase(qs(".column.w_x_"+current_id+"[data-pos-x='"+(pos-1)+"']"),true); }
-    }
-    if (S.axe==="y") {
-      if (key==="ArrowDown") { const pos=parseInt(current_case.getAttribute("data-pos-y")); checkCase(qs(".column.w_y_"+current_id+"[data-pos-y='"+(pos+1)+"']"),false); }
-      if (key==="ArrowUp")   { const pos=parseInt(current_case.getAttribute("data-pos-y")); checkCase(qs(".column.w_y_"+current_id+"[data-pos-y='"+(pos-1)+"']"),true); }
-    }
-  });
-}
-
-function isLetter(str) {
-  return str.length===1 && /[a-zA-ZÀ-ÿ]/i.test(str);
-}
-
-// Déplace la case active (logique exacte checkCase de keyboard.js)
-function checkCase(newCase, isBack) {
-  if (newCase && !newCase.classList.contains("validated")) {
-    current_case.classList.remove("active");
-    current_case = newCase;
-    current_case.classList.add("active");
-    current_case.classList.remove("select");
-  }
-  // Saute les cases validées
-  while (newCase && newCase.classList.contains("validated")) {
-    const pos = parseInt(newCase.getAttribute("data-pos-"+S.axe));
-    newCase = isBack
-      ? qs(".column.w_"+S.axe+"_"+current_id+"[data-pos-"+S.axe+"='"+(pos-1)+"']")
-      : qs(".column.w_"+S.axe+"_"+current_id+"[data-pos-"+S.axe+"='"+(pos+1)+"']");
-    if (newCase && !newCase.classList.contains("validated")) {
-      current_case.classList.remove("active");
-      current_case = newCase;
-      current_case.classList.add("active");
-    }
-  }
-}
-
-// Vérifie le mot après 500ms (logique checkWords de arrowwords.js)
-function scheduleCheck() {
-  if (checkTimeout) clearTimeout(checkTimeout);
-  checkTimeout = setTimeout(async () => {
-    if (!current_id || !S.selId) return;
-    // Lit les lettres dans les cases du mot courant
-    const cells = [...qsa(".column.w_"+S.axe+"_"+current_id+":not(.play)")];
-    const word = S.G.words.find(w=>w.id===current_id);
-    if (!word) return;
-    const letters = cells.map(c=>c.querySelector("span.letter")?.textContent||"");
-    if (letters.some(l=>!l)) return; // mot incomplet
-    const answer = letters.join("").toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
-    if (answer.length!==word.size) return;
-    await validateWord(current_id, answer);
-  }, 500);
-}
-
-async function validateWord(wordId, answer) {
-  const ok = await checkWord(S.G.id, wordId, answer);
-  if (!ok) return;
-
-  // Marque comme validé
-  S.found.add(wordId);
-  const axe = S.G.words.find(w=>w.id===wordId)?.axe || S.axe;
-  qsa(".column.w_"+axe+"_"+wordId+":not(.play)").forEach(c=>{
-    c.classList.remove("select","active","last_played");
-    c.classList.add("validated");
-  });
-  current_case = null; S.selId = null; current_id = 0;
-  qs("#dmain").textContent="–"; qs("#dhint").textContent="Sélectionne une case";
-  qsa(".column.select,.column.active").forEach(c=>c.classList.remove("select","active"));
-
-  const n=S.found.size, total=S.G.totalWords;
-  qs("#myscore").textContent=n; qs("#pmyscore").textContent=n;
-  const p=Math.round(n/total*100);
-  qs("#pgmy").style.width=p+"%"; qs("#pgmyp").textContent=p+"%";
-  addEv("me",`✓ mot trouvé (${n}/${total})`);
-  toast("✓ Bravo !");
-  await submitWord({roomId:S.roomId,uid:S.user.uid,wordId,totalFound:n,totalWords:total});
-}
-
-async function doValidate() {
-  // Bouton valider manuel — lit le champ input
-  if (!S.selId) return;
-  const inp=qs("#wi");
-  const raw=inp.value.trim().toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
-  if (!raw) return;
-  const word=S.G.words.find(w=>w.id===S.selId);
-  if (!word||raw.length!==word.size) { toast(`${word?.size||"?"} lettres attendues`); return; }
-  inp.value="";
-  await validateWord(S.selId, raw);
-}
-
-async function checkWord(gridId,wordId,answer){
-  try{
-    const r=await fetch(`https://sdk.mygamify.fr/mots-fleches/verifier/${gridId}`,{
-      method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({wordId,answer})
-    });
-    return (await r.json()).correct===true;
-  }catch{return true;}
-}
-
-// ── TIMERS ──────────────────────────────────────────────────────────────────
-function tickC(){qs("#tmr").textContent=fmt(Math.floor((Date.now()-S.startTime)/1000));}
-function tickB(){S.blitzLeft--;qs("#tmr").textContent=fmt(S.blitzLeft);if(S.blitzLeft<=30)qs("#tmr").classList.add("w");if(S.blitzLeft<=0){clearInterval(S.timerInt);finishGame({roomId:S.roomId,uid:S.user.uid});}}
+// ── TIMER ──────────────────────────────────────────────────────────────────
+function tickC(){document.getElementById("tmr").textContent=fmt(Math.floor((Date.now()-DUEL.startTime)/1000));}
+function tickB(){DUEL.blitzLeft--;document.getElementById("tmr").textContent=fmt(DUEL.blitzLeft);if(DUEL.blitzLeft<=30)document.getElementById("tmr").classList.add("w");if(DUEL.blitzLeft<=0){clearInterval(DUEL.timerInt);finishGame({roomId:DUEL.roomId,uid:DUEL.user.uid});}}
 function fmt(s){return`${Math.floor(s/60).toString().padStart(2,"0")}:${(s%60).toString().padStart(2,"0")}`;}
 
-// ── END ─────────────────────────────────────────────────────────────────────
+// ── END ────────────────────────────────────────────────────────────────────
 function endGame(room){
-  if(S.timerInt)clearInterval(S.timerInt);
-  if(S.unsubRoom)S.unsubRoom();if(S.unsubLive)S.unsubLive();
-  const win=room.winner===S.user.uid,noW=!room.winner;
-  const el=qs("#etitle");
+  if(DUEL.timerInt)clearInterval(DUEL.timerInt);
+  if(DUEL.unsubRoom)DUEL.unsubRoom();if(DUEL.unsubLive)DUEL.unsubLive();
+  const win=room.winner===DUEL.user.uid,noW=!room.winner;
+  const el=document.getElementById("etitle");
   if(noW){el.textContent="Égalité !";el.className="et draw";}
   else if(win){el.textContent="Victoire ! 🎉";el.className="et win";}
   else{el.textContent="Défaite…";el.className="et lose";}
-  const elapsed=S.startTime?Math.floor((Date.now()-S.startTime)/1000):0;
-  qs("#escore").textContent=S.found.size;qs("#etime").textContent=fmt(elapsed);
-  qs("#eelo").textContent=win?"+16":"−16";show("end");
+  const elapsed=DUEL.startTime?Math.floor((Date.now()-DUEL.startTime)/1000):0;
+  document.getElementById("escore").textContent=DUEL.found.size;
+  document.getElementById("etime").textContent=fmt(elapsed);
+  document.getElementById("eelo").textContent=win?"+16":"−16";
+  show("end");
 }
+
 async function doGiveUp(){
   if(!confirm("Abandonner ?"))return;
-  const r=(await getDoc(doc(db,"rooms",S.roomId))).data();
-  const opp=r.player1===S.user.uid?r.player2:r.player1;
-  await finishGame({roomId:S.roomId,uid:opp||S.user.uid});
+  const r=(await getDoc(doc(db,"rooms",DUEL.roomId))).data();
+  const opp=r.player1===DUEL.user.uid?r.player2:r.player1;
+  await finishGame({roomId:DUEL.roomId,uid:opp||DUEL.user.uid});
 }
+
 async function doRematch(){
   try{
-    const nid=await requestRematch({roomId:S.roomId,uid:S.user.uid,pseudo:S.pseudo,gridData:S.G,mode:S.mode});
-    S.roomId=nid;S.found=new Set();S.started=false;
-    show("waiting");qs("#cdisp").textContent=nid;
+    const nid=await requestRematch({roomId:DUEL.roomId,uid:DUEL.user.uid,pseudo:DUEL.pseudo,gridData:DUEL.G,mode:DUEL.mode});
+    DUEL.roomId=nid;DUEL.found=new Set();
+    show("waiting");document.getElementById("cdisp").textContent=nid;
     history.replaceState(null,"",`#room/${nid}`);
-    S.unsubRoom=listenRoom(nid,onRoom);
+    DUEL.unsubRoom=listenRoom(nid,onRoom);
   }catch(e){toast("Erreur: "+e.message);}
 }
 
-// ── UTILS ────────────────────────────────────────────────────────────────────
-function getPseudo(){const p=qs("#pseudo").value.trim();if(!p){toast("Entre ton pseudo d'abord");qs("#pseudo").focus();return null;}localStorage.setItem("mfd-pseudo",p);return p;}
-function show(id){qsa(".screen").forEach(s=>s.classList.remove("active"));qs("#"+id).classList.add("active");}
-function addEv(who,txt){const f=qs("#feed");const el=document.createElement("div");el.className=`ev ${who}`;el.innerHTML=`<span class="dot"></span>${txt}`;f.prepend(el);while(f.children.length>25)f.lastChild.remove();}
-function copyLink(){navigator.clipboard.writeText(`${location.origin}${location.pathname}#room/${S.roomId}`).then(()=>toast("Lien copié !"));}
-let _t;function toast(msg){const t=qs("#toast");t.textContent=msg;t.classList.add("on");clearTimeout(_t);_t=setTimeout(()=>t.classList.remove("on"),2500);}
-const qs=s=>document.querySelector(s);const qsa=s=>document.querySelectorAll(s);
+// ── UTILS ──────────────────────────────────────────────────────────────────
+function getPseudo(){const p=document.getElementById("pseudo").value.trim();if(!p){toast("Entre ton pseudo d'abord");document.getElementById("pseudo").focus();return null;}localStorage.setItem("mfd-pseudo",p);return p;}
+function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));document.getElementById(id).classList.add("active");}
+function addEv(who,txt){const f=document.getElementById("feed");const el=document.createElement("div");el.className=`ev ${who}`;el.innerHTML=`<span class="dot"></span>${txt}`;f.prepend(el);while(f.children.length>25)f.lastChild.remove();}
+function copyLink(){navigator.clipboard.writeText(`${location.origin}${location.pathname}#room/${DUEL.roomId}`).then(()=>toast("Lien copié !"));}
+let _t;function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("on");clearTimeout(_t);_t=setTimeout(()=>t.classList.remove("on"),2500);}
+
+// Hook sur la définition sélectionnée
+$(document).on("click","#grid .column",function(){
+  const id_x = $(this).attr("data-id-x");
+  const id_y = $(this).attr("data-id-y");
+  const id = current_axe==="x" ? id_x : id_y;
+  if(id) {
+    const word = DUEL.G.words.find(w=>w.id===parseInt(id));
+    if(word) {
+      document.getElementById("dhint").textContent = `${current_axe==="x"?"→":"↓"} · ${word.size} lettres`;
+      document.getElementById("dmain").textContent = word.def;
+    }
+  }
+});
 
 boot().catch(console.error);
 </script>
+
+<!-- arrowwords.js de Mygamify chargé APRÈS jQuery et les variables globales -->
+<script src="https://sdk.mygamify.fr/assets/js/arrowwords.js?v=20260608185457"></script>
+<script src="https://sdk.mygamify.fr/assets/js/keyboard.js"></script>
 </body>
 </html>
