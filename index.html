@@ -457,14 +457,12 @@ function buildGrid() {
     });
   });
 
-  // Pas de cases noires dans Mygamify — toutes les cases sont blanches ou DEF
-
-  // 4. Événements clic (comme arrowwords.js initGrid)
-  qsa(".column").forEach(col => {
-    col.addEventListener("click", () => {
-      if (col.classList.contains("black")) return;
-      onCellClick(col);
-    });
+  // 4. Délégation d'événements sur la grille entière (plus fiable)
+  const gridEl = qs("#grid");
+  gridEl.addEventListener("click", e => {
+    const col = e.target.closest(".column");
+    if (!col) return;
+    onCellClick(col);
   });
 }
 
