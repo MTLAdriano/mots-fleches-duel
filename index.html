@@ -8,123 +8,197 @@
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
-  <!-- CSS Mygamify (arrowwords + franceinfo style) -->
+  <!-- CSS Mygamify (arrowwords.css + style.css de franceinfo) -->
   <link rel="stylesheet" href="assets/arrowwords.css">
   <link rel="stylesheet" href="assets/style.css">
 
-  <!-- Simple keyboard CSS -->
+  <!-- Simple keyboard CSS (requis par keyboard.js) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-keyboard@latest/build/css/index.css">
 
   <style>
-    /* ── Reset & base ─────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Inter', sans-serif; background: #f2f0eb; color: #111; min-height: 100dvh; display: flex; flex-direction: column; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f2f0eb;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
 
-    /* ── Header ───────────────────────────────────────────── */
-    header { background: #111; color: #fff; padding: 10px 18px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; z-index: 10; }
+    /* ══ HEADER ══════════════════════════════════════════════ */
+    header {
+      background: #111;
+      color: #fff;
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      z-index: 100;
+    }
     .logo { font-size: 15px; font-weight: 800; }
     .logo em { font-style: normal; color: #f97316; }
 
-    /* ── Screens ──────────────────────────────────────────── */
+    /* ══ SCREENS ═════════════════════════════════════════════ */
     .screen { display: none; flex: 1; flex-direction: column; }
     .screen.active { display: flex; }
 
-    /* ── Lobby ────────────────────────────────────────────── */
-    #lobby { align-items: center; justify-content: center; gap: 20px; padding: 32px 16px; }
-    .lobby-title { font-size: clamp(26px,6vw,46px); font-weight: 900; text-align: center; letter-spacing: -.04em; line-height: 1.05; }
+    /* ══ LOBBY ═══════════════════════════════════════════════ */
+    #lobby {
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      padding: 32px 16px;
+    }
+    .lobby-title {
+      font-size: clamp(26px, 6vw, 46px);
+      font-weight: 900;
+      text-align: center;
+      letter-spacing: -.04em;
+      line-height: 1.05;
+    }
     .lobby-title b { color: #2563eb; }
-    .card { background: white; border-radius: 14px; padding: 22px; width: 100%; max-width: 350px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 2px 12px rgba(0,0,0,.07); }
+    .card {
+      background: white;
+      border-radius: 14px;
+      padding: 22px;
+      width: 100%;
+      max-width: 350px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.07);
+    }
     .lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #888; margin-bottom: 3px; }
-    .fi { width: 100%; font-size: 15px; padding: 10px 13px; border: 1.5px solid #e5e5e5; border-radius: 9px; outline: none; font-family: inherit; background: #fafafa; transition: border-color .15s; }
+    .fi { width: 100%; font-size: 15px; padding: 10px 13px; border: 1.5px solid #e5e5e5; border-radius: 9px; outline: none; font-family: inherit; background: #fafafa; }
     .fi:focus { border-color: #111; background: white; }
     .modes { display: flex; border: 1.5px solid #e5e5e5; border-radius: 9px; overflow: hidden; }
-    .mb { flex: 1; padding: 9px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; background: #f5f5f5; color: #666; font-family: inherit; transition: all .15s; }
+    .mb { flex: 1; padding: 9px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; background: #f5f5f5; color: #666; font-family: inherit; }
     .mb.on { background: #111; color: white; }
-    .btn { font-family: inherit; font-size: 14px; font-weight: 700; padding: 11px 18px; border-radius: 9px; border: none; cursor: pointer; transition: all .15s; }
+    .btn { font-family: inherit; font-size: 14px; font-weight: 700; padding: 11px 18px; border-radius: 9px; border: none; cursor: pointer; }
     .btn-d { background: #111; color: white; width: 100%; }
-    .btn-d:hover { background: #333; }
     .btn-b { background: #2563eb; color: white; }
     .btn-r { background: #dc2626; color: white; }
     .btn-o { background: white; color: #111; border: 1.5px solid #e5e5e5; }
-    .btn-o:hover { background: #f5f5f5; }
     .sep { display: flex; align-items: center; gap: 8px; color: #ccc; font-size: 12px; }
     .sep::before, .sep::after { content: ''; flex: 1; height: 1px; background: #eee; }
     .join-row { display: flex; gap: 8px; }
     .join-row .fi { flex: 1; text-transform: uppercase; letter-spacing: .12em; font-size: 16px; font-weight: 700; }
 
-    /* ── Waiting ──────────────────────────────────────────── */
-    #waiting { align-items: center; justify-content: center; gap: 18px; padding: 40px 16px; text-align: center; }
-    .codebox { font-size: 44px; font-weight: 900; letter-spacing: .15em; border: 3px dashed #ddd; border-radius: 14px; padding: 18px 32px; background: white; }
-    .pulse-txt { color: #888; font-size: 14px; }
-    .pulse-txt::after { content: ''; animation: dots 1.5s infinite; }
+    /* ══ WAITING ═════════════════════════════════════════════ */
+    #waiting {
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      padding: 40px 16px;
+      text-align: center;
+    }
+    .codebox {
+      font-size: 44px;
+      font-weight: 900;
+      letter-spacing: .15em;
+      border: 3px dashed #ddd;
+      border-radius: 14px;
+      padding: 18px 32px;
+      background: white;
+    }
+    .pulse::after { content: ''; animation: dots 1.5s infinite; }
     @keyframes dots { 0%{content:'.'} 33%{content:'..'} 66%{content:'...'} }
     .cpbtn { background: none; border: none; color: #2563eb; font-size: 13px; cursor: pointer; text-decoration: underline; font-family: inherit; }
 
-    /* ── Game layout ──────────────────────────────────────── */
+    /* ══ GAME ════════════════════════════════════════════════ */
     #game { overflow: hidden; }
-    .game-bar { background: white; border-bottom: 1px solid #e5e5e5; padding: 7px 14px; display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
-    .timer { font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; min-width: 58px; }
-    .timer.warn { color: #dc2626; }
+
+    .game-bar {
+      background: white;
+      border-bottom: 1px solid #e5e5e5;
+      padding: 7px 14px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-shrink: 0;
+    }
+    .tmr { font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; min-width: 58px; }
+    .tmr.warn { color: #dc2626; }
+
     .game-body { display: flex; flex: 1; overflow: hidden; }
 
-    /* ── Zone grille ──────────────────────────────────────── */
-    .grid-area { flex: 1; overflow: auto; display: flex; flex-direction: column; }
-    .grid-scroll { flex: 1; overflow: auto; padding: 12px; }
-
-    /* Overrides pour intégrer la grille Mygamify dans notre layout */
-    #grid-container {
-      overflow: hidden;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      background: #fff;
-      position: relative;
-      margin: 0 auto;
-    }
-    #grid-scaler {
-      position: absolute;
-      top: -1px; left: -1px;
-      transform-origin: top left;
-    }
-    #grid {
-      position: relative;
-      touch-action: none;
-    }
-    #grid .rows { display: flex; }
-    #grid .column {
-      vertical-align: middle;
-      border: 0; padding: 0;
-      user-select: none;
-      float: left;
-      display: block;
-      cursor: pointer;
-      position: relative;
-    }
-    #grid .column span {
-      width: 100%; height: 100%;
+    /* ── Zone grille ── */
+    /*
+      Structure EXACTE de Mygamify (mode hideDef = sans panneau defs latéral) :
+      .gameBody > .gameContainer.hideDef > .gameCol > #grid-container > #grid-scaler > #grid
+      + .gameDefinition (sous la grille)
+      + .gameKeyboard (clavier mobile)
+    */
+    .gameBody {
+      flex: 1;
       display: flex;
-      font-weight: bold;
-      text-transform: uppercase;
-      text-align: center;
-      align-items: center;
-      justify-content: center;
-      border-right: solid 1px #ddd;
-      border-bottom: solid 1px #ddd;
-      line-height: 0 !important;
+      flex-direction: column;
+      overflow: hidden;
     }
 
-    /* ── Barre de définition ──────────────────────────────── */
-    .def-bar {
-      background: #f9f9f7;
+    /* gameContainer en mode hideDef : occupe toute la largeur */
+    .gameContainer {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .gameContainer.hideDef .gameDefs { display: none; }
+
+    /* gameCol = zone qui contient la grille */
+    .gameCol {
+      flex: 1;
+      overflow: auto;
+      padding: 12px;
+      background: #f2f0eb;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* gameDefs = panneau latéral des définitions (caché en hideDef) */
+    .gameDefs { display: none; }
+
+    /* Listes de définitions (remplies par arrowwords.js via appendTo) */
+    .dico_v, .dico_h { display: none; }
+
+    /* gameList = liste des mots (cachée) */
+    .gameList { display: none; }
+
+    /* gameDefinition = arrowwords.js y écrit la définition du mot actif */
+    .gameDefinition {
+      background: white;
       border-top: 1px solid #e5e5e5;
-      padding: 10px 14px;
+      padding: 10px 16px;
       flex-shrink: 0;
-      min-height: 52px;
+      font-size: 15px;
+      font-weight: 600;
+      min-height: 48px;
+      display: flex;
+      align-items: center;
     }
-    .def-bar-hint { font-size: 11px; color: #999; margin-bottom: 2px; }
-    .def-bar-text { font-size: 14px; font-weight: 600; }
 
-    /* ── Panneau duel ─────────────────────────────────────── */
-    .duel-panel { width: 250px; flex-shrink: 0; border-left: 1px solid #e5e5e5; background: white; display: flex; flex-direction: column; overflow: hidden; }
+    /* gameKeyboard = clavier virtuel mobile */
+    .gameKeyboard { display: none; }
+
+    /* Boutons cachés requis par arrowwords.js (.trigger) */
+    .validate, .save, .toggleDef, .show_keyboard,
+    #vertical-tab, #horizontal-tab, #words, #zoomIn, #zoomOut,
+    #inputForm { display: none !important; }
+
+    /* #app = arrowwords.js l'anime en opacity 1 */
+    #app { opacity: 0; }
+
+    /* ── Panneau duel ── */
+    .duel-panel {
+      width: 250px;
+      flex-shrink: 0;
+      border-left: 1px solid #e5e5e5;
+      background: white;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
     .psec { padding: 12px 14px; border-bottom: 1px solid #f0f0f0; }
     .ptitle { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: #999; margin-bottom: 8px; }
     .scores { display: flex; align-items: center; gap: 6px; }
@@ -143,17 +217,22 @@
     .last-badge { font-size: 12px; padding: 5px 9px; border-radius: 7px; background: #f8f8f8; color: #666; min-height: 28px; display: flex; align-items: center; }
     .last-badge.flash { background: #fef9c3; color: #854d0e; }
     .feed { flex: 1; overflow-y: auto; padding: 10px 14px; display: flex; flex-direction: column; gap: 3px; }
-    .ev { font-size: 11px; padding: 5px 9px; border-radius: 7px; animation: fi .2s; display: flex; align-items: center; gap: 5px; }
-    @keyframes fi { from { opacity: 0; transform: translateX(6px); } }
+    .ev { font-size: 11px; padding: 5px 9px; border-radius: 7px; display: flex; align-items: center; gap: 5px; }
     .ev.me { background: #f0fdf4; color: #166534; }
     .ev.opp { background: #eff6ff; color: #1e40af; }
     .evdot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
     .ev.me .evdot { background: #16a34a; }
     .ev.opp .evdot { background: #2563eb; }
 
-    /* ── End screen ───────────────────────────────────────── */
-    #end { align-items: center; justify-content: center; gap: 18px; padding: 40px 16px; text-align: center; }
-    .end-title { font-size: clamp(34px,8vw,54px); font-weight: 900; letter-spacing: -.04em; }
+    /* ══ END ═════════════════════════════════════════════════ */
+    #end {
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      padding: 40px 16px;
+      text-align: center;
+    }
+    .end-title { font-size: clamp(34px, 8vw, 54px); font-weight: 900; letter-spacing: -.04em; }
     .end-title.win { color: #16a34a; }
     .end-title.lose { color: #dc2626; }
     .end-title.draw { color: #888; }
@@ -164,31 +243,41 @@
     .end-btns { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; max-width: 360px; width: 100%; }
     .end-btns .btn { flex: 1; min-width: 130px; }
 
-    /* ── Toast ────────────────────────────────────────────── */
-    .toast { position: fixed; bottom: 72px; left: 50%; transform: translateX(-50%); background: #111; color: white; font-size: 13px; font-weight: 600; padding: 9px 18px; border-radius: 999px; z-index: 9999; opacity: 0; transition: opacity .2s; pointer-events: none; white-space: nowrap; }
+    /* ══ TOAST ═══════════════════════════════════════════════ */
+    .toast {
+      position: fixed;
+      bottom: 72px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #111;
+      color: white;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 9px 18px;
+      border-radius: 999px;
+      z-index: 9999;
+      opacity: 0;
+      transition: opacity .2s;
+      pointer-events: none;
+      white-space: nowrap;
+    }
     .toast.on { opacity: 1; }
 
-    /* ── Keyboard override ────────────────────────────────── */
-    .gameKeyboard { display: none; }
-
-    @media (max-width: 640px) {
-      .duel-panel { display: none; }
-    }
+    @media (max-width: 640px) { .duel-panel { display: none; } }
   </style>
 </head>
 <body>
 
+<!-- ══ HEADER ═══════════════════════════════════════════════ -->
 <header>
   <div class="logo">Mots Fléchés <em>Duel</em></div>
   <div style="font-size:12px;color:#888" id="hbadge"></div>
 </header>
 
-<!-- ── LOBBY ──────────────────────────────────────────────── -->
+<!-- ══ LOBBY ════════════════════════════════════════════════ -->
 <div id="lobby" class="screen active">
   <h1 class="lobby-title">Joue contre<br>tes <b>amis</b></h1>
-  <p style="color:#666;font-size:15px;text-align:center;max-width:340px;line-height:1.5">
-    La grille Franceinfo du jour, en duel temps réel.
-  </p>
+  <p style="color:#666;font-size:15px;text-align:center;max-width:340px;line-height:1.5">La grille Franceinfo du jour, en duel temps réel.</p>
   <div class="card">
     <div>
       <div class="lbl">Ton pseudo</div>
@@ -207,49 +296,86 @@
   </div>
 </div>
 
-<!-- ── WAITING ─────────────────────────────────────────────── -->
+<!-- ══ WAITING ══════════════════════════════════════════════ -->
 <div id="waiting" class="screen">
   <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#999">Code de la partie</p>
   <div class="codebox" id="cdisp">——</div>
   <p style="font-size:14px;color:#666">Partage ce lien :</p>
   <button class="cpbtn" id="btn-copy">📋 Copier le lien</button>
-  <p class="pulse-txt" id="wstatus">En attente du joueur 2</p>
+  <p class="pulse" id="wstatus" style="color:#888;font-size:14px">En attente du joueur 2</p>
   <button class="btn btn-d" id="btn-launch" style="margin-top:8px;padding:12px 32px;display:none">🚀 Lancer la partie</button>
   <button class="btn btn-o" style="margin-top:8px;padding:9px 20px;width:auto" id="btn-cancel">Annuler</button>
 </div>
 
-<!-- ── GAME ────────────────────────────────────────────────── -->
+<!-- ══ GAME ══════════════════════════════════════════════════ -->
 <div id="game" class="screen">
+
+  <!-- Barre de score/timer -->
   <div class="game-bar">
-    <div class="timer" id="tmr">00:00</div>
+    <div class="tmr" id="tmr">00:00</div>
     <div style="font-size:13px;color:#666">
-      <strong id="myscore" style="font-size:15px;color:#111">0</strong> / <span id="totw">–</span> mots
+      <strong id="myscore" style="font-size:15px;color:#111">0</strong>
+      / <span id="totw">–</span> mots
     </div>
     <div style="flex:1"></div>
     <button class="btn btn-o" style="font-size:12px;padding:5px 11px" id="btn-giveup">Abandonner</button>
   </div>
 
   <div class="game-body">
-    <!-- Zone grille + def bar -->
-    <div class="grid-area">
-      <div class="grid-scroll">
-        <!-- Structure exacte de Mygamify -->
-        <div id="grid-container">
-          <div id="grid-scaler">
-            <div id="grid">
-              <!-- Rempli par buildGrid() -->
+
+    <!-- ── Zone grille (structure exacte Mygamify) ── -->
+    <div class="gameBody">
+      <!-- #app : arrowwords.js l'anime en opacity 1 -->
+      <div id="app" class="gameContainer">
+
+        <!-- gameDefs : panneau latéral définitions (caché en hideDef) -->
+        <div class="gameDefs col-md-4 px-0">
+          <div class="gameList"></div>
+          <div class="dico dico_v box"></div>
+          <div class="dico dico_h box"></div>
+        </div>
+
+        <!-- gameCol : zone grille principale -->
+        <div class="gameCol col-md-8">
+
+          <!-- Boutons cachés requis par arrowwords.js -->
+          <button class="validate" style="display:none"></button>
+          <button class="save" style="display:none"></button>
+          <button class="toggleDef" style="display:none"></button>
+          <button class="show_keyboard" style="display:none"></button>
+          <button id="vertical-tab" style="display:none"></button>
+          <button id="horizontal-tab" style="display:none"></button>
+          <button id="zoomIn" style="display:none"></button>
+          <button id="zoomOut" style="display:none"></button>
+          <div id="words" style="display:none"></div>
+
+          <!-- Grille Mygamify -->
+          <div id="grid-container">
+            <div id="grid-scaler">
+              <div id="grid">
+                <!-- Rempli par buildGrid() puis generateGrid() -->
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-      <!-- Définition du mot sélectionné -->
-      <div class="def-bar">
-        <div class="def-bar-hint" id="def-hint">Clique sur une case pour commencer</div>
-        <div class="def-bar-text" id="def-text">–</div>
-      </div>
-    </div>
 
-    <!-- Panneau duel -->
+          <!-- gameDefinition : arrowwords.js écrit le texte de la définition ici -->
+          <div class="gameDefinition text-center my-2"></div>
+
+          <!-- inputForm requis par arrowwords.js (saisie mobile) -->
+          <form id="inputForm" autocomplete="off" style="height:0;overflow:hidden;position:fixed;top:50%">
+            <input autocomplete="off" maxlength="1" id="text" type="text">
+          </form>
+
+          <!-- Clavier virtuel mobile -->
+          <div class="gameKeyboard">
+            <div class="simple-keyboard"></div>
+          </div>
+
+        </div><!-- /gameCol -->
+      </div><!-- /gameContainer #app -->
+    </div><!-- /gameBody -->
+
+    <!-- ── Panneau duel ── -->
     <div class="duel-panel">
       <div class="psec">
         <div class="ptitle">Score</div>
@@ -285,10 +411,11 @@
       </div>
       <div class="feed" id="feed"></div>
     </div>
-  </div>
-</div>
 
-<!-- ── END ─────────────────────────────────────────────────── -->
+  </div><!-- /game-body -->
+</div><!-- /game -->
+
+<!-- ══ END ═══════════════════════════════════════════════════ -->
 <div id="end" class="screen">
   <div class="end-title" id="end-title">–</div>
   <div class="end-stats">
@@ -308,35 +435,53 @@
      SCRIPTS — ordre exact requis par Mygamify
      ═══════════════════════════════════════════════════════════ -->
 
-<!-- 1. jQuery (requis par arrowwords.js) -->
+<!-- 1. jQuery (requis par arrowwords.js et keyboard.js) -->
 <script src="https://code.jquery.com/jquery-3.6.1.slim.min.js"></script>
 
-<!-- 2. interact.js (requis pour le drag/zoom de la grille) -->
+<!-- 2. interact.js (drag/zoom grille dans arrowwords.js) -->
 <script src="https://unpkg.com/interactjs@1.10.27/dist/interact.min.js"></script>
 
 <!-- 3. Simple Keyboard (requis par keyboard.js) -->
 <script src="https://cdn.jsdelivr.net/npm/simple-keyboard@latest/build/index.min.js"></script>
 
-<!-- 4. Variables APP_ globales -->
+<!-- 4. Toastify stub (arrowwords.js appelle Toastify) -->
+<script>
+window.Toastify = function(opts) {
+  return {
+    showToast: function() {
+      // Redirige vers notre toast
+      if (window._duelToast) window._duelToast(opts.text || '');
+    }
+  };
+};
+// isTouchDevice requis par arrowwords.js
+function isTouchDevice() {
+  return ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+}
+// enterKey requis par keyboard.js
+function enterKey() {}
+</script>
+
+<!-- 5. Variables APP_ globales (hors APP_GAME_DATA) -->
 <script src="assets/duel_vars.js"></script>
 
-<!-- 5. APP_GAME_DATA (données de la grille) -->
+<!-- 6. APP_GAME_DATA (données de la grille du jour) -->
 <script src="assets/app_game_data.js"></script>
 
-<!-- 6. arrowwords.js Mygamify (logique grille) -->
+<!-- 7. arrowwords.js de Mygamify -->
 <script src="assets/arrowwords.js"></script>
 
-<!-- 7. keyboard.js Mygamify (saisie clavier) -->
+<!-- 8. keyboard.js de Mygamify -->
 <script src="assets/keyboard.js"></script>
 
-<!-- 8. Notre logique duel Firebase -->
+<!-- 9. Logique duel (Firebase) -->
 <script type="module">
 import { initAuth, db } from "./js/firebase.js";
 import { fetchGrid } from "./js/grid.js";
 import { createRoom, joinRoom, listenRoom, listenOpponentLive, submitWord, finishGame, requestRematch } from "./js/room.js";
 import { doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// ── State ──────────────────────────────────────────────────
+// ── State ─────────────────────────────────────────────────────────────────
 const S = {
   user: null, pseudo: "", mode: "classic",
   roomId: null, G: null,
@@ -346,14 +491,29 @@ const S = {
   pollInterval: null,
 };
 
-// ── Toast global pour Mygamify ─────────────────────────────
-window.DUEL_TOAST = (msg) => toast(msg);
+// ── Expose toast à Mygamify ───────────────────────────────────────────────
+window._duelToast = toast;
 
-// ── Callback quand un mot est validé par Mygamify ──────────
-window.DUEL_ON_WORD_FOUND = async (wordId) => {
-  if (S.found.has(wordId)) return;
-  S.found.add(wordId);
+// ── Surcharge checkWords pour détecter les mots validés ──────────────────
+// arrowwords.js appelle checkWords() après chaque saisie
+// On intercepte les nouveaux wordsFound pour les syncer Firebase
+const _origCheckWords = window.checkWords;
+window.checkWords = function(notify, callback) {
+  _origCheckWords && _origCheckWords.call(this, notify, async function() {
+    if (window.wordsFound) {
+      for (const wid of window.wordsFound) {
+        const id = parseInt(wid);
+        if (!S.found.has(id)) {
+          S.found.add(id);
+          await syncWord(id);
+        }
+      }
+    }
+    if (callback) callback();
+  });
+};
 
+async function syncWord(wordId) {
   const n = S.found.size;
   const total = S.G?.totalWords || 61;
   document.getElementById("myscore").textContent = n;
@@ -362,20 +522,12 @@ window.DUEL_ON_WORD_FOUND = async (wordId) => {
   document.getElementById("pg-my").style.width = pct + "%";
   document.getElementById("pg-my-pct").textContent = pct + "%";
   addEv("me", `✓ mot (${n}/${total})`);
+  if (S.roomId) {
+    await submitWord({ roomId: S.roomId, uid: S.user.uid, wordId, totalFound: n, totalWords: total });
+  }
+}
 
-  await submitWord({ roomId: S.roomId, uid: S.user.uid, wordId, totalFound: n, totalWords: total });
-};
-
-// ── Callback sélection de case ─────────────────────────────
-window.DUEL_ON_SELECT = (wordId, axe) => {
-  if (!S.G) return;
-  const word = S.G.words.find(w => w.id === parseInt(wordId));
-  if (!word) return;
-  document.getElementById("def-hint").textContent = `${axe === "x" ? "→" : "↓"} · ${word.size} lettres`;
-  document.getElementById("def-text").textContent = word.def;
-};
-
-// ── Boot ───────────────────────────────────────────────────
+// ── Boot ──────────────────────────────────────────────────────────────────
 async function boot() {
   S.user = await initAuth();
   S.G = fetchGrid();
@@ -388,12 +540,11 @@ async function boot() {
   bindUI();
 }
 
-// ── Bind UI ────────────────────────────────────────────────
+// ── Bind UI ───────────────────────────────────────────────────────────────
 function bindUI() {
   document.querySelectorAll(".mb").forEach(b => b.addEventListener("click", () => {
     document.querySelectorAll(".mb").forEach(x => x.classList.remove("on"));
-    b.classList.add("on");
-    S.mode = b.dataset.mode;
+    b.classList.add("on"); S.mode = b.dataset.mode;
   }));
   document.getElementById("btn-create").addEventListener("click", doCreate);
   document.getElementById("btn-join").addEventListener("click", doJoin);
@@ -404,18 +555,9 @@ function bindUI() {
   document.getElementById("btn-giveup").addEventListener("click", doGiveUp);
   document.getElementById("btn-rematch").addEventListener("click", doRematch);
   document.getElementById("btn-newgame").addEventListener("click", () => show("lobby"));
-
-  // Hook jQuery sur les clics grille pour update notre def-bar
-  $(document).on("click", "#grid .column", function() {
-    setTimeout(() => {
-      if (window.current_id && window.current_axe) {
-        window.DUEL_ON_SELECT(window.current_id, window.current_axe);
-      }
-    }, 20);
-  });
 }
 
-// ── Create room ────────────────────────────────────────────
+// ── Create ────────────────────────────────────────────────────────────────
 async function doCreate() {
   const p = getPseudo(); if (!p) return;
   try {
@@ -426,13 +568,13 @@ async function doCreate() {
     document.getElementById("cdisp").textContent = S.roomId;
     history.replaceState(null, "", `#room/${S.roomId}`);
     S.unsubRoom = listenRoom(S.roomId, onRoom);
-    // Poll pour détecter joueur 2
+    // Poll joueur 2
     S.pollInterval = setInterval(async () => {
       try {
         const snap = await getDoc(doc(db, "rooms", S.roomId));
         if (snap.exists() && snap.data().player2 && document.getElementById("waiting").classList.contains("active")) {
           document.getElementById("wstatus").textContent = "✅ Joueur 2 connecté !";
-          document.getElementById("wstatus").classList.remove("pulse-txt");
+          document.getElementById("wstatus").classList.remove("pulse");
           document.getElementById("btn-launch").style.display = "block";
           clearInterval(S.pollInterval);
         }
@@ -441,7 +583,7 @@ async function doCreate() {
   } catch(e) { toast("Erreur: " + e.message); console.error(e); }
 }
 
-// ── Join room ──────────────────────────────────────────────
+// ── Join ──────────────────────────────────────────────────────────────────
 async function doJoin() {
   const p = getPseudo(); if (!p) return;
   const code = document.getElementById("jcode").value.trim().toUpperCase();
@@ -455,7 +597,7 @@ async function doJoin() {
     document.getElementById("wstatus").textContent = "En attente du lancement...";
     document.getElementById("btn-launch").style.display = "none";
     S.unsubRoom = listenRoom(code, onRoom);
-    // Poll pour détecter le lancement
+    // Poll lancement
     S.pollInterval = setInterval(async () => {
       try {
         const snap = await getDoc(doc(db, "rooms", code));
@@ -468,7 +610,7 @@ async function doJoin() {
   } catch(e) { toast("Erreur: " + e.message); console.error(e); }
 }
 
-// ── Room listener ──────────────────────────────────────────
+// ── Room listener ─────────────────────────────────────────────────────────
 async function onRoom(room) {
   if (room.status === "playing" && document.getElementById("waiting").classList.contains("active")) {
     if (S.pollInterval) clearInterval(S.pollInterval);
@@ -479,17 +621,20 @@ async function onRoom(room) {
   }
 }
 
-// ── Launch (host) ──────────────────────────────────────────
+// ── Launch (host) ─────────────────────────────────────────────────────────
 async function doLaunch() {
   try {
     if (S.pollInterval) clearInterval(S.pollInterval);
-    await updateDoc(doc(db, "rooms", S.roomId), { status: "playing", startedAt: serverTimestamp() });
+    await updateDoc(doc(db, "rooms", S.roomId), {
+      status: "playing",
+      startedAt: serverTimestamp()
+    });
     const snap = await getDoc(doc(db, "rooms", S.roomId));
     startGame(snap.data());
   } catch(e) { toast("Erreur: " + e.message); console.error(e); }
 }
 
-// ── Start game ─────────────────────────────────────────────
+// ── Start game ────────────────────────────────────────────────────────────
 function startGame(room) {
   show("game");
 
@@ -497,21 +642,19 @@ function startGame(room) {
   document.getElementById("p-my-name").textContent = S.pseudo;
   document.getElementById("pg-my-name").textContent = S.pseudo;
 
-  // Construit la grille HTML (208 divs.column comme Mygamify)
+  // 1. Construit les 208 divs.column (structure Mygamify)
   buildGrid();
 
-  // Lance generateGrid() de arrowwords.js — qui lit APP_GAME_DATA global
-  if (typeof generateGrid === "function") {
-    generateGrid();
-  }
+  // 2. generateGrid() de arrowwords.js remplit les cases DEF et lettres
+  window.generateGrid();
 
-  // Lance le timer
+  // 3. Timer
   S.startTime = Date.now();
   S.timerInt = S.mode === "blitz"
     ? setInterval(tickBlitz, 1000)
     : setInterval(tickChrono, 1000);
 
-  // Adversaire
+  // 4. Adversaire
   const opp = room.player1 === S.user.uid ? room.player2 : room.player1;
   if (opp) {
     S.unsubLive = listenOpponentLive(S.roomId, opp, onOpp);
@@ -519,18 +662,13 @@ function startGame(room) {
   }
 }
 
-// ── Build grid HTML ────────────────────────────────────────
-// Reproduit exactement la structure HTML prérendue de Mygamify
+// ── Build grid HTML ───────────────────────────────────────────────────────
+// Crée les 208 divs.column VIDES exactement comme game_page.html
+// arrowwords.js les remplit ensuite via generateGrid()
 function buildGrid() {
-  const rows = S.G.rows;
-  const cols = S.G.cols;
+  const rows = S.G.rows;    // 16
+  const cols = S.G.cols;    // 13
 
-  // Calcule la taille des cases
-  const availW = document.querySelector(".grid-scroll").clientWidth - 24;
-  const cellSize = Math.min(56, Math.floor(availW / cols));
-  const fontSize = Math.round(cellSize * 0.45);
-
-  // HTML grille — identique à game_page.html
   let html = "";
   let idx = 0;
   for (let r = 1; r <= rows; r++) {
@@ -542,32 +680,9 @@ function buildGrid() {
     html += "</div>";
   }
   document.getElementById("grid").innerHTML = html;
-  document.getElementById("grid").style.fontSize = fontSize + "px";
-
-  // Dimensions
-  const w = cellSize * cols;
-  const h = cellSize * rows;
-  document.getElementById("grid").style.width = w + "px";
-  document.getElementById("grid").style.height = h + "px";
-  document.getElementById("grid-container").style.width = w + "px";
-  document.getElementById("grid-container").style.height = h + "px";
-  document.getElementById("grid-scaler").style.width = w + "px";
-  document.getElementById("grid-scaler").style.height = h + "px";
-
-  document.querySelectorAll("#grid .column").forEach(col => {
-    col.style.width = cellSize + "px";
-    col.style.height = cellSize + "px";
-  });
-  document.querySelectorAll("#grid .rows").forEach(row => {
-    row.style.height = cellSize + "px";
-  });
-
-  // Met à jour les variables globales de arrowwords.js
-  window.row = rows;
-  window.column = cols;
 }
 
-// ── Opponent ───────────────────────────────────────────────
+// ── Opponent ──────────────────────────────────────────────────────────────
 async function loadOppName(uid) {
   try {
     const s = await getDoc(doc(db, "rooms", S.roomId, "players", uid));
@@ -588,14 +703,14 @@ function onOpp(data) {
   document.getElementById("pg-opp-pct").textContent = pct + "%";
   if (data.lastFoundAt && n > 0) {
     const b = document.getElementById("last-badge");
-    b.textContent = `${n} mot${n > 1 ? "s" : ""} trouvé${n > 1 ? "s" : ""}`;
+    b.textContent = `${n} mot${n>1?"s":""} trouvé${n>1?"s":""}`;
     b.classList.add("flash");
     setTimeout(() => b.classList.remove("flash"), 2000);
     addEv("opp", `+1 mot (${n}/${total})`);
   }
 }
 
-// ── Timers ─────────────────────────────────────────────────
+// ── Timers ────────────────────────────────────────────────────────────────
 function tickChrono() {
   document.getElementById("tmr").textContent = fmt(Math.floor((Date.now() - S.startTime) / 1000));
 }
@@ -605,19 +720,23 @@ function tickBlitz() {
   if (S.blitzLeft <= 30) document.getElementById("tmr").classList.add("warn");
   if (S.blitzLeft <= 0) { clearInterval(S.timerInt); finishGame({ roomId: S.roomId, uid: S.user.uid }); }
 }
-function fmt(s) { return `${Math.floor(s/60).toString().padStart(2,"0")}:${(s%60).toString().padStart(2,"0")}`; }
+function fmt(s) {
+  return `${Math.floor(s/60).toString().padStart(2,"0")}:${(s%60).toString().padStart(2,"0")}`;
+}
 
-// ── End ────────────────────────────────────────────────────
+// ── End ───────────────────────────────────────────────────────────────────
 function endGame(room) {
   if (S.timerInt) clearInterval(S.timerInt);
   if (S.unsubRoom) S.unsubRoom();
   if (S.unsubLive) S.unsubLive();
+
   const win = room.winner === S.user.uid;
   const noW = !room.winner;
   const el = document.getElementById("end-title");
-  if (noW)       { el.textContent = "Égalité !";     el.className = "end-title draw"; }
-  else if (win)  { el.textContent = "Victoire ! 🎉"; el.className = "end-title win"; }
-  else           { el.textContent = "Défaite…";      el.className = "end-title lose"; }
+  if (noW)      { el.textContent = "Égalité !";     el.className = "end-title draw"; }
+  else if (win) { el.textContent = "Victoire ! 🎉"; el.className = "end-title win";  }
+  else          { el.textContent = "Défaite…";      el.className = "end-title lose"; }
+
   const elapsed = S.startTime ? Math.floor((Date.now() - S.startTime) / 1000) : 0;
   document.getElementById("end-score").textContent = S.found.size;
   document.getElementById("end-time").textContent = fmt(elapsed);
@@ -634,7 +753,10 @@ async function doGiveUp() {
 
 async function doRematch() {
   try {
-    const nid = await requestRematch({ roomId: S.roomId, uid: S.user.uid, pseudo: S.pseudo, gridData: S.G, mode: S.mode });
+    const nid = await requestRematch({
+      roomId: S.roomId, uid: S.user.uid,
+      pseudo: S.pseudo, gridData: S.G, mode: S.mode
+    });
     S.roomId = nid; S.found = new Set();
     show("waiting");
     document.getElementById("cdisp").textContent = nid;
@@ -643,17 +765,19 @@ async function doRematch() {
   } catch(e) { toast("Erreur: " + e.message); }
 }
 
-// ── Utils ──────────────────────────────────────────────────
+// ── Utils ─────────────────────────────────────────────────────────────────
 function getPseudo() {
   const p = document.getElementById("pseudo").value.trim();
   if (!p) { toast("Entre ton pseudo d'abord"); document.getElementById("pseudo").focus(); return null; }
   localStorage.setItem("mfd-pseudo", p);
   return p;
 }
+
 function show(id) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
 }
+
 function addEv(who, txt) {
   const feed = document.getElementById("feed");
   const el = document.createElement("div");
@@ -662,38 +786,23 @@ function addEv(who, txt) {
   feed.prepend(el);
   while (feed.children.length > 25) feed.lastChild.remove();
 }
+
 function copyLink() {
-  navigator.clipboard.writeText(`${location.origin}${location.pathname}#room/${S.roomId}`)
+  navigator.clipboard
+    .writeText(`${location.origin}${location.pathname}#room/${S.roomId}`)
     .then(() => toast("Lien copié !"));
 }
+
 let _toastTimer;
 function toast(msg) {
   const t = document.getElementById("toast");
-  t.textContent = msg; t.classList.add("on");
+  t.textContent = msg;
+  t.classList.add("on");
   clearTimeout(_toastTimer);
   _toastTimer = setTimeout(() => t.classList.remove("on"), 2500);
 }
 
 boot().catch(console.error);
-</script>
-
-<!-- 9. Override checkWords pour syncer avec Firebase -->
-<script>
-// Attendu que arrowwords.js ait défini checkWords, on le surcharge
-(function() {
-  const _orig = window.checkWords;
-  window.checkWords = function(notify, callback) {
-    _orig && _orig.call(this, notify, function() {
-      // Sync les mots trouvés
-      if (window.wordsFound && window.DUEL_ON_WORD_FOUND) {
-        window.wordsFound.forEach(function(wid) {
-          window.DUEL_ON_WORD_FOUND(parseInt(wid));
-        });
-      }
-      if (callback) callback();
-    });
-  };
-})();
 </script>
 
 </body>
