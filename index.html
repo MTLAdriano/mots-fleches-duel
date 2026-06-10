@@ -4,595 +4,697 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mots Fléchés Duel</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <!-- jQuery comme Mygamify -->
-  <script src="https://code.jquery.com/jquery-3.6.1.slim.min.js"></script>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- CSS Mygamify (arrowwords + franceinfo style) -->
+  <link rel="stylesheet" href="assets/arrowwords.css">
+  <link rel="stylesheet" href="assets/style.css">
+
+  <!-- Simple keyboard CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-keyboard@latest/build/css/index.css">
+
   <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Inter',sans-serif;background:#f2f0eb;color:#111;min-height:100dvh;display:flex;flex-direction:column}
-    header{background:#111;color:#fff;padding:10px 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
-    .logo{font-size:15px;font-weight:800}.logo em{font-style:normal;color:#f97316}
-    .screen{display:none;flex:1;flex-direction:column}.screen.active{display:flex}
+    /* ── Reset & base ─────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #f2f0eb; color: #111; min-height: 100dvh; display: flex; flex-direction: column; }
 
-    /* LOBBY */
-    #lobby{align-items:center;justify-content:center;gap:20px;padding:32px 16px}
-    h1.title{font-size:clamp(26px,6vw,46px);font-weight:900;text-align:center;letter-spacing:-.04em;line-height:1.05}
-    h1.title b{color:#2563eb}
-    .card{background:white;border-radius:14px;padding:22px;width:100%;max-width:350px;display:flex;flex-direction:column;gap:14px;box-shadow:0 2px 12px rgba(0,0,0,.07)}
-    .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#888;margin-bottom:3px}
-    input.fi{width:100%;font-size:15px;padding:10px 13px;border:1.5px solid #e5e5e5;border-radius:9px;outline:none;font-family:inherit;background:#fafafa;transition:border-color .15s}
-    input.fi:focus{border-color:#111;background:white}
-    .modes{display:flex;border:1.5px solid #e5e5e5;border-radius:9px;overflow:hidden}
-    .mb{flex:1;padding:9px;font-size:13px;font-weight:600;border:none;cursor:pointer;background:#f5f5f5;color:#666;font-family:inherit;transition:all .15s}
-    .mb.on{background:#111;color:white}
-    .btn{font-family:inherit;font-size:14px;font-weight:700;padding:11px 18px;border-radius:9px;border:none;cursor:pointer;transition:all .15s}
-    .btn-d{background:#111;color:white;width:100%}.btn-d:hover{background:#333}
-    .btn-b{background:#2563eb;color:white}
-    .btn-r{background:#dc2626;color:white}
-    .btn-o{background:white;color:#111;border:1.5px solid #e5e5e5}.btn-o:hover{background:#f5f5f5}
-    .sep{display:flex;align-items:center;gap:8px;color:#ccc;font-size:12px}.sep::before,.sep::after{content:'';flex:1;height:1px;background:#eee}
-    .jr{display:flex;gap:8px}.jr input{flex:1;text-transform:uppercase;letter-spacing:.12em;font-size:16px;font-weight:700}
+    /* ── Header ───────────────────────────────────────────── */
+    header { background: #111; color: #fff; padding: 10px 18px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; z-index: 10; }
+    .logo { font-size: 15px; font-weight: 800; }
+    .logo em { font-style: normal; color: #f97316; }
 
-    /* WAITING */
-    #waiting{align-items:center;justify-content:center;gap:18px;padding:40px 16px;text-align:center}
-    .codebox{font-size:44px;font-weight:900;letter-spacing:.15em;border:3px dashed #ddd;border-radius:14px;padding:18px 32px;background:white}
-    .pulse::after{content:'';animation:dots 1.5s infinite}
-    @keyframes dots{0%{content:'.'}33%{content:'..'}66%{content:'...'}}
-    .cpbtn{background:none;border:none;color:#2563eb;font-size:13px;cursor:pointer;text-decoration:underline;font-family:inherit}
+    /* ── Screens ──────────────────────────────────────────── */
+    .screen { display: none; flex: 1; flex-direction: column; }
+    .screen.active { display: flex; }
 
-    /* GAME */
-    #game{overflow:hidden}
-    .gbar{background:white;border-bottom:1px solid #e5e5e5;padding:7px 14px;display:flex;align-items:center;gap:14px;flex-shrink:0}
-    .tmr{font-size:20px;font-weight:800;font-variant-numeric:tabular-nums;min-width:58px}
-    .tmr.w{color:#dc2626}
-    .gbody{display:flex;flex:1;overflow:hidden}
-    .gwrap{flex:1;overflow:auto;padding:12px;background:#f2f0eb}
+    /* ── Lobby ────────────────────────────────────────────── */
+    #lobby { align-items: center; justify-content: center; gap: 20px; padding: 32px 16px; }
+    .lobby-title { font-size: clamp(26px,6vw,46px); font-weight: 900; text-align: center; letter-spacing: -.04em; line-height: 1.05; }
+    .lobby-title b { color: #2563eb; }
+    .card { background: white; border-radius: 14px; padding: 22px; width: 100%; max-width: 350px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 2px 12px rgba(0,0,0,.07); }
+    .lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #888; margin-bottom: 3px; }
+    .fi { width: 100%; font-size: 15px; padding: 10px 13px; border: 1.5px solid #e5e5e5; border-radius: 9px; outline: none; font-family: inherit; background: #fafafa; transition: border-color .15s; }
+    .fi:focus { border-color: #111; background: white; }
+    .modes { display: flex; border: 1.5px solid #e5e5e5; border-radius: 9px; overflow: hidden; }
+    .mb { flex: 1; padding: 9px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; background: #f5f5f5; color: #666; font-family: inherit; transition: all .15s; }
+    .mb.on { background: #111; color: white; }
+    .btn { font-family: inherit; font-size: 14px; font-weight: 700; padding: 11px 18px; border-radius: 9px; border: none; cursor: pointer; transition: all .15s; }
+    .btn-d { background: #111; color: white; width: 100%; }
+    .btn-d:hover { background: #333; }
+    .btn-b { background: #2563eb; color: white; }
+    .btn-r { background: #dc2626; color: white; }
+    .btn-o { background: white; color: #111; border: 1.5px solid #e5e5e5; }
+    .btn-o:hover { background: #f5f5f5; }
+    .sep { display: flex; align-items: center; gap: 8px; color: #ccc; font-size: 12px; }
+    .sep::before, .sep::after { content: ''; flex: 1; height: 1px; background: #eee; }
+    .join-row { display: flex; gap: 8px; }
+    .join-row .fi { flex: 1; text-transform: uppercase; letter-spacing: .12em; font-size: 16px; font-weight: 700; }
 
-    /* ── GRILLE EXACTE MYGAMIFY ── */
-    #grid-container{overflow:hidden;border:1px solid #ccc;border-radius:8px;background:#fff;position:relative;margin:0 auto}
-    #grid-scaler{position:absolute;top:-1px;left:-1px}
-    #grid{position:relative;border:none;touch-action:none}
-    #grid .rows{display:flex}
-    #grid .column{
-      vertical-align:middle;border:0;padding:0;
-      user-select:none;float:left;display:block;
-      cursor:pointer;position:relative;
+    /* ── Waiting ──────────────────────────────────────────── */
+    #waiting { align-items: center; justify-content: center; gap: 18px; padding: 40px 16px; text-align: center; }
+    .codebox { font-size: 44px; font-weight: 900; letter-spacing: .15em; border: 3px dashed #ddd; border-radius: 14px; padding: 18px 32px; background: white; }
+    .pulse-txt { color: #888; font-size: 14px; }
+    .pulse-txt::after { content: ''; animation: dots 1.5s infinite; }
+    @keyframes dots { 0%{content:'.'} 33%{content:'..'} 66%{content:'...'} }
+    .cpbtn { background: none; border: none; color: #2563eb; font-size: 13px; cursor: pointer; text-decoration: underline; font-family: inherit; }
+
+    /* ── Game layout ──────────────────────────────────────── */
+    #game { overflow: hidden; }
+    .game-bar { background: white; border-bottom: 1px solid #e5e5e5; padding: 7px 14px; display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+    .timer { font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; min-width: 58px; }
+    .timer.warn { color: #dc2626; }
+    .game-body { display: flex; flex: 1; overflow: hidden; }
+
+    /* ── Zone grille ──────────────────────────────────────── */
+    .grid-area { flex: 1; overflow: auto; display: flex; flex-direction: column; }
+    .grid-scroll { flex: 1; overflow: auto; padding: 12px; }
+
+    /* Overrides pour intégrer la grille Mygamify dans notre layout */
+    #grid-container {
+      overflow: hidden;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: #fff;
+      position: relative;
+      margin: 0 auto;
     }
-    #grid .column span{
-      width:100%;height:100%;display:flex;
-      font-weight:bold;text-transform:uppercase;
-      font-size:4vw;text-align:center;
-      align-items:center;justify-content:center;
-      border-right:solid 1px #ddd;
-      border-bottom:solid 1px #ddd;
-      line-height:0!important;
+    #grid-scaler {
+      position: absolute;
+      top: -1px; left: -1px;
+      transform-origin: top left;
     }
-    /* Cases DEF (play) — style hideDef de Mygamify */
-    #grid .column.c_0 span,#grid .column.c_1 span{
-      display:flex;flex-direction:column;justify-content:center;align-items:center;
-      flex-wrap:nowrap;padding:2px;background-color:#d0ccc4;
+    #grid {
+      position: relative;
+      touch-action: none;
     }
-    #grid .column.c_0 span div,#grid .column.c_1 span div{
-      position:initial;width:100%;text-align:center;padding:0.25vw 2px;
-      background:#d0ccc4;color:#111;font-size:1.1vw;line-height:1.1vw;
-      word-break:break-word;font-weight:600;hyphens:auto;
-      margin:auto;height:100%;display:flex;align-items:center;
-      justify-content:center;box-shadow:inset 1px 1px 0px black;border:0!important;
-      padding-top:3px;
+    #grid .rows { display: flex; }
+    #grid .column {
+      vertical-align: middle;
+      border: 0; padding: 0;
+      user-select: none;
+      float: left;
+      display: block;
+      cursor: pointer;
+      position: relative;
     }
-    #grid .column.c_1 span div:nth-child(2){border-top:1px solid #21353F!important}
-    /* Flèches */
-    #grid .column.tl span{
-      background-image:url('https://sdk.mygamify.fr/examples/franceinfo/icons/left.svg')!important;
-      background-size:4vw;background-clip:content-box;
-      background-position:0 center;background-repeat:no-repeat;
+    #grid .column span {
+      width: 100%; height: 100%;
+      display: flex;
+      font-weight: bold;
+      text-transform: uppercase;
+      text-align: center;
+      align-items: center;
+      justify-content: center;
+      border-right: solid 1px #ddd;
+      border-bottom: solid 1px #ddd;
+      line-height: 0 !important;
     }
-    #grid .column.tt span::after{
-      content:' ';position:absolute;width:100%;height:100%;top:0;left:0;
-      background-image:url('https://sdk.mygamify.fr/examples/franceinfo/icons/top.svg')!important;
-      background-size:4vw;background-clip:content-box;
-      background-position:center 0;background-repeat:no-repeat;
-      pointer-events:none;
-    }
-    /* Sélection et validation */
-    #grid .column.select span{background:#fef3c7!important;background-color:#fef3c7!important}
-    #grid .column.active span{background:#fde68a!important;background-color:#fde68a!important;outline:2px solid #d97706}
-    #grid .column.validated span{background:#d1fae5!important;background-color:#d1fae5!important}
-    #grid .column.c_0.select span,#grid .column.c_0.active span{background:#fde68a!important}
-    #grid .column.c_0.select span div,#grid .column.c_0.active span div{background:#fde68a!important;color:#111}
 
-    /* INPUT BAR */
-    .ibar{background:#f9f9f7;border-top:1px solid #e5e5e5;padding:9px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0}
-    .dinfo{flex:1;min-width:0}
-    .dhint{font-size:11px;color:#999;margin-bottom:1px}
-    .dmain{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    /* ── Barre de définition ──────────────────────────────── */
+    .def-bar {
+      background: #f9f9f7;
+      border-top: 1px solid #e5e5e5;
+      padding: 10px 14px;
+      flex-shrink: 0;
+      min-height: 52px;
+    }
+    .def-bar-hint { font-size: 11px; color: #999; margin-bottom: 2px; }
+    .def-bar-text { font-size: 14px; font-weight: 600; }
 
-    /* DUEL PANEL */
-    .duel{width:250px;flex-shrink:0;border-left:1px solid #e5e5e5;background:white;display:flex;flex-direction:column;overflow:hidden}
-    .ps{padding:12px 14px;border-bottom:1px solid #f0f0f0}
-    .pt{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#999;margin-bottom:8px}
-    .sc{display:flex;align-items:center;gap:6px}
-    .sb{flex:1;text-align:center;padding:8px 6px;border-radius:9px;background:#f8f8f8}
-    .sb.me{border:2px solid #16a34a}
-    .sn{font-size:10px;color:#888;margin-bottom:3px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .sv{font-size:26px;font-weight:900;line-height:1}
-    .sb.me .sv{color:#16a34a}
-    .svs{font-size:10px;font-weight:700;color:#ccc}
-    .pr{margin-bottom:7px}
-    .pl{display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px;color:#666}
-    .pt2{height:5px;background:#f0f0f0;border-radius:3px;overflow:hidden}
-    .pf{height:100%;border-radius:3px;transition:width .4s ease}
-    .pf.me{background:#16a34a}.pf.op{background:#2563eb}
-    .lb{font-size:12px;padding:5px 9px;border-radius:7px;background:#f8f8f8;color:#666;min-height:28px;display:flex;align-items:center}
-    .lb.fl{background:#fef9c3;color:#854d0e}
-    .feed{flex:1;overflow-y:auto;padding:10px 14px;display:flex;flex-direction:column;gap:3px}
-    .ev{font-size:11px;padding:5px 9px;border-radius:7px;animation:fi .2s;display:flex;align-items:center;gap:5px}
-    @keyframes fi{from{opacity:0;transform:translateX(6px)}}
-    .ev.me{background:#f0fdf4;color:#166534}.ev.op{background:#eff6ff;color:#1e40af}
-    .dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
-    .ev.me .dot{background:#16a34a}.ev.op .dot{background:#2563eb}
+    /* ── Panneau duel ─────────────────────────────────────── */
+    .duel-panel { width: 250px; flex-shrink: 0; border-left: 1px solid #e5e5e5; background: white; display: flex; flex-direction: column; overflow: hidden; }
+    .psec { padding: 12px 14px; border-bottom: 1px solid #f0f0f0; }
+    .ptitle { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: #999; margin-bottom: 8px; }
+    .scores { display: flex; align-items: center; gap: 6px; }
+    .sbox { flex: 1; text-align: center; padding: 8px 6px; border-radius: 9px; background: #f8f8f8; }
+    .sbox.me { border: 2px solid #16a34a; }
+    .sname { font-size: 10px; color: #888; margin-bottom: 3px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .snum { font-size: 26px; font-weight: 900; line-height: 1; }
+    .sbox.me .snum { color: #16a34a; }
+    .svs { font-size: 10px; font-weight: 700; color: #ccc; }
+    .prow { margin-bottom: 7px; }
+    .plbl { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 3px; color: #666; }
+    .ptrack { height: 5px; background: #f0f0f0; border-radius: 3px; overflow: hidden; }
+    .pfill { height: 100%; border-radius: 3px; transition: width .4s ease; }
+    .pfill.me { background: #16a34a; }
+    .pfill.opp { background: #2563eb; }
+    .last-badge { font-size: 12px; padding: 5px 9px; border-radius: 7px; background: #f8f8f8; color: #666; min-height: 28px; display: flex; align-items: center; }
+    .last-badge.flash { background: #fef9c3; color: #854d0e; }
+    .feed { flex: 1; overflow-y: auto; padding: 10px 14px; display: flex; flex-direction: column; gap: 3px; }
+    .ev { font-size: 11px; padding: 5px 9px; border-radius: 7px; animation: fi .2s; display: flex; align-items: center; gap: 5px; }
+    @keyframes fi { from { opacity: 0; transform: translateX(6px); } }
+    .ev.me { background: #f0fdf4; color: #166534; }
+    .ev.opp { background: #eff6ff; color: #1e40af; }
+    .evdot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+    .ev.me .evdot { background: #16a34a; }
+    .ev.opp .evdot { background: #2563eb; }
 
-    /* END */
-    #end{align-items:center;justify-content:center;gap:18px;padding:40px 16px;text-align:center}
-    .et{font-size:clamp(34px,8vw,54px);font-weight:900;letter-spacing:-.04em}
-    .et.win{color:#16a34a}.et.lose{color:#dc2626}.et.draw{color:#888}
-    .estats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:360px}
-    .estat{background:white;border-radius:11px;padding:14px 10px}
-    .ev2{font-size:26px;font-weight:900;line-height:1}
-    .el{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:#999;margin-top:3px}
-    .ebtns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;max-width:360px;width:100%}
+    /* ── End screen ───────────────────────────────────────── */
+    #end { align-items: center; justify-content: center; gap: 18px; padding: 40px 16px; text-align: center; }
+    .end-title { font-size: clamp(34px,8vw,54px); font-weight: 900; letter-spacing: -.04em; }
+    .end-title.win { color: #16a34a; }
+    .end-title.lose { color: #dc2626; }
+    .end-title.draw { color: #888; }
+    .end-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; width: 100%; max-width: 360px; }
+    .estat { background: white; border-radius: 11px; padding: 14px 10px; }
+    .estat-val { font-size: 26px; font-weight: 900; line-height: 1; }
+    .estat-lbl { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; color: #999; margin-top: 3px; }
+    .end-btns { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; max-width: 360px; width: 100%; }
+    .end-btns .btn { flex: 1; min-width: 130px; }
 
-    .toast{position:fixed;bottom:72px;left:50%;transform:translateX(-50%);background:#111;color:white;font-size:13px;font-weight:600;padding:9px 18px;border-radius:999px;z-index:999;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
-    .toast.on{opacity:1}
-    @media(max-width:640px){.duel{display:none}}
+    /* ── Toast ────────────────────────────────────────────── */
+    .toast { position: fixed; bottom: 72px; left: 50%; transform: translateX(-50%); background: #111; color: white; font-size: 13px; font-weight: 600; padding: 9px 18px; border-radius: 999px; z-index: 9999; opacity: 0; transition: opacity .2s; pointer-events: none; white-space: nowrap; }
+    .toast.on { opacity: 1; }
+
+    /* ── Keyboard override ────────────────────────────────── */
+    .gameKeyboard { display: none; }
+
+    @media (max-width: 640px) {
+      .duel-panel { display: none; }
+    }
   </style>
 </head>
 <body>
+
 <header>
   <div class="logo">Mots Fléchés <em>Duel</em></div>
   <div style="font-size:12px;color:#888" id="hbadge"></div>
 </header>
 
+<!-- ── LOBBY ──────────────────────────────────────────────── -->
 <div id="lobby" class="screen active">
-  <h1 class="title">Joue contre<br>tes <b>amis</b></h1>
-  <p style="color:#666;font-size:15px;text-align:center;max-width:340px;line-height:1.5">La grille Franceinfo du jour, en duel temps réel.</p>
+  <h1 class="lobby-title">Joue contre<br>tes <b>amis</b></h1>
+  <p style="color:#666;font-size:15px;text-align:center;max-width:340px;line-height:1.5">
+    La grille Franceinfo du jour, en duel temps réel.
+  </p>
   <div class="card">
-    <div><div class="lbl">Ton pseudo</div><input class="fi" id="pseudo" type="text" placeholder="ex: Alice" maxlength="16" autocomplete="off"></div>
+    <div>
+      <div class="lbl">Ton pseudo</div>
+      <input class="fi" id="pseudo" type="text" placeholder="ex: Alice" maxlength="16" autocomplete="off">
+    </div>
     <div class="modes">
       <button class="mb on" data-mode="classic">Classique</button>
       <button class="mb" data-mode="blitz">⚡ Blitz 5min</button>
     </div>
     <button class="btn btn-d" id="btn-create">Créer une partie</button>
     <div class="sep">ou rejoindre</div>
-    <div class="jr">
+    <div class="join-row">
       <input class="fi" id="jcode" type="text" placeholder="CODE" maxlength="6" autocomplete="off">
       <button class="btn btn-b" style="padding:11px 16px" id="btn-join">Rejoindre</button>
     </div>
   </div>
 </div>
 
+<!-- ── WAITING ─────────────────────────────────────────────── -->
 <div id="waiting" class="screen">
   <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#999">Code de la partie</p>
   <div class="codebox" id="cdisp">——</div>
   <p style="font-size:14px;color:#666">Partage ce lien :</p>
   <button class="cpbtn" id="btn-copy">📋 Copier le lien</button>
-  <div id="wstatus" class="pulse" style="color:#888;font-size:14px">En attente du joueur 2</div>
+  <p class="pulse-txt" id="wstatus">En attente du joueur 2</p>
   <button class="btn btn-d" id="btn-launch" style="margin-top:8px;padding:12px 32px;display:none">🚀 Lancer la partie</button>
-  <button class="btn btn-o" style="margin-top:8px;padding:9px 20px" id="btn-cancel">Annuler</button>
+  <button class="btn btn-o" style="margin-top:8px;padding:9px 20px;width:auto" id="btn-cancel">Annuler</button>
 </div>
 
+<!-- ── GAME ────────────────────────────────────────────────── -->
 <div id="game" class="screen">
-  <div class="gbar">
-    <div class="tmr" id="tmr">00:00</div>
-    <div style="font-size:13px;color:#666"><strong id="myscore" style="font-size:15px;color:#111">0</strong> / <span id="totw">–</span> mots</div>
+  <div class="game-bar">
+    <div class="timer" id="tmr">00:00</div>
+    <div style="font-size:13px;color:#666">
+      <strong id="myscore" style="font-size:15px;color:#111">0</strong> / <span id="totw">–</span> mots
+    </div>
     <div style="flex:1"></div>
     <button class="btn btn-o" style="font-size:12px;padding:5px 11px" id="btn-giveup">Abandonner</button>
   </div>
-  <div class="gbody">
-    <div style="display:flex;flex-direction:column;flex:1;overflow:hidden">
-      <div class="gwrap">
+
+  <div class="game-body">
+    <!-- Zone grille + def bar -->
+    <div class="grid-area">
+      <div class="grid-scroll">
+        <!-- Structure exacte de Mygamify -->
         <div id="grid-container">
           <div id="grid-scaler">
-            <div id="grid"></div>
+            <div id="grid">
+              <!-- Rempli par buildGrid() -->
+            </div>
           </div>
         </div>
       </div>
-      <div class="ibar">
-        <div class="dinfo">
-          <div class="dhint" id="dhint">Clique sur une case pour commencer</div>
-          <div class="dmain" id="dmain">–</div>
-        </div>
+      <!-- Définition du mot sélectionné -->
+      <div class="def-bar">
+        <div class="def-bar-hint" id="def-hint">Clique sur une case pour commencer</div>
+        <div class="def-bar-text" id="def-text">–</div>
       </div>
     </div>
-    <div class="duel">
-      <div class="ps"><div class="pt">Score</div>
-        <div class="sc">
-          <div class="sb me"><div class="sn" id="pmyname">Moi</div><div class="sv" id="pmyscore">0</div></div>
+
+    <!-- Panneau duel -->
+    <div class="duel-panel">
+      <div class="psec">
+        <div class="ptitle">Score</div>
+        <div class="scores">
+          <div class="sbox me">
+            <div class="sname" id="p-my-name">Moi</div>
+            <div class="snum" id="p-my-score">0</div>
+          </div>
           <div class="svs">VS</div>
-          <div class="sb"><div class="sn" id="poppname">Adversaire</div><div class="sv" id="poppscore">0</div></div>
+          <div class="sbox">
+            <div class="sname" id="p-opp-name">Adversaire</div>
+            <div class="snum" id="p-opp-score">0</div>
+          </div>
         </div>
       </div>
-      <div class="ps"><div class="pt">Progression</div>
-        <div class="pr"><div class="pl"><span id="pgmyn">Moi</span><span id="pgmyp">0%</span></div><div class="pt2"><div class="pf me" id="pgmy" style="width:0%"></div></div></div>
-        <div class="pr"><div class="pl"><span id="pgopn">Adversaire</span><span id="pgopp">0%</span></div><div class="pt2"><div class="pf op" id="pgop" style="width:0%"></div></div></div>
+      <div class="psec">
+        <div class="ptitle">Progression</div>
+        <div class="prow">
+          <div class="plbl"><span id="pg-my-name">Moi</span><span id="pg-my-pct">0%</span></div>
+          <div class="ptrack"><div class="pfill me" id="pg-my" style="width:0%"></div></div>
+        </div>
+        <div class="prow">
+          <div class="plbl"><span id="pg-opp-name">Adversaire</span><span id="pg-opp-pct">0%</span></div>
+          <div class="ptrack"><div class="pfill opp" id="pg-opp" style="width:0%"></div></div>
+        </div>
       </div>
-      <div class="ps"><div class="pt">Dernier mot adversaire</div><div class="lb" id="lbadge">–</div></div>
-      <div class="ps" style="border-bottom:none"><div class="pt">Événements</div></div>
+      <div class="psec">
+        <div class="ptitle">Dernier mot adversaire</div>
+        <div class="last-badge" id="last-badge">–</div>
+      </div>
+      <div class="psec" style="border-bottom:none">
+        <div class="ptitle">Événements</div>
+      </div>
       <div class="feed" id="feed"></div>
     </div>
   </div>
 </div>
 
+<!-- ── END ─────────────────────────────────────────────────── -->
 <div id="end" class="screen">
-  <div class="et" id="etitle">–</div>
-  <div class="estats">
-    <div class="estat"><div class="ev2" id="escore">–</div><div class="el">Mots</div></div>
-    <div class="estat"><div class="ev2" id="etime">–</div><div class="el">Temps</div></div>
-    <div class="estat"><div class="ev2" id="eelo" style="font-size:18px">–</div><div class="el">Elo</div></div>
+  <div class="end-title" id="end-title">–</div>
+  <div class="end-stats">
+    <div class="estat"><div class="estat-val" id="end-score">–</div><div class="estat-lbl">Mots</div></div>
+    <div class="estat"><div class="estat-val" id="end-time">–</div><div class="estat-lbl">Temps</div></div>
+    <div class="estat"><div class="estat-val" id="end-elo" style="font-size:18px">–</div><div class="estat-lbl">Elo</div></div>
   </div>
-  <div class="ebtns">
-    <button class="btn btn-r" id="btn-rematch" style="flex:1;min-width:130px">Revanche ⚡</button>
-    <button class="btn btn-o" id="btn-ng" style="flex:1;min-width:130px">Nouvelle partie</button>
+  <div class="end-btns">
+    <button class="btn btn-r" id="btn-rematch">Revanche ⚡</button>
+    <button class="btn btn-o" id="btn-newgame">Nouvelle partie</button>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
-<!-- Variables globales nécessaires pour arrowwords.js -->
-<script>
-// Stub des variables globales Mygamify
-var APP_GAME_DATA = null;
-var APP_GAME_SLUG = 'arrowwords';
-var APP_CHECK_URL = '';
-var APP_QUERY = '';
-var APP_AUTO_SAVE = false;
-var APP_USER = false;
+<!-- ═══════════════════════════════════════════════════════════
+     SCRIPTS — ordre exact requis par Mygamify
+     ═══════════════════════════════════════════════════════════ -->
 
-// Variables globales arrowwords.js
-var can_touch = true;
-var current_case = null;
-var current_id = 0;
-var current_axe = "x";
-var word_ids = [];
-var wordsFound = [];
-var nd_child = false;
-var current_scale = 1;
-var showDef = false; // On utilise hideDef mode
-var last_pos = 1;
-var count_h = 0, count_v = 0, last_h = 0, last_v = 0;
-var helper = [];
-var allWords = [];
-var lastCount = 0;
-var checkTimeout = null;
+<!-- 1. jQuery (requis par arrowwords.js) -->
+<script src="https://code.jquery.com/jquery-3.6.1.slim.min.js"></script>
 
-// Fonctions stub
-function checkWords(notify, callback) { if(callback) callback(); }
-function enterKey() {}
+<!-- 2. interact.js (requis pour le drag/zoom de la grille) -->
+<script src="https://unpkg.com/interactjs@1.10.27/dist/interact.min.js"></script>
 
-// Notre état de jeu
-var DUEL = {
+<!-- 3. Simple Keyboard (requis par keyboard.js) -->
+<script src="https://cdn.jsdelivr.net/npm/simple-keyboard@latest/build/index.min.js"></script>
+
+<!-- 4. Variables APP_ globales -->
+<script src="assets/duel_vars.js"></script>
+
+<!-- 5. APP_GAME_DATA (données de la grille) -->
+<script src="assets/app_game_data.js"></script>
+
+<!-- 6. arrowwords.js Mygamify (logique grille) -->
+<script src="assets/arrowwords.js"></script>
+
+<!-- 7. keyboard.js Mygamify (saisie clavier) -->
+<script src="assets/keyboard.js"></script>
+
+<!-- 8. Notre logique duel Firebase -->
+<script type="module">
+import { initAuth, db } from "./js/firebase.js";
+import { fetchGrid } from "./js/grid.js";
+import { createRoom, joinRoom, listenRoom, listenOpponentLive, submitWord, finishGame, requestRematch } from "./js/room.js";
+import { doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// ── State ──────────────────────────────────────────────────
+const S = {
   user: null, pseudo: "", mode: "classic",
   roomId: null, G: null,
   found: new Set(),
   startTime: null, timerInt: null, blitzLeft: 300,
   unsubRoom: null, unsubLive: null,
-  _pollInterval: null
+  pollInterval: null,
 };
-</script>
 
-<script type="module">
-import { initAuth, db } from "./js/firebase.js";
-import { fetchGrid, getLetterCells } from "./js/grid.js";
-import { createRoom, joinRoom, listenRoom, listenOpponentLive, submitWord, finishGame, requestRematch } from "./js/room.js";
-import { doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+// ── Toast global pour Mygamify ─────────────────────────────
+window.DUEL_TOAST = (msg) => toast(msg);
 
-// ── BOOT ──────────────────────────────────────────────────────────────────
+// ── Callback quand un mot est validé par Mygamify ──────────
+window.DUEL_ON_WORD_FOUND = async (wordId) => {
+  if (S.found.has(wordId)) return;
+  S.found.add(wordId);
+
+  const n = S.found.size;
+  const total = S.G?.totalWords || 61;
+  document.getElementById("myscore").textContent = n;
+  document.getElementById("p-my-score").textContent = n;
+  const pct = Math.round(n / total * 100);
+  document.getElementById("pg-my").style.width = pct + "%";
+  document.getElementById("pg-my-pct").textContent = pct + "%";
+  addEv("me", `✓ mot (${n}/${total})`);
+
+  await submitWord({ roomId: S.roomId, uid: S.user.uid, wordId, totalFound: n, totalWords: total });
+};
+
+// ── Callback sélection de case ─────────────────────────────
+window.DUEL_ON_SELECT = (wordId, axe) => {
+  if (!S.G) return;
+  const word = S.G.words.find(w => w.id === parseInt(wordId));
+  if (!word) return;
+  document.getElementById("def-hint").textContent = `${axe === "x" ? "→" : "↓"} · ${word.size} lettres`;
+  document.getElementById("def-text").textContent = word.def;
+};
+
+// ── Boot ───────────────────────────────────────────────────
 async function boot() {
-  DUEL.user = await initAuth();
-  const h = location.hash.replace("#room/","");
-  if (h.length===6) document.getElementById("jcode").value = h.toUpperCase();
-  const sv = localStorage.getItem("mfd-pseudo");
-  if (sv) document.getElementById("pseudo").value = sv;
-  bind();
+  S.user = await initAuth();
+  S.G = fetchGrid();
+
+  const hash = location.hash.replace("#room/", "");
+  if (hash.length === 6) document.getElementById("jcode").value = hash.toUpperCase();
+  const saved = localStorage.getItem("mfd-pseudo");
+  if (saved) document.getElementById("pseudo").value = saved;
+
+  bindUI();
 }
 
-function bind() {
-  document.querySelectorAll(".mb").forEach(b=>b.addEventListener("click",()=>{
-    document.querySelectorAll(".mb").forEach(x=>x.classList.remove("on"));
-    b.classList.add("on"); DUEL.mode=b.dataset.mode;
+// ── Bind UI ────────────────────────────────────────────────
+function bindUI() {
+  document.querySelectorAll(".mb").forEach(b => b.addEventListener("click", () => {
+    document.querySelectorAll(".mb").forEach(x => x.classList.remove("on"));
+    b.classList.add("on");
+    S.mode = b.dataset.mode;
   }));
-  document.getElementById("btn-create").addEventListener("click",doCreate);
-  document.getElementById("btn-join").addEventListener("click",doJoin);
-  document.getElementById("jcode").addEventListener("keydown",e=>e.key==="Enter"&&doJoin());
-  document.getElementById("btn-cancel").addEventListener("click",()=>show("lobby"));
-  document.getElementById("btn-launch").addEventListener("click",doLaunch);
-  document.getElementById("btn-copy").addEventListener("click",copyLink);
-  document.getElementById("btn-giveup").addEventListener("click",doGiveUp);
-  document.getElementById("btn-rematch").addEventListener("click",doRematch);
-  document.getElementById("btn-ng").addEventListener("click",()=>show("lobby"));
+  document.getElementById("btn-create").addEventListener("click", doCreate);
+  document.getElementById("btn-join").addEventListener("click", doJoin);
+  document.getElementById("jcode").addEventListener("keydown", e => e.key === "Enter" && doJoin());
+  document.getElementById("btn-cancel").addEventListener("click", () => show("lobby"));
+  document.getElementById("btn-launch").addEventListener("click", doLaunch);
+  document.getElementById("btn-copy").addEventListener("click", copyLink);
+  document.getElementById("btn-giveup").addEventListener("click", doGiveUp);
+  document.getElementById("btn-rematch").addEventListener("click", doRematch);
+  document.getElementById("btn-newgame").addEventListener("click", () => show("lobby"));
+
+  // Hook jQuery sur les clics grille pour update notre def-bar
+  $(document).on("click", "#grid .column", function() {
+    setTimeout(() => {
+      if (window.current_id && window.current_axe) {
+        window.DUEL_ON_SELECT(window.current_id, window.current_axe);
+      }
+    }, 20);
+  });
 }
 
+// ── Create room ────────────────────────────────────────────
 async function doCreate() {
-  const p=getPseudo(); if(!p) return;
+  const p = getPseudo(); if (!p) return;
   try {
     toast("Chargement…");
-    DUEL.G=fetchGrid(); DUEL.pseudo=p; DUEL.found=new Set();
-    DUEL.roomId=await createRoom({uid:DUEL.user.uid,pseudo:p,gridData:DUEL.G,mode:DUEL.mode});
+    S.pseudo = p; S.found = new Set();
+    S.roomId = await createRoom({ uid: S.user.uid, pseudo: p, gridData: S.G, mode: S.mode });
     show("waiting");
-    document.getElementById("cdisp").textContent=DUEL.roomId;
-    history.replaceState(null,"",`#room/${DUEL.roomId}`);
-    DUEL.unsubRoom=listenRoom(DUEL.roomId,onRoom);
-    DUEL._pollInterval=setInterval(async()=>{
+    document.getElementById("cdisp").textContent = S.roomId;
+    history.replaceState(null, "", `#room/${S.roomId}`);
+    S.unsubRoom = listenRoom(S.roomId, onRoom);
+    // Poll pour détecter joueur 2
+    S.pollInterval = setInterval(async () => {
       try {
-        const snap=await getDoc(doc(db,"rooms",DUEL.roomId));
-        if(snap.exists()&&snap.data().player2&&document.getElementById("waiting").classList.contains("active")){
-          document.getElementById("wstatus").textContent="✅ Joueur 2 connecté !";
-          document.getElementById("wstatus").classList.remove("pulse");
-          document.getElementById("btn-launch").style.display="block";
-          clearInterval(DUEL._pollInterval);
+        const snap = await getDoc(doc(db, "rooms", S.roomId));
+        if (snap.exists() && snap.data().player2 && document.getElementById("waiting").classList.contains("active")) {
+          document.getElementById("wstatus").textContent = "✅ Joueur 2 connecté !";
+          document.getElementById("wstatus").classList.remove("pulse-txt");
+          document.getElementById("btn-launch").style.display = "block";
+          clearInterval(S.pollInterval);
         }
-      } catch(e){console.error(e);}
-    },2000);
-  } catch(e){toast("Erreur: "+e.message);console.error(e);}
+      } catch(e) { console.error(e); }
+    }, 2000);
+  } catch(e) { toast("Erreur: " + e.message); console.error(e); }
 }
 
+// ── Join room ──────────────────────────────────────────────
 async function doJoin() {
-  const p=getPseudo(); if(!p) return;
-  const code=document.getElementById("jcode").value.trim().toUpperCase();
-  if(code.length!==6){toast("Code à 6 caractères svp");return;}
+  const p = getPseudo(); if (!p) return;
+  const code = document.getElementById("jcode").value.trim().toUpperCase();
+  if (code.length !== 6) { toast("Code à 6 caractères svp"); return; }
   try {
     toast("Connexion…");
-    DUEL.pseudo=p; DUEL.found=new Set(); DUEL.roomId=code; DUEL.G=fetchGrid();
-    await joinRoom({roomId:code,uid:DUEL.user.uid,pseudo:p});
+    S.pseudo = p; S.found = new Set(); S.roomId = code;
+    await joinRoom({ roomId: code, uid: S.user.uid, pseudo: p });
     show("waiting");
-    document.getElementById("cdisp").textContent=code;
-    document.getElementById("wstatus").textContent="En attente du lancement...";
-    document.getElementById("btn-launch").style.display="none";
-    DUEL.unsubRoom=listenRoom(code,onRoom);
-    DUEL._pollInterval=setInterval(async()=>{
+    document.getElementById("cdisp").textContent = code;
+    document.getElementById("wstatus").textContent = "En attente du lancement...";
+    document.getElementById("btn-launch").style.display = "none";
+    S.unsubRoom = listenRoom(code, onRoom);
+    // Poll pour détecter le lancement
+    S.pollInterval = setInterval(async () => {
       try {
-        const snap=await getDoc(doc(db,"rooms",code));
-        if(snap.exists()&&snap.data().status==="playing"&&document.getElementById("waiting").classList.contains("active")){
-          clearInterval(DUEL._pollInterval);
+        const snap = await getDoc(doc(db, "rooms", code));
+        if (snap.exists() && snap.data().status === "playing" && document.getElementById("waiting").classList.contains("active")) {
+          clearInterval(S.pollInterval);
           startGame(snap.data());
         }
-      } catch(e){console.error(e);}
-    },2000);
-  } catch(e){toast("Erreur: "+e.message);console.error(e);}
+      } catch(e) { console.error(e); }
+    }, 2000);
+  } catch(e) { toast("Erreur: " + e.message); console.error(e); }
 }
 
+// ── Room listener ──────────────────────────────────────────
 async function onRoom(room) {
-  if(room.status==="playing"&&document.getElementById("waiting").classList.contains("active")){
-    if(DUEL._pollInterval) clearInterval(DUEL._pollInterval);
-    if(!DUEL.G) DUEL.G=fetchGrid();
+  if (room.status === "playing" && document.getElementById("waiting").classList.contains("active")) {
+    if (S.pollInterval) clearInterval(S.pollInterval);
     startGame(room);
   }
-  if(room.status==="finished"&&document.getElementById("game").classList.contains("active")) endGame(room);
+  if (room.status === "finished" && document.getElementById("game").classList.contains("active")) {
+    endGame(room);
+  }
 }
 
+// ── Launch (host) ──────────────────────────────────────────
 async function doLaunch() {
   try {
-    if(DUEL._pollInterval) clearInterval(DUEL._pollInterval);
-    await updateDoc(doc(db,"rooms",DUEL.roomId),{status:"playing",startedAt:serverTimestamp()});
-    const snap=await getDoc(doc(db,"rooms",DUEL.roomId));
+    if (S.pollInterval) clearInterval(S.pollInterval);
+    await updateDoc(doc(db, "rooms", S.roomId), { status: "playing", startedAt: serverTimestamp() });
+    const snap = await getDoc(doc(db, "rooms", S.roomId));
     startGame(snap.data());
-  } catch(e){toast("Erreur: "+e.message);console.error(e);}
+  } catch(e) { toast("Erreur: " + e.message); console.error(e); }
 }
 
-// ── START GAME ─────────────────────────────────────────────────────────────
+// ── Start game ─────────────────────────────────────────────
 function startGame(room) {
   show("game");
-  
-  // Expose APP_GAME_DATA globalement pour arrowwords.js
-  window.APP_GAME_DATA = {
-    id: DUEL.G.id,
-    rows: DUEL.G.rows,
-    columns: DUEL.G.cols,
-    grid: DUEL.G.words.map(w => ({
-      id: w.id,
-      x: w.x - 1, // arrowwords utilise index 0-based si sw=1, mais nos données sont 1-based
-      y: w.y - 1,
-      dir: w.dir,
-      def: w.def,
-      size_word: w.size
-    })),
-    discovery: 1,
-    next_grid_id: null,
-    level: 1
-  };
 
-  // Override checkWords pour intégrer notre validation
-  window.checkWords = async function(notify, callback) {
-    if(callback) callback();
-    await syncValidated();
-  };
+  document.getElementById("totw").textContent = S.G.totalWords;
+  document.getElementById("p-my-name").textContent = S.pseudo;
+  document.getElementById("pg-my-name").textContent = S.pseudo;
 
-  document.getElementById("totw").textContent=DUEL.G.totalWords;
-  document.getElementById("pmyname").textContent=DUEL.pseudo;
-  document.getElementById("pgmyn").textContent=DUEL.pseudo;
+  // Construit la grille HTML (208 divs.column comme Mygamify)
+  buildGrid();
 
-  // Construit la grille HTML comme Mygamify
-  buildMygamifyGrid();
-  
-  // Lance le timer
-  DUEL.startTime=Date.now();
-  DUEL.timerInt=DUEL.mode==="blitz"?setInterval(tickB,1000):setInterval(tickC,1000);
-  
-  const opp=room.player1===DUEL.user.uid?room.player2:room.player1;
-  if(opp){DUEL.unsubLive=listenOpponentLive(DUEL.roomId,opp,onOpp);loadOpp(opp);}
-}
-
-// ── GRILLE ─────────────────────────────────────────────────────────────────
-function buildMygamifyGrid() {
-  const rows = DUEL.G.rows;
-  const cols = DUEL.G.cols;
-  
-  // Calcule la taille des cases
-  const gridWrap = document.querySelector(".gwrap");
-  const availW = gridWrap.clientWidth - 24;
-  const cellSize = Math.min(52, Math.floor(availW / cols));
-
-  // Construit le HTML de la grille (exactement comme Mygamify)
-  let html = '';
-  for(let r = 1; r <= rows; r++) {
-    html += '<div class="rows">';
-    for(let c = 1; c <= cols; c++) {
-      html += `<div class="column" data-column="${c}" data-row="${r}" data-index="${(r-1)*cols+(c-1)}"><span></span></div>`;
-    }
-    html += '</div>';
-  }
-  document.getElementById("grid").innerHTML = html;
-  
-  // Taille des cases
-  document.querySelectorAll("#grid .column").forEach(col => {
-    col.style.width = cellSize+"px";
-    col.style.height = cellSize+"px";
-  });
-  document.querySelectorAll("#grid .rows").forEach(row => {
-    row.style.height = cellSize+"px";
-  });
-  document.getElementById("grid").style.width = (cellSize*cols)+"px";
-  document.getElementById("grid").style.height = (cellSize*rows)+"px";
-  document.getElementById("grid-container").style.width = (cellSize*cols)+"px";
-  document.getElementById("grid-container").style.height = (cellSize*rows)+"px";
-  document.getElementById("grid-scaler").style.width = (cellSize*cols)+"px";
-  document.getElementById("grid-scaler").style.height = (cellSize*rows)+"px";
-
-  // Ajuste la taille des polices
-  const fontSize = Math.max(10, cellSize * 0.45);
-  document.querySelectorAll("#grid .column span").forEach(s => {
-    s.style.fontSize = fontSize+"px";
-  });
-  document.querySelectorAll("#grid .column.c_0 span div, #grid .column.c_1 span div").forEach(d => {
-    d.style.fontSize = Math.max(7, cellSize * 0.14)+"px";
-    d.style.lineHeight = Math.max(8, cellSize * 0.15)+"px";
-  });
-
-  // Appelle generateGrid() de arrowwords.js
-  if(typeof generateGrid === 'function') {
+  // Lance generateGrid() de arrowwords.js — qui lit APP_GAME_DATA global
+  if (typeof generateGrid === "function") {
     generateGrid();
   }
+
+  // Lance le timer
+  S.startTime = Date.now();
+  S.timerInt = S.mode === "blitz"
+    ? setInterval(tickBlitz, 1000)
+    : setInterval(tickChrono, 1000);
+
+  // Adversaire
+  const opp = room.player1 === S.user.uid ? room.player2 : room.player1;
+  if (opp) {
+    S.unsubLive = listenOpponentLive(S.roomId, opp, onOpp);
+    loadOppName(opp);
+  }
 }
 
-// Synchronise les mots validés avec Firebase
-async function syncValidated() {
-  const newlyFound = [];
-  DUEL.G.words.forEach(w => {
-    if(DUEL.found.has(w.id)) return;
-    const axe = (w.dir==="RR"||w.dir==="BR") ? "x" : "y";
-    const cells = document.querySelectorAll(`.column[data-id-${axe}="${w.id}"]:not(.play)`);
-    let word = "";
-    cells.forEach(c => { word += (c.querySelector("span")?.textContent||"").trim(); });
-    if(word.length === w.size && document.querySelectorAll(`.column.w_${axe}_${w.id}.validated:not(.play)`).length === w.size) {
-      newlyFound.push(w.id);
+// ── Build grid HTML ────────────────────────────────────────
+// Reproduit exactement la structure HTML prérendue de Mygamify
+function buildGrid() {
+  const rows = S.G.rows;
+  const cols = S.G.cols;
+
+  // Calcule la taille des cases
+  const availW = document.querySelector(".grid-scroll").clientWidth - 24;
+  const cellSize = Math.min(56, Math.floor(availW / cols));
+  const fontSize = Math.round(cellSize * 0.45);
+
+  // HTML grille — identique à game_page.html
+  let html = "";
+  let idx = 0;
+  for (let r = 1; r <= rows; r++) {
+    html += '<div class="rows">';
+    for (let c = 1; c <= cols; c++) {
+      html += `<div class="column" data-column="${c}" data-row="${r}" data-index="${idx}"><span data-index="${idx}"></span></div>`;
+      idx++;
     }
+    html += "</div>";
+  }
+  document.getElementById("grid").innerHTML = html;
+  document.getElementById("grid").style.fontSize = fontSize + "px";
+
+  // Dimensions
+  const w = cellSize * cols;
+  const h = cellSize * rows;
+  document.getElementById("grid").style.width = w + "px";
+  document.getElementById("grid").style.height = h + "px";
+  document.getElementById("grid-container").style.width = w + "px";
+  document.getElementById("grid-container").style.height = h + "px";
+  document.getElementById("grid-scaler").style.width = w + "px";
+  document.getElementById("grid-scaler").style.height = h + "px";
+
+  document.querySelectorAll("#grid .column").forEach(col => {
+    col.style.width = cellSize + "px";
+    col.style.height = cellSize + "px";
   });
-  
-  for(const wid of newlyFound) {
-    DUEL.found.add(wid);
-    const n=DUEL.found.size, total=DUEL.G.totalWords;
-    document.getElementById("myscore").textContent=n;
-    document.getElementById("pmyscore").textContent=n;
-    const p=Math.round(n/total*100);
-    document.getElementById("pgmy").style.width=p+"%";
-    document.getElementById("pgmyp").textContent=p+"%";
-    addEv("me",`✓ mot (${n}/${total})`);
-    toast("✓ Bravo !");
-    await submitWord({roomId:DUEL.roomId,uid:DUEL.user.uid,wordId:wid,totalFound:n,totalWords:total});
-    
-    // Met à jour la définition affichée
-    const word = DUEL.G.words.find(w=>w.id===wid);
-    if(word) {
-      document.getElementById("dhint").textContent="Sélectionne une case";
-      document.getElementById("dmain").textContent="–";
+  document.querySelectorAll("#grid .rows").forEach(row => {
+    row.style.height = cellSize + "px";
+  });
+
+  // Met à jour les variables globales de arrowwords.js
+  window.row = rows;
+  window.column = cols;
+}
+
+// ── Opponent ───────────────────────────────────────────────
+async function loadOppName(uid) {
+  try {
+    const s = await getDoc(doc(db, "rooms", S.roomId, "players", uid));
+    if (s.exists()) {
+      const n = s.data().pseudo || "Adversaire";
+      document.getElementById("p-opp-name").textContent = n;
+      document.getElementById("pg-opp-name").textContent = n;
     }
+  } catch {}
+}
+
+function onOpp(data) {
+  const total = S.G?.totalWords || 61;
+  const n = (data.foundWords || []).length;
+  document.getElementById("p-opp-score").textContent = n;
+  const pct = Math.round(n / total * 100);
+  document.getElementById("pg-opp").style.width = pct + "%";
+  document.getElementById("pg-opp-pct").textContent = pct + "%";
+  if (data.lastFoundAt && n > 0) {
+    const b = document.getElementById("last-badge");
+    b.textContent = `${n} mot${n > 1 ? "s" : ""} trouvé${n > 1 ? "s" : ""}`;
+    b.classList.add("flash");
+    setTimeout(() => b.classList.remove("flash"), 2000);
+    addEv("opp", `+1 mot (${n}/${total})`);
   }
 }
 
-async function loadOpp(uid){
-  try{
-    const s=await getDoc(doc(db,"rooms",DUEL.roomId,"players",uid));
-    if(s.exists()){const n=s.data().pseudo||"Adversaire";document.getElementById("poppname").textContent=n;document.getElementById("pgopn").textContent=n;}
-  }catch{}
+// ── Timers ─────────────────────────────────────────────────
+function tickChrono() {
+  document.getElementById("tmr").textContent = fmt(Math.floor((Date.now() - S.startTime) / 1000));
 }
-
-function onOpp(data){
-  const total=DUEL.G?.totalWords||1,n=(data.foundWords||[]).length;
-  document.getElementById("poppscore").textContent=n;
-  const p=Math.round(n/total*100);
-  document.getElementById("pgop").style.width=p+"%";document.getElementById("pgopp").textContent=p+"%";
-  if(data.lastFoundAt&&n>0){
-    const b=document.getElementById("lbadge");
-    b.textContent=`${n} mot${n>1?"s":""} trouvé${n>1?"s":""}`;
-    b.classList.add("fl");setTimeout(()=>b.classList.remove("fl"),2000);
-    addEv("op",`+1 mot (${n}/${total})`);
-  }
+function tickBlitz() {
+  S.blitzLeft--;
+  document.getElementById("tmr").textContent = fmt(S.blitzLeft);
+  if (S.blitzLeft <= 30) document.getElementById("tmr").classList.add("warn");
+  if (S.blitzLeft <= 0) { clearInterval(S.timerInt); finishGame({ roomId: S.roomId, uid: S.user.uid }); }
 }
+function fmt(s) { return `${Math.floor(s/60).toString().padStart(2,"0")}:${(s%60).toString().padStart(2,"0")}`; }
 
-// ── TIMER ──────────────────────────────────────────────────────────────────
-function tickC(){document.getElementById("tmr").textContent=fmt(Math.floor((Date.now()-DUEL.startTime)/1000));}
-function tickB(){DUEL.blitzLeft--;document.getElementById("tmr").textContent=fmt(DUEL.blitzLeft);if(DUEL.blitzLeft<=30)document.getElementById("tmr").classList.add("w");if(DUEL.blitzLeft<=0){clearInterval(DUEL.timerInt);finishGame({roomId:DUEL.roomId,uid:DUEL.user.uid});}}
-function fmt(s){return`${Math.floor(s/60).toString().padStart(2,"0")}:${(s%60).toString().padStart(2,"0")}`;}
-
-// ── END ────────────────────────────────────────────────────────────────────
-function endGame(room){
-  if(DUEL.timerInt)clearInterval(DUEL.timerInt);
-  if(DUEL.unsubRoom)DUEL.unsubRoom();if(DUEL.unsubLive)DUEL.unsubLive();
-  const win=room.winner===DUEL.user.uid,noW=!room.winner;
-  const el=document.getElementById("etitle");
-  if(noW){el.textContent="Égalité !";el.className="et draw";}
-  else if(win){el.textContent="Victoire ! 🎉";el.className="et win";}
-  else{el.textContent="Défaite…";el.className="et lose";}
-  const elapsed=DUEL.startTime?Math.floor((Date.now()-DUEL.startTime)/1000):0;
-  document.getElementById("escore").textContent=DUEL.found.size;
-  document.getElementById("etime").textContent=fmt(elapsed);
-  document.getElementById("eelo").textContent=win?"+16":"−16";
+// ── End ────────────────────────────────────────────────────
+function endGame(room) {
+  if (S.timerInt) clearInterval(S.timerInt);
+  if (S.unsubRoom) S.unsubRoom();
+  if (S.unsubLive) S.unsubLive();
+  const win = room.winner === S.user.uid;
+  const noW = !room.winner;
+  const el = document.getElementById("end-title");
+  if (noW)       { el.textContent = "Égalité !";     el.className = "end-title draw"; }
+  else if (win)  { el.textContent = "Victoire ! 🎉"; el.className = "end-title win"; }
+  else           { el.textContent = "Défaite…";      el.className = "end-title lose"; }
+  const elapsed = S.startTime ? Math.floor((Date.now() - S.startTime) / 1000) : 0;
+  document.getElementById("end-score").textContent = S.found.size;
+  document.getElementById("end-time").textContent = fmt(elapsed);
+  document.getElementById("end-elo").textContent = win ? "+16" : "−16";
   show("end");
 }
 
-async function doGiveUp(){
-  if(!confirm("Abandonner ?"))return;
-  const r=(await getDoc(doc(db,"rooms",DUEL.roomId))).data();
-  const opp=r.player1===DUEL.user.uid?r.player2:r.player1;
-  await finishGame({roomId:DUEL.roomId,uid:opp||DUEL.user.uid});
+async function doGiveUp() {
+  if (!confirm("Abandonner la partie ?")) return;
+  const r = (await getDoc(doc(db, "rooms", S.roomId))).data();
+  const opp = r.player1 === S.user.uid ? r.player2 : r.player1;
+  await finishGame({ roomId: S.roomId, uid: opp || S.user.uid });
 }
 
-async function doRematch(){
-  try{
-    const nid=await requestRematch({roomId:DUEL.roomId,uid:DUEL.user.uid,pseudo:DUEL.pseudo,gridData:DUEL.G,mode:DUEL.mode});
-    DUEL.roomId=nid;DUEL.found=new Set();
-    show("waiting");document.getElementById("cdisp").textContent=nid;
-    history.replaceState(null,"",`#room/${nid}`);
-    DUEL.unsubRoom=listenRoom(nid,onRoom);
-  }catch(e){toast("Erreur: "+e.message);}
+async function doRematch() {
+  try {
+    const nid = await requestRematch({ roomId: S.roomId, uid: S.user.uid, pseudo: S.pseudo, gridData: S.G, mode: S.mode });
+    S.roomId = nid; S.found = new Set();
+    show("waiting");
+    document.getElementById("cdisp").textContent = nid;
+    history.replaceState(null, "", `#room/${nid}`);
+    S.unsubRoom = listenRoom(nid, onRoom);
+  } catch(e) { toast("Erreur: " + e.message); }
 }
 
-// ── UTILS ──────────────────────────────────────────────────────────────────
-function getPseudo(){const p=document.getElementById("pseudo").value.trim();if(!p){toast("Entre ton pseudo d'abord");document.getElementById("pseudo").focus();return null;}localStorage.setItem("mfd-pseudo",p);return p;}
-function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));document.getElementById(id).classList.add("active");}
-function addEv(who,txt){const f=document.getElementById("feed");const el=document.createElement("div");el.className=`ev ${who}`;el.innerHTML=`<span class="dot"></span>${txt}`;f.prepend(el);while(f.children.length>25)f.lastChild.remove();}
-function copyLink(){navigator.clipboard.writeText(`${location.origin}${location.pathname}#room/${DUEL.roomId}`).then(()=>toast("Lien copié !"));}
-let _t;function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("on");clearTimeout(_t);_t=setTimeout(()=>t.classList.remove("on"),2500);}
-
-// Hook sur la définition sélectionnée
-$(document).on("click","#grid .column",function(){
-  const id_x = $(this).attr("data-id-x");
-  const id_y = $(this).attr("data-id-y");
-  const id = current_axe==="x" ? id_x : id_y;
-  if(id) {
-    const word = DUEL.G.words.find(w=>w.id===parseInt(id));
-    if(word) {
-      document.getElementById("dhint").textContent = `${current_axe==="x"?"→":"↓"} · ${word.size} lettres`;
-      document.getElementById("dmain").textContent = word.def;
-    }
-  }
-});
+// ── Utils ──────────────────────────────────────────────────
+function getPseudo() {
+  const p = document.getElementById("pseudo").value.trim();
+  if (!p) { toast("Entre ton pseudo d'abord"); document.getElementById("pseudo").focus(); return null; }
+  localStorage.setItem("mfd-pseudo", p);
+  return p;
+}
+function show(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+function addEv(who, txt) {
+  const feed = document.getElementById("feed");
+  const el = document.createElement("div");
+  el.className = `ev ${who}`;
+  el.innerHTML = `<span class="evdot"></span>${txt}`;
+  feed.prepend(el);
+  while (feed.children.length > 25) feed.lastChild.remove();
+}
+function copyLink() {
+  navigator.clipboard.writeText(`${location.origin}${location.pathname}#room/${S.roomId}`)
+    .then(() => toast("Lien copié !"));
+}
+let _toastTimer;
+function toast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("on");
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => t.classList.remove("on"), 2500);
+}
 
 boot().catch(console.error);
 </script>
 
-<!-- arrowwords.js de Mygamify chargé APRÈS jQuery et les variables globales -->
-<script src="https://sdk.mygamify.fr/assets/js/arrowwords.js?v=20260608185457"></script>
-<script src="https://sdk.mygamify.fr/assets/js/keyboard.js"></script>
+<!-- 9. Override checkWords pour syncer avec Firebase -->
+<script>
+// Attendu que arrowwords.js ait défini checkWords, on le surcharge
+(function() {
+  const _orig = window.checkWords;
+  window.checkWords = function(notify, callback) {
+    _orig && _orig.call(this, notify, function() {
+      // Sync les mots trouvés
+      if (window.wordsFound && window.DUEL_ON_WORD_FOUND) {
+        window.wordsFound.forEach(function(wid) {
+          window.DUEL_ON_WORD_FOUND(parseInt(wid));
+        });
+      }
+      if (callback) callback();
+    });
+  };
+})();
+</script>
+
 </body>
 </html>
