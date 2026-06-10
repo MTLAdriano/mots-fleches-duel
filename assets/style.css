@@ -1,0 +1,847 @@
+@import url('fonts/stylesheet.css');
+@import url('fonts/stylesheet.css');
+
+
+:root {
+    --color-primary: #3f3f3f;
+    --color-secondary: #fed035;
+    --color-tertiary: #1A2024;
+    --color-success: #29AD61;
+    --color-warning: #F07828;
+    --color-danger: #C61B25;
+    --color-dark: #192024;
+    --color-light: #DFE4E6;
+    --color-light2: #F5F7F8;
+    --color-blue-light: #fed035;
+    --color-blue-light2: #fed035;
+    --color-blue-alpha: #fecf3586;
+}
+
+html {
+    font-size: 90%
+}
+
+body,
+p {
+    font-family: 'FranceTV Brown';
+    user-select: none;
+    color: #555;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: "source-sans-pro", sans-serif;
+    font-weight: bold;
+    /* color: var(--color-primary); */
+}
+
+.gridList,
+.save,
+.rules,
+.grids,
+.gameTitle {
+    display: none !important;
+}
+
+.gameList {
+    border-radius: 8px;
+}
+
+.gameHeader {
+    border-bottom: solid 1px #E6E9EB;
+}
+
+.btn,
+.swal2-styled {
+    border-radius: 25px !important;
+}
+
+.btn-close {
+    border: solid 1px #DFE4E6;
+    border-radius: 100%;
+    width: 40px;
+    height: 40px;
+    padding: 0 !important;
+}
+
+.btn-primary {
+    background-color: var(--color-primary) !important;
+    border-color: var(--color-primary) !important;
+}
+
+.btn-outline-primary {
+    color: var(--color-primary) !important;
+    border-color: var(--color-primary) !important;
+}
+
+.btn-outline-primary:hover {
+    color: #fff !important;
+    background-color: var(--color-primary) !important;
+}
+
+.btn-outline-light {
+    color: var(--color-dark) !important;
+    border-color: #78909c4f !important
+}
+
+.bg-primary {
+    background-color: var(--color-primary) !important;
+    border-color: var(--color-primary) !important;
+}
+
+.text-primary {
+    color: var(--color-primary) !important;
+}
+
+.btn-light {
+    background-color: var(--color-light2) !important;
+    border-color: var(--color-light2) !important;
+    color: #9FBCC6 !important;
+}
+
+.bg-light2 {
+    background-color: var(--color-light2) !important;
+}
+
+.modal {
+    overflow: hidden;
+}
+
+.modal-header,
+.modal-footer {
+    border: 0;
+}
+
+.card,
+.modal-content,
+.swal2-popup {
+    border: 0;
+    border-radius: 8px;
+}
+
+.form-select {
+    border-radius: 25px;
+    width: fit-content;
+    display: inline-block;
+    padding-right: 2rem;
+    font-weight: 600;
+}
+
+.game {
+    background: url('https://sdk.mygamify.fr/examples/franceinfo/icons/grid.svg');
+    background-position: calc(100% - 20px);
+    background-repeat: no-repeat;
+    border: solid 2px #3f3f3f54;
+    /* height: 100%; */
+    color: var(--color-dark);
+    border-radius: 8px;
+}
+
+.game .title {
+    font-weight: bold;
+    margin-bottom: .5rem;
+}
+
+.game.locked {
+    background: url('https://sdk.mygamify.fr/examples/franceinfo/icons/grid-locked.svg');
+    background-position: calc(100% - 20px);
+    background-repeat: no-repeat;
+    border-color: #DFE4E6;
+    color: var(--color-primary);
+}
+
+.state {
+    width: 24px;
+    height: 24px;
+    margin-right: .5rem;
+}
+
+.state-locked {
+    background: url('https://sdk.mygamify.fr/examples/franceinfo/icons/locked.svg');
+}
+
+.state-completed {
+    background: url('https://sdk.mygamify.fr/examples/franceinfo/icons/completed.svg');
+}
+
+.state-progress {
+    background: url('https://sdk.mygamify.fr/examples/franceinfo/icons/progress.svg');
+}
+
+.state-unlocked {
+    background: url('https://sdk.mygamify.fr/examples/franceinfo/icons/unlocked.svg');
+}
+
+.game .difficulty {
+    /* width: 18px; */
+    height: 20px;
+    border-radius: 25px;
+    background: var(--color-blue-light2);
+    color: var(--color-primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 12px;
+    padding: .75rem 1rem;
+}
+
+.game.locked .difficulty {
+    background: var(--color-secondary);
+    color: #333 !important;
+}
+
+.ranking-row .position {
+    width: 35px;
+}
+
+
+.ranking-row small {
+    display: none;
+}
+
+.ranking .ranking-row .username {
+    font-weight: 600;
+    width: 100%;
+}
+
+.ranking .ranking-row .points {
+    color: var(--color-secondary);
+}
+
+.ranking .ranking-row:nth-child(1) .username {
+    background: url('https://sdk.mygamify.fr/examples/franceinfo/icons/trophy-1.svg');
+    background-position: 0;
+    background-repeat: no-repeat;
+    padding-left: 30px;
+}
+
+.ranking .ranking-row:nth-child(2) .username {
+    background: url('https://sdk.mygamify.fr/examples/franceinfo/icons/trophy-2.svg');
+    background-position: 0;
+    background-repeat: no-repeat;
+    padding-left: 30px;
+}
+
+.ranking .ranking-row:nth-child(3) .username {
+    background: url('https://sdk.mygamify.fr/examples/franceinfo/icons/trophy-3.svg');
+    background-position: 0;
+    background-repeat: no-repeat;
+    padding-left: 30px;
+}
+
+.ranking .ranking-row.active {
+    background: #f5f5f5;
+}
+
+.active .podium-row {
+    border: solid 1px var(--color-primary);
+    background-color: var(--color-blue-light2);
+}
+
+.podium .place {
+    text-align: center;
+}
+
+.podium .place .rank {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 100%;
+    border: solid 2px #000;
+    margin: auto;
+    margin-bottom: .5rem;
+    background: #000;
+    box-shadow: inset 0px 0px 0px 2px #fff;
+    color: #fff;
+}
+
+.podium .place .plot {
+    width: 100%;
+    height: 50px;
+    border: solid 2px;
+    border-top-right-radius: 16px;
+    border-top-left-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 0;
+    margin-bottom: .5rem;
+}
+
+.podium .place .name {
+    font-weight: bold;
+    margin: .5rem 0;
+}
+
+.podium-row {
+    padding: .5rem;
+    border: solid 1px #d3dee2;
+    border-radius: 8px;
+    margin-bottom: .5rem;
+    font-weight: bold;
+}
+
+.podium-row .position {
+    max-width: 40px;
+}
+
+.userRank .podium-row {
+    border: solid 1px var(--color-primary);
+    background-color: var(--color-blue-light2);
+}
+
+.place.second {
+    padding-top: 25px;
+}
+
+.place.third {
+    padding-top: 50px;
+}
+
+.first .plot {
+    height: 100px !important;
+    background-color: #fff6d6;
+    border-color: #dcaf32 !important;
+}
+
+.second .plot {
+    height: 75px !important;
+    background-color: #f6f7f8;
+    border-color: #a0bcc6 !important;
+}
+
+.third .plot {
+    height: 50px !important;
+    background-color: #fff4eb;
+    border-color: #f07928 !important;
+}
+
+.first .rank {
+    background: #dcaf32 !important;
+    border-color: #dcaf32 !important;
+}
+
+.second .rank {
+    background: #a0bcc6 !important;
+    border-color: #a0bcc6 !important;
+}
+
+.third .rank {
+    background: #f07928 !important;
+    border-color: #f07928 !important;
+}
+
+.shareon>* {
+    border-radius: 100% !important;
+    background: var(--color-blue-light2) !important;
+    color: var(--color-secondary) !important;
+    width: 35px !important;
+    height: 35px !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    padding: 0 !important;
+}
+
+.shareon>:not(:empty):before {
+    display: none;
+}
+
+.nav-pills {
+    background-color: #fff;
+    border-radius: 25px;
+    margin: 0 1rem;
+}
+
+.nav-pills .nav-link {
+
+    border-radius: 25px !important;
+}
+
+.nav-pills .nav-link.active {
+    background-color: var(--color-primary);
+}
+
+.timer {
+    color: var(--color-danger);
+}
+
+.action {
+    border: 0 !important;
+    background: #fff;
+    border-radius: 25px;
+    margin: .5rem;
+    color: var(--color-primary);
+    font-weight: bold;
+}
+
+.action span {
+    margin-left: .5rem;
+}
+
+
+.action.validate,
+.action.cheat,
+.action.helps {
+    /* border: solid 1px var(--color-primary) !important; */
+    border: 0;
+    color: var(--color-primary) !important;
+    background: var(--color-secondary) !important;
+    font-weight: bold;
+}
+
+.container {
+    position: relative;
+}
+
+.btn.difficulty {
+    position: absolute;
+    top: .75rem;
+    left: .75rem;
+}
+
+.dico span {
+    padding-left: .5rem;
+    width: 25px;
+    display: inline-block;
+    font-weight: bold;
+    color: var(--color-secondary);
+}
+
+.dico a {
+    border: solid 1px transparent;
+}
+
+.dico a.select {
+    border: solid 1px;
+    color: var(--color-primary);
+    font-weight: bold;
+}
+
+.dico a.disabled {
+    text-decoration: line-through;
+}
+
+.gameDefinition {
+    font-size: 20px !important;
+    color: var(--color-dark);
+}
+
+.gameDefinition span {
+    margin-right: 1rem;
+    color: var(--color-primary);
+    font-weight: bold;
+}
+
+.modalImg {
+    margin-bottom: 0 !important;
+}
+
+.slotwrapper {
+    border-radius: 16px;
+    position: relative;
+}
+
+.slotwrapper #skin {
+    height: 150px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+}
+
+.slotwrapper #skin div {
+    background: #E6E9EB;
+    border-radius: 16px;
+    width: calc(33.333% - 10px);
+    float: left;
+    height: 100%;
+    overflow: hidden;
+    margin: 0 5px;
+}
+
+.startSlot {
+    position: unset !important;
+    bottom: 0 !important;
+    left: 0 !important;
+}
+
+/* 
+#loginModal .modalImg {
+    width: 100%;
+    height: 100px;
+    background: center/contain no-repeat url('https://sdk.mygamify.fr/examples/franceinfo/img/play.webp');
+    margin-bottom: 0 !important;
+}
+
+#startModal .modalImg {
+    width: 150px;
+    height: 150px;
+    background: center/contain no-repeat url('https://sdk.mygamify.fr/examples/franceinfo/img/play.webp');
+}
+
+#looseModal .modalImg {
+    width: 150px;
+    height: 150px;
+    background: center/contain no-repeat url('https://sdk.mygamify.fr/examples/franceinfo/img/play.webp');
+}
+
+#endModal .modalImg {
+    width: 120px;
+    height: 120px;
+    background: center/contain no-repeat url('https://sdk.mygamify.fr/examples/franceinfo/img/play.webp');
+}
+
+#endModal .modalImg2 {
+    width: 150px;
+    height: 130px;
+    background: center/contain no-repeat url('https://sdk.mygamify.fr/examples/franceinfo/img/play.webp');
+}
+
+#helpModal .modalImg {
+    width: 150px;
+    height: 130px;
+    background: center/contain no-repeat url('https://sdk.mygamify.fr/examples/franceinfo/img/play.webp');
+} */
+
+#app {
+    background: #F5F7F8;
+    border-radius: 8px;
+}
+
+#endModal .btn-close {
+    display: none !important;
+}
+
+#endModal .modal-header {
+    padding-top: 3rem;
+}
+
+@-webkit-keyframes bgFlash {
+
+    0% {
+        background-color: var(--color-secondary)
+    }
+
+    25% {
+        background-color: var(--color-secondary)
+    }
+
+    50% {
+        background-color: var(--color-secondary)
+    }
+
+    100% {
+        background-color: var(--color-secondary)
+    }
+}
+
+#grid .play span {
+    background-color: var(--color-tertiary) !important;
+    border-right: solid 1px var(--color-tertiary) !important;
+    border-bottom: solid 1px var(--color-tertiary) !important;
+}
+
+#grid .win span {
+    color: #fff !important;
+    background-color: var(--color-success) !important;
+}
+
+#grid .column.active span {
+    color: #fff !important;
+    -webkit-animation: bgFlash 2s infinite;
+    -moz-animation: bgFlash 2s infinite;
+    -o-animation: bgFlash 2s infinite;
+    animation: bgFlash 2s infinite;
+}
+
+#grid .column.active.play span {
+    color: #fff !important;
+    background-color: var(--color-primary) !important;
+    border-color: var(--color-tertiary) !important;
+}
+
+#grid .select span {
+    background-color: var(--color-blue-alpha);
+    color: var(--color-primary) !important;
+}
+
+#grid .active span {
+    /* background-color: var(--color-primary) !important; */
+    color: #fff !important;
+    opacity: 1
+}
+
+.play span div.select {
+    background-color: var(--color-secondary) !important;
+    color: var(--color-primary) !important;
+}
+
+.column div {
+    font-weight: 100 !important;
+}
+
+#grid .select.vertical span {
+    border-color: var(--color-primary);
+    border-left: solid 1px var(--color-primary);
+}
+
+#grid .select.horizontal span {
+    border-color: var(--color-primary);
+    border-bottom: solid 1px var(--color-primary);
+    border-top: solid 1px var(--color-primary);
+}
+
+#grid .select.sy span {
+    border-color: var(--color-primary);
+    border-left: solid 1px var(--color-primary);
+}
+
+#grid .select.sx span {
+    border-color: var(--color-primary);
+    border-bottom: solid 1px var(--color-primary);
+    border-top: solid 1px var(--color-primary);
+}
+
+#grid .game_help span {
+    background-color: #E7FBEC;
+    border-color: var(--color-success) !important;
+    /* box-shadow: inset 0px 0px 0px 3px var(--color-success); */
+}
+
+#grid span.game_help {
+    box-shadow: inset 0px 0px 0px 5px var(--color-success);
+}
+
+#grid .sx span {
+    border-top: solid 1px var(--color-primary) !important;
+    border-bottom: solid 1px var(--color-primary) !important;
+}
+
+#grid .sy span {
+    border-left: solid 1px var(--color-primary) !important;
+    border-right: solid 1px var(--color-primary) !important;
+}
+
+#grid .column::before {
+    content: ' ';
+    position: absolute;
+    background: var(--color-blue-light) !important;
+    border-radius: 100% !important;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    z-index: -1;
+    transition: all .5s;
+    transform: scale(0);
+    opacity: 0;
+}
+
+#grid .column span {
+    color: var(--color-primary) !important;
+    font-weight: 100 !important;
+}
+
+#grid .column.validated {
+    pointer-events: none;
+    cursor: default;
+}
+
+#grid .column.validated {
+    font-weight: bold !important;
+}
+
+#grid .column.active.validated span {
+    /* background-color: var(--color-dark) !important; */
+    /* border-color: var(--color-dark) !important; */
+    color: var(--color-dark) !important;
+}
+
+#grid .column.select.validated span {
+    /* border-color: var(--color-dark) !important; */
+    color: var(--color-dark) !important;
+}
+
+#grid .validated span {
+    color: var(--color-dark) !important;
+    transition: all .5s;
+}
+
+#grid .validated.anim.column::before {
+    opacity: 1;
+    transform: scale(0.8);
+}
+
+#grid .column.validated.anim:not(.active) span {
+    color: var(--color-primary) !important;
+    background: transparent !important;
+}
+
+#mozzle .validate_grid {
+    background-color: var(--color-secondary) !important;
+    color: #333 !important;
+}
+
+#wordle .show_keyboard {
+    display: none !important;
+}
+
+#wordle #grid {
+    background: transparent;
+    border: 0;
+}
+
+#wordle .column span {
+    color: #192024 !important;
+    border: solid 1px var(--color-secondary);
+    border-radius: 4px;
+    font-size: 2rem !important;
+    background: transparent !important;
+}
+
+#wordle .column.active span {
+    border: solid 2px var(--color-secondary);
+    border-radius: 4px;
+    color: #192024 !important;
+}
+
+#wordle .column.last_played span {
+    background: #fff !important;
+}
+
+#wordle #grid .column {
+    border: solid 2px transparent;
+    max-width: 60px;
+    max-height: 60px;
+
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+    position: relative;
+}
+
+#wordle #grid .column.played,
+.result {
+    transform: rotateX(180deg);
+}
+
+#wordle .hg-theme-default .hg-button {
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: #E6E9EB !important;
+}
+
+#wordle #grid .column .result,
+#wordle .hg-button.played {
+    background: #192024 !important;
+    color: #fff !important;
+}
+
+#wordle #grid .column.goodLetter .result,
+#wordle .hg-button.goodLetter {
+    background: #DCAF32 !important;
+    color: #fff !important;
+}
+
+#wordle #grid .column.goodPlace .result,
+#wordle .hg-button.goodPlace {
+    background: #29AD61 !important;
+    color: #fff !important;
+}
+
+#wordle .hg-theme-default .hg-button.hg-button-enter {
+    background: var(--color-primary) !important;
+    color: #fff !important;
+}
+
+@media screen and (min-width: 768px) {
+    .gameDefinition {
+        display: none !important;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .action {
+        margin: .5rem 3px;
+    }
+
+    .action.exit {
+        position: absolute;
+        right: 0.5rem;
+        background: var(--color-danger);
+        color: #fff !important;
+        top: 10px;
+    }
+
+    .gameDefinition {
+        font-size: 16px !important;
+    }
+
+    .gameDefinition span {
+        width: 35px;
+    }
+
+    /* #grid .game_help span {
+        box-shadow: inset 0px 0px 0px 3px var(--color-success);
+    } */
+
+    #grid span.game_help {
+        box-shadow: inset 0px 0px 0px 3px var(--color-success);
+    }
+
+    #grid .game_help div {
+        display: none;
+    }
+
+    /* .modalImg,
+    .modalImg2 {
+        height: 100px !important;
+    } */
+}
+
+.sudoku-board-cell input {
+    font-family: 'FranceTV Brown';
+}
+
+.sudoku-board-cell .highligt {
+    background: var(--color-blue-alpha) !important
+}
+
+
+.sudoku-board-cell .selected {
+    background: var(--color-secondary) !important;
+    color: #000 !important;
+}
+
+/* .puzzle .info {
+    width: 115px;
+    height: 115px;
+    background: center/contain no-repeat url('https://sdk.mygamify.fr/examples/franceinfo/img/ludo/png/Ludo-Good@2x.png');
+} */
+
+.puzzle #preview.blur {
+    background: center/cover url('https://sdk.mygamify.fr/examples/franceinfo/img/grid.png');
+    filter: blur(0);
+}
+
+.puzzle #preview.blur img {
+    opacity: 0;
+}
+
+.puzzle-piece:hover,
+.puzzle-piece.selected {
+    box-shadow: 0px 4px 16px 0px #3f3f3f80;
+}
+
+.simple-keyboard {
+    background-color: transparent !important;
+    color: #000 !important;
+    font-weight: bold;
+}

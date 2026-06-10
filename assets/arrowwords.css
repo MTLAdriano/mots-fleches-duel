@@ -1,0 +1,373 @@
+@media screen and (max-height : 414px) {
+  .controls .btn {
+    font-size: 12px !important
+  }
+}
+
+.gameContainer.hideDef .gameDefs {
+  display: none;
+}
+
+.gameContainer.hideDef #grid-container {
+  margin: 0 auto;
+}
+
+#grid-container {
+  box-sizing: border-box;
+  overflow: hidden;
+  border: 1px solid var(--color-tertiary);
+  border-radius: 8px;
+  margin: auto;
+  background: #fff;
+  position: relative;
+}
+
+#grid-scaler {
+  transition: transform 0.3s ease;
+  transform: scale(1);
+  transform-origin: top left;
+  position: absolute;
+  top: -1px;
+  left: -1px;
+}
+
+#grid {
+  border-collapse: collapse;
+  font-size: 16px;
+  margin: auto;
+  width: 100%;
+  height: 100%;
+  border: none;
+  -ms-touch-action: none;
+  touch-action: none;
+}
+
+#grid:not(.dragging) {
+  transition: transform .3s;
+}
+
+#grid .column {
+  vertical-align: middle;
+  position: relative;
+}
+
+
+
+
+.hideDef span {
+  padding: 0px !important;
+}
+
+.column div {
+  position: absolute;
+  bottom: 2px;
+  text-align: right;
+  right: 1px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: bold;
+  background: var(--color-success);
+  padding: 0 3px;
+}
+
+.brd_r {
+  border-left: solid 3px #ddd;
+}
+
+.brd_b {
+  border-top: solid 3px #ddd;
+}
+
+.over {
+  opacity: .5;
+  background: #000
+}
+
+.over .brd_r, .over .brd_b {
+  border-color: #444
+}
+
+.game {
+  margin: auto;
+  background: #fff;
+  margin-bottom: 1em
+}
+
+
+#grid {
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  margin: auto;
+}
+
+#grid .column {
+  vertical-align: middle;
+  border: solid 0px #eee;
+  padding: 0;
+  height: 100%;
+  user-select: none;
+  float: left;
+  display: block;
+}
+
+#grid .column span {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 4vw;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  border-right: solid 1px #ddd;
+  border-bottom: solid 1px #ddd;
+  line-height: 0 !important
+}
+
+#grid {
+  position: relative;
+}
+
+.output {
+  overflow: auto;
+  margin: 20px auto;
+  display: block;
+  text-align: center;
+}
+
+.output input {
+  border: solid 1px #ccc;
+  display: inline-block;
+  width: 35px;
+  padding: 5px 0px;
+  text-transform: uppercase;
+  font-size: 25px;
+  border-radius: 0px;
+}
+
+#gameplay.modal {
+  height: 220px;
+  overflow: visible !important;
+}
+
+#gameplay .modal-dialog {
+  box-shadow: 0px 0px 100px rgba(0, 0, 0, 0.3);
+  border-radius: 0px
+}
+
+#gameplay .modal-content {
+  border-radius: 0px
+}
+
+@media screen and (max-width : 768px) {
+  .column {
+    vertical-align: middle;
+    border: solid 0px #ddd;
+    padding: 0;
+    width: calc(100% / 10 - 2px);
+    display: inline-block;
+
+    height: calc(100% - 2px);
+    user-select: none;
+  }
+}
+
+.tl span {
+  background-image: url('../img/left.svg') !important;
+  background-size: 4vw;
+  background-clip: content-box;
+  background-position: 0 center;
+  background-repeat: no-repeat;
+}
+
+.tl.double span {
+  background-image: url('../img/left.svg') !important;
+  background-size: 4vw;
+  background-clip: content-box;
+  background-position: 0 0;
+  background-repeat: no-repeat;
+}
+
+.tt span::after {
+  content: ' ';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-image: url('../img/top.svg') !important;
+  background-size: 4vw;
+  background-clip: content-box;
+  background-position: center 0;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+.t2 span {
+  background-image: url('../img/all.svg') !important;
+  background-size: cover !important;
+  background-clip: content-box;
+}
+
+.c_0.hideDef span {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: nowrap;
+  padding: 2px;
+  background-color: var(--color-light);
+}
+
+.c_1.hideDef span div:nth-child(2) {
+  border-top: 1px solid #21353F;
+}
+
+.c_0.hideDef span div {
+  position: initial;
+  width: 100%;
+  text-align: center;
+  padding: 0.25vw 2px;
+  background: var(--color-light);
+  color: var(--color-dark);
+  font-size: 1.1vw;
+  line-height: 1.1vw;
+  word-break: break-word;
+  font-weight: 600;
+  -webkit-hyphens: auto;
+  -moz-hyphens: auto;
+  -ms-hyphens: auto;
+  -o-hyphens: auto;
+  hyphens: auto;
+  margin: auto;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 1px 1px 0px black;
+  border: 0 !important;
+  padding-top: 3px;
+  /* font-family: sans-serif; */
+}
+
+.c_1.c_0.hideDef span div {
+  max-height: 60%;
+  height: -webkit-fill-available;
+}
+
+.c_0.hideDef span::before, .c_1.hideDef span::before,
+.c_0.hideDef span::after, .c_1.hideDef span::after {
+  display: none;
+}
+
+.c_0:not(.hideDef) div, .c_1:not(.hideDef) div,
+.c_0:not(.hideDef) div, .c_1:not(.hideDef) div {
+  display: none;
+}
+
+.c_0 span::before {
+  position: absolute;
+  content: '';
+  width: 100%;
+  height: 100%;
+  color: #fff !important;
+  align-items: center;
+  display: grid;
+  background: #fff;
+  width: 7px;
+  height: 7px;
+  border-radius: 100%;
+  top: calc(50% - 3.5px);
+  left: calc(50% - 3.5px);
+}
+
+.c_1 span::before {
+  position: absolute;
+  content: '';
+  width: 100%;
+  height: 100%;
+  color: #fff !important;
+  align-items: center;
+  display: grid;
+  background: #fff;
+  width: 7px;
+  height: 7px;
+  border-radius: 100%;
+  top: 10%;
+  left: 10%;
+}
+
+.c_1 span::after {
+  position: absolute;
+  content: '';
+  width: 100%;
+  height: 100%;
+  color: #fff !important;
+  align-items: center;
+  display: grid;
+  background: #fff;
+  width: 7px;
+  height: 7px;
+  border-radius: 100%;
+  bottom: 10%;
+  right: 10%;
+}
+
+.play span div.select {
+  color: #fff;
+  background-color: var(--color-primary);
+}
+
+#contentGrid form {
+  height: 0px;
+  overflow: hidden;
+}
+
+#grid sup, #grid small {
+  color: #333;
+  font-size: 15px !important;
+  margin-top: 0px !important;
+}
+
+#grid small {
+  left: 0px;
+  float: right;
+  font-size: 12px;
+  position: absolute;
+  top: -25px;
+  font-weight: bold;
+  text-align: center;
+  width: 100%;
+}
+
+#grid sup {
+  font-weight: bold;
+  top: 50%;
+  left: -30px;
+  text-align: right;
+  position: absolute;
+  width: 20px;
+}
+
+@media screen and (max-width: 768px) {
+
+  #grid sup, #grid small {
+    color: #333;
+  }
+
+  #grid small {
+    top: -25px;
+  }
+
+  .c_0.hideDef span div,
+  #grid .column span {
+    border-width: 0.1vw !important;
+  }
+
+  .c_0.hideDef span div {
+    box-shadow: inset 0.1vw 0.1vw 0px black;
+  }
+}
