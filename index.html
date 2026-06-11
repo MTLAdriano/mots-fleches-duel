@@ -263,6 +263,23 @@
     }
     .toast.on { opacity: 1; }
 
+    /* ── Tailles adaptées à la cellule (override du 4vw de arrowwords.css) ── */
+    #grid .column span {
+      font-size: calc(var(--cell, 56px) * 0.5) !important;
+    }
+    .c_0.hideDef span div,
+    .c_1.hideDef span div {
+      font-size: calc(var(--cell, 56px) * 0.155) !important;
+      line-height: 1.2 !important;
+    }
+    .tl span,
+    .tl.double span {
+      background-size: calc(var(--cell, 56px) * 0.95) !important;
+    }
+    .tt span::after {
+      background-size: calc(var(--cell, 56px) * 0.95) !important;
+    }
+
     @media (max-width: 640px) { .duel-panel { display: none; } }
   </style>
 </head>
@@ -474,6 +491,61 @@ function enterKey() {}
 <!-- 8. keyboard.js de Mygamify -->
 <script src="assets/keyboard.js"></script>
 
+<!-- 8bis. Overrides : validation LOCALE + resize adapté à notre layout -->
+<script>
+// ── resizeGrid basé sur notre conteneur (pas window.innerWidth) ──
+window.resizeGrid = function() {
+  var cont = document.querySelector('.gameCol');
+  var avail = (cont ? cont.clientWidth : window.innerWidth) - 24;
+  var sizeX = Math.min(56, Math.floor(avail / column));
+  var sizeY = sizeX * row;
+  $("#grid .column").css("width", sizeX).css("height", sizeX);
+  $("#grid .rows").css("height", sizeX);
+  $("#grid").css("height", sizeY).css("width", sizeX * column);
+  $("#grid-container").css("height", sizeY).css("width", sizeX * column);
+  $("#grid-scaler").css("height", sizeY).css("width", sizeX * column);
+  document.documentElement.style.setProperty('--cell', sizeX + 'px');
+};
+
+// ── Validation 100% LOCALE (remplace le POST CORS de Mygamify) ──
+// Reproduit exactement le comportement du callback original (classes,
+// animations, toast) mais compare avec APP_SOLUTIONS au lieu du serveur.
+window.checkWords = function(notify, callback) {
+  try {
+    var grid = JSON.parse(getGrid());
+    grid.forEach(function(item) {
+      var sol = APP_SOLUTIONS[String(item.id)];
+      if (!sol) return;
+      if (String(item.word).toUpperCase().trim() !== sol) return;
+      if (wordsFound.indexOf(item.id) !== -1) return;
+
+      wordsFound.push(item.id);
+      word_ids.push(item.id);
+
+      var els = $(".column[data-id-" + item.axe + '="' + item.id + '"]').not(".play");
+      for (let i = 0; i < sol.length; i++) {
+        let letter = els.eq(i);
+        letter.addClass('validated');
+        setTimeout(() => {
+          letter.addClass('anim');
+          letter.removeClass('active');
+        }, i * 100);
+      }
+      setTimeout(() => { els.removeClass('anim'); }, sol.length * 100 + 1500);
+
+      if (window._duelToast) window._duelToast('✓ ' + sol + ' !');
+      if (window.DUEL_ON_WORD_FOUND) window.DUEL_ON_WORD_FOUND(parseInt(item.id));
+    });
+
+    // Grille complète → fin de partie
+    if (wordsFound.length >= APP_GAME_DATA.grid.length && window.DUEL_ON_COMPLETE) {
+      window.DUEL_ON_COMPLETE();
+    }
+  } catch(e) { console.error('checkWords local:', e); }
+  if (callback) callback();
+};
+</script>
+
 <!-- 9. Logique duel (Firebase) -->
 <script type="module">
 import { initAuth, db } from "./js/firebase.js";
@@ -494,26 +566,10 @@ const S = {
 // ── Expose toast à Mygamify ───────────────────────────────────────────────
 window._duelToast = toast;
 
-// ── Surcharge checkWords pour détecter les mots validés ──────────────────
-// arrowwords.js appelle checkWords() après chaque saisie
-// On intercepte les nouveaux wordsFound pour les syncer Firebase
-const _origCheckWords = window.checkWords;
-window.checkWords = function(notify, callback) {
-  _origCheckWords && _origCheckWords.call(this, notify, async function() {
-    if (window.wordsFound) {
-      for (const wid of window.wordsFound) {
-        const id = parseInt(wid);
-        if (!S.found.has(id)) {
-          S.found.add(id);
-          await syncWord(id);
-        }
-      }
-    }
-    if (callback) callback();
-  });
-};
-
-async function syncWord(wordId) {
+// ── Callbacks appelés par la validation locale (script 8bis) ─────────────
+window.DUEL_ON_WORD_FOUND = async function(wordId) {
+  if (S.found.has(wordId)) return;
+  S.found.add(wordId);
   const n = S.found.size;
   const total = S.G?.totalWords || 61;
   document.getElementById("myscore").textContent = n;
@@ -525,7 +581,12 @@ async function syncWord(wordId) {
   if (S.roomId) {
     await submitWord({ roomId: S.roomId, uid: S.user.uid, wordId, totalFound: n, totalWords: total });
   }
-}
+};
+
+window.DUEL_ON_COMPLETE = async function() {
+  // Grille terminée → je gagne
+  if (S.roomId) await finishGame({ roomId: S.roomId, uid: S.user.uid });
+};
 
 // ── Boot ──────────────────────────────────────────────────────────────────
 async function boot() {
